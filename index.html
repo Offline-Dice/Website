@@ -5,7 +5,18 @@
 <title>Offline Dice</title>
 <style>
 body{margin:0;background:lightblue;font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh}
-.card{background:#111;color:white;padding:30px;border-radius:20px;width:900px;text-align:center}
+.card{
+background:transparent !important;
+color:white;
+padding:30px;
+border-radius:20px;
+width:900px;
+text-align:center;
+backdrop-filter:none;
+-webkit-backdrop-filter:none;
+position:relative;
+z-index:1;
+}
 h1{font-size:60px;background:linear-gradient(90deg,red,orange,yellow,green,#0000cc,#8000ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .dicewrap{display:flex;justify-content:center;gap:20px;margin:25px 0}
 .dice{width:100px;height:100px;border:4px solid white;border-radius:18px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px rgba(255,255,255,.25)}
@@ -36,21 +47,27 @@ margin-bottom:20px;
 body.casino-dark{background:#050505;}
 
 
-.card{background:#111 !important;}
+.card{background:rgba(17,17,17,0.55) !important;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
 
 .pattern{
-position:fixed;inset:0;pointer-events:none;opacity:.18;
-background-size:120px 120px;
+position:fixed;
+top:0;left:0;right:0;bottom:0;
+width:100vw;
+height:100vh;
+pointer-events:none;
+opacity:.22;
+z-index:0;
+background-size:112px 112px;
 background-image:
-radial-gradient(circle at 20px 20px,#888 0 2px,transparent 3px),
-radial-gradient(circle at 80px 50px,#777 0 18px,transparent 19px),
-linear-gradient(45deg,transparent 46%,#666 47%,#666 53%,transparent 54%);
+radial-gradient(circle at 20px 20px,#444 0 2px,transparent 3px),
+radial-gradient(circle at 80px 50px,#222 0 18px,transparent 19px),
+linear-gradient(45deg,transparent 46%,#2f2f2f 47%,#2f2f2f 53%,transparent 54%);
 }
 </style>
 </head>
 <body class="casino-dark">
-<div class="card">
 <div class="pattern"></div>
+<div class="card">
 
 
 <div style="margin:10px 0;">
@@ -235,3 +252,5 @@ document.getElementById('bgUpload').addEventListener('change',function(e){
   reader.readAsDataURL(file);
 });
 </script>
+
+<!-- fixed full-page pattern -->
