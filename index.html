@@ -71,7 +71,7 @@ margin-bottom:20px;
  margin-bottom:10px;
 }
 .avatar{width:36px !important;height:36px !important;min-width:36px;max-width:36px;min-height:36px;max-height:36px;border-radius:9999px !important;object-fit:cover;display:block;overflow:hidden;border:none;}
-.name{display:block;font-weight:900;font-size:16px;margin-top:0;text-align:left;width:auto;margin-left:0;}
+.name { display:block; font-weight:900; font-size:16px; text-align:center; width:100%; margin-left:-10px; margin-top:6px; }
 .tag {
  font-size:12px;
  color:#ddd;
@@ -133,30 +133,12 @@ transform: scale(0.98);
 </head>
 <body class="casino-dark">
 
-
 <div class="streamers-left">
-<h2>TOP STREAMER</h2>
+<h2 style="font-size:18px;font-weight:900;text-align:center;">TOP STREAMER</h2>
 
-<a href="https://www.tiktok.com/@tiktokhakki?is_from_webapp=1&sender_device=pc" target="_blank" style="text-decoration:none;color:white;">
-<div class="streamer">
-<img class="avatar" src="hakki_profile.jpg" style="background:#555;">
-<div>
-<span class="name">tiktokhakki</span>
-</div>
-</div>
-</a>
-
-<div class="streamer">
-<div style="width:44px;height:44px;border-radius:50%;background:#0f0;color:black;font-size:24px;display:flex;align-items:center;justify-content:center;font-weight:bold;">+</div>
-<div>
-<span class="name">Add Promotion</span>
-<span class="tag">Click here and message me on TikTok</span>
-</div>
-</div>
-</div>
-
-
-<div><span class="name">tiktokhakki</span><span class="tag"></span></div>
+<div class="streamer" style="justify-content:center;cursor:pointer;" onclick="window.open('https://www.tiktok.com/@flexy_22837?is_from_webapp=1&sender_device=pc','_blank')">
+<div style="width:44px;height:44px;border-radius:50%;background:#0f0;color:black;font-size:24px;display:flex;align-items:center;justify-content:center;font-weight:bold;flex-shrink:0;">+</div>
+<div><span class="name">Add Promotion</span><span class="tag">Click here and message me on TikTok</span></div>
 </div>
 </div>
 
@@ -173,7 +155,7 @@ transform: scale(0.98);
 </div>
 </a>
 
-<div class="streamer" style="cursor:pointer;" onclick="window.open('https://www.tiktok.com/@flexy_22837?is_from_webapp=1&sender_device=pc','_blank')">
+<div class="streamer" style="justify-content:center;cursor:pointer;" onclick="window.open('https://www.tiktok.com/@flexy_22837?is_from_webapp=1&sender_device=pc','_blank')">
 <div style="width:44px;height:44px;border-radius:50%;background:#0f0;color:black;font-size:24px;display:flex;align-items:center;justify-content:center;font-weight:bold;flex-shrink:0;">+</div>
 <div><span class="name">Add Promotion</span><span class="tag">Click here and message me on TikTok</span></div>
 </div>
@@ -227,11 +209,7 @@ function handleOption(){
 <h1 class="logo">Offline Dice</h1>
 <div class="dicewrap" id="dicewrap"></div>
 <div id="result" style="font-size:22px;font-weight:900;letter-spacing:0.3px;">Click ROLL AGAIN</div><br>
-<div id="lastSpin" style="margin:10px auto;padding:12px;border:2px solid white;border-radius:10px;width:80%;font-size:24px;font-weight:600;">
-<div style="display:flex;justify-content:space-between;align-items:flex-start;">
-<div><div>Last Spin</div><div id="prevBoxes" style="display:flex;justify-content:center;gap:8px;margin-top:8px;"></div></div>
-<div><div>Current Spin</div><div id="lastBoxes" style="display:flex;justify-content:center;gap:8px;margin-top:8px;"></div></div>
-</div></div><br>
+<div id="lastSpin" style="margin:10px auto;padding:12px;border:2px solid white;border-radius:10px;width:70%;font-size:24px;font-weight:600;">Last Roll: <div id="lastBoxes" style="display:flex;justify-content:center;gap:8px;margin-top:8px;"></div></div><br>
 <button id="rollBtn" onclick="rollDice()">ROLL AGAIN</button>
 
 
@@ -274,7 +252,7 @@ if(previousSpin.length){
 lastBoxesEl.innerHTML = previousSpin.map(v=>`<div style="padding:6px 12px;border:1px solid white;border-radius:6px;">${v}</div>`).join('');
 }
 function rollDice(){
-const oldSpin = [...previousSpinValues]; const prevBoxes=document.getElementById('prevBoxes'); if(prevBoxes){prevBoxes.innerHTML=''; oldSpin.forEach(col=>{const m=document.createElement('div');m.style.width='24px';m.style.height='24px';m.style.border='2px solid white';m.style.borderRadius='6px';m.style.background=col;prevBoxes.appendChild(m);});}
+const oldSpin = [...previousSpinValues];
  const btn=document.getElementById("rollBtn");
  if(btn.disabled) return;
  btn.disabled=true;
@@ -293,13 +271,13 @@ const oldSpin = [...previousSpinValues]; const prevBoxes=document.getElementById
    count++;
    if(count>=10){
       clearInterval(interval);
-      let results=[]; previousSpinValues=[];
+      let results=[];
       const lastBoxes=document.getElementById("lastBoxes");
       lastBoxes.innerHTML="";
       dice.forEach(d=>{
         const active=getActiveColors(); const c=active[Math.floor(Math.random()*active.length)];
         d.style.background=c[0];
-        results.push(c[1]); previousSpinValues.push(c[0]);
+        results.push(c[1]);
 
         const mini=document.createElement("div");
         mini.style.width="24px";
@@ -431,8 +409,3 @@ window.addEventListener('load',()=>{
   }
 });
 </script>
-
-<style>
-.last-spin-container,.spin-history{max-width:700px!important;margin:auto!important;}
-.last-spin-container{display:flex!important;justify-content:space-around!important;}
-</style>
