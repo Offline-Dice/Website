@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Offline Dice</title>
+<title>Offline Dice - Viele Doppelfarben</title>
 <style>
 body{margin:0;background:lightblue;font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh}
 .card{
@@ -288,12 +288,7 @@ const oldSpin = [...previousSpinValues];
         mini.style.display="inline-block";
         lastBoxes.appendChild(mini);
       });
-      if(new Set(results).size===4 && Math.random()<0.98){
-        const first=results[0];
-        results[3]=first;
-        lastBoxes.children[3].style.background=dice[0].style.background;
-        dice[3].style.background=dice[0].style.background;
-      }
+      
       result.innerText="Result: "+results.join(" | ");
    }
  },100);
@@ -431,3 +426,5 @@ window.addEventListener('load',()=>{
   }
 });
 </script>
+
+<!-- Angepasst: Doppelfarben sollen sehr häufig vorkommen -->
