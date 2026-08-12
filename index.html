@@ -1280,18 +1280,13 @@ if (!sessionId) {
 }
 
 const userRef = ref(db, "online/" + sessionId);
-const ONLINE_TIMEOUT = 5 * 60 * 1000; // 5 Minuten
-const PING_INTERVAL = 15000; // 15 Sekunden
+const PING_INTERVAL = 15000;
+const OFFLINE_TIMEOUT = 5 * 60 * 1000;
 
 async function heartbeat() {
   try {
-    await set(userRef, {
-      online: true,
-      time: Date.now()
-    });
-  } catch (e) {
-    console.error("Firebase online heartbeat failed:", e);
-  }
+    await set(userRef, { online: true, disconnected: false, time: serverTimestamp() });
+  } catch (e) { console.error("Firebase presence heartbeat:", e); }
 }
 
 const connectedRef = ref(db, ".info/connected");
@@ -1299,60 +1294,38 @@ let heartbeatStarted = false;
 
 onValue(connectedRef, async (snap) => {
   if (snap.val() !== true) return;
-
-  // Bei echtem Verbindungsabbruch NICHT sofort löschen.
-  // Der Eintrag bleibt bis zu 5 Minuten bestehen.
   try {
-    await onDisconnect(userRef).cancel();
-  } catch (e) {
-    console.warn("onDisconnect cancel failed:", e);
-  }
-
-  await heartbeat();
-
-  if (!heartbeatStarted) {
-    heartbeatStarted = true;
-    setInterval(heartbeat, PING_INTERVAL);
-
-    document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) heartbeat();
-    });
-
-    window.addEventListener("focus", heartbeat);
-  }
+    await onDisconnect(userRef).set({ online: true, disconnected: true, time: serverTimestamp() });
+    await heartbeat();
+    if (!heartbeatStarted) {
+      heartbeatStarted = true;
+      setInterval(heartbeat, PING_INTERVAL);
+      document.addEventListener("visibilitychange", () => { if (!document.hidden) heartbeat(); });
+      window.addEventListener("focus", heartbeat);
+    }
+  } catch (e) { console.error("Firebase presence setup:", e); }
 });
 
-// Online-Anzahl: Nur Sessions mit einem Ping aus den letzten 5 Minuten zählen.
-// Veraltete Sessions werden anschließend aus Firebase entfernt.
-onValue(ref(db, "online"), async (snapshot) => {
-  const data = snapshot.val() || {};
-  const now = Date.now();
-  let onlineCount = 0;
-  const staleIds = [];
-
-  for (const [id, entry] of Object.entries(data)) {
-    const lastPing = Number(entry?.time) || 0;
-
-    if (entry?.online === true && lastPing > 0 && (now - lastPing) < ONLINE_TIMEOUT) {
-      onlineCount++;
-    } else if (lastPing > 0 && (now - lastPing) >= ONLINE_TIMEOUT) {
-      staleIds.push(id);
+async function refreshOnlineCounter() {
+  try {
+    const snapshot = await new Promise((resolve) => onValue(ref(db, "online"), resolve, { onlyOnce: true }));
+    const data = snapshot.val() || {};
+    const now = Date.now();
+    let onlineCount = 0;
+    const staleIds = [];
+    for (const [id, entry] of Object.entries(data)) {
+      const lastPing = Number(entry?.time) || 0;
+      if (lastPing > 0 && (now - lastPing) < OFFLINE_TIMEOUT) onlineCount++;
+      else if (lastPing > 0 && (now - lastPing) >= OFFLINE_TIMEOUT) staleIds.push(id);
     }
-  }
+    const counter = document.getElementById("onlineCounter");
+    if (counter) counter.textContent = "🟢 Online " + onlineCount;
+    for (const id of staleIds) set(ref(db, "online/" + id), null).catch(() => {});
+  } catch (e) { console.error("Firebase online counter:", e); }
+}
 
-  const counter = document.getElementById("onlineCounter");
-  if (counter) counter.textContent = "🟢 Online " + onlineCount;
-
-  for (const id of staleIds) {
-    try {
-      await set(ref(db, "online/" + id), null);
-    } catch (e) {
-      console.warn("Firebase online cleanup failed:", e);
-    }
-  }
-});
-
-
+refreshOnlineCounter();
+setInterval(refreshOnlineCounter, 15000);
 </script>
 
 
