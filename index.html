@@ -1309,7 +1309,7 @@ onValue(connectedRef, (snap) => {
   onDisconnect(userRef).set({
     online: false,
     disconnected: true,
-    time: Date.now()
+    disconnectedAt: serverTimestamp()
   }).catch((e) => console.error("Firebase onDisconnect:", e));
 
   heartbeat();
@@ -1336,13 +1336,19 @@ onValue(ref(db, "online"), (snapshot) => {
 
   for (const [id, entry] of Object.entries(data)) {
     const lastPing = Number(entry?.time) || 0;
-    const age = lastPing > 0 ? now - lastPing : Infinity;
+    const disconnectedAt = Number(entry?.disconnectedAt) || 0;
+    const pingAge = lastPing > 0 ? now - lastPing : Infinity;
+    const disconnectAge = disconnectedAt > 0 ? now - disconnectedAt : 0;
 
-    if (entry?.online === true && age < OFFLINE_TIMEOUT) {
+    // Beim Tab-Schließen sofort nicht mehr als online zählen.
+    if (entry?.online === true && !entry?.disconnected && pingAge < OFFLINE_TIMEOUT) {
       onlineCount++;
     }
 
-    if (lastPing > 0 && age >= OFFLINE_TIMEOUT) {
+    // Aktive Nutzer nach 5 Minuten ohne Ping entfernen; getrennte Nutzer
+    // genau 5 Minuten nach dem Disconnect entfernen.
+    if ((entry?.disconnected && disconnectedAt > 0 && disconnectAge >= OFFLINE_TIMEOUT) ||
+        (!entry?.disconnected && lastPing > 0 && pingAge >= OFFLINE_TIMEOUT)) {
       staleIds.push(id);
     }
   }
