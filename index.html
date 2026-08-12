@@ -1274,33 +1274,58 @@ window.saveKzCode = async function(id, data){
 };
 
 
-const PRESENCE_TIMEOUT = 5 * 60 * 1000;
-const HEARTBEAT_INTERVAL = 15 * 1000;
-
-let sessionId = sessionStorage.getItem("offlineDiceSessionId");
+let sessionId = localStorage.getItem("kenzyOnlineId");
 if (!sessionId) {
-  sessionId = crypto.randomUUID();
-  sessionStorage.setItem("offlineDiceSessionId", sessionId);
+    sessionId = crypto.randomUUID();
+    localStorage.setItem("kenzyOnlineId", sessionId);
+}
+const userRef = ref(db, "online/" + sessionId);
+
+function heartbeat() {
+  return set(userRef, {
+    online: true,
+    time: serverTimestamp()
+  });
 }
 
-const userRef = ref(db, "online/" + sessionId);
-const onlineRootRef = ref(db, "online");
 const connectedRef = ref(db, ".info/connected");
+let heartbeatStarted = false;
 
-let latestOnlineData = {};
+onValue(connectedRef, async (snap) => {
+  if (snap.val() === true) {
+    await onDisconnect(userRef).remove();
 
-function renderOnlineCount() {
+    heartbeat();
+
+    if (!heartbeatStarted) {
+      heartbeatStarted = true;
+      setInterval(heartbeat, 15000);
+
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) heartbeat();
+      });
+
+      window.addEventListener("focus", heartbeat);
+    }
+  }
+});
+
+const onlineRootRef = ref(db, "online");
+const ACTIVE_WINDOW = 45 * 1000;
+
+onValue(onlineRootRef, (snapshot) => {
+  const data = snapshot.val() || {};
   const now = Date.now();
   let count = 0;
 
-  for (const entry of Object.values(latestOnlineData)) {
+  for (const entry of Object.values(data)) {
     if (!entry || entry.online !== true) continue;
 
     const t = Number(entry.time);
 
-    // Aktive Einträge werden gezählt. Ein alter Eintrag wird spätestens
-    // nach 5 Minuten nicht mehr als online gewertet.
-    if (!Number.isFinite(t) || now - t < PRESENCE_TIMEOUT) {
+    // Nur wirklich frisch gepingte Tabs zählen.
+    // Alte/stale Einträge werden dadurch nicht als online gezählt.
+    if (Number.isFinite(t) && now - t <= ACTIVE_WINDOW) {
       count++;
     }
   }
@@ -1309,84 +1334,27 @@ function renderOnlineCount() {
   if (counter) {
     counter.textContent = "🟢 Online " + count;
   }
-}
-
-async function heartbeat() {
-  try {
-    await set(userRef, {
-      online: true,
-      time: serverTimestamp()
-    });
-  } catch (err) {
-    console.error("Firebase online heartbeat:", err);
-  }
-}
-
-async function registerDisconnect() {
-  try {
-    // Beim Schließen/Verbindungsverlust sofort OFFLINE setzen.
-    // Der Datensatz wird NICHT sofort gelöscht.
-    await onDisconnect(userRef).set({
-      online: false,
-      time: serverTimestamp()
-    });
-
-    await heartbeat();
-  } catch (err) {
-    console.error("Firebase onDisconnect:", err);
-  }
-}
-
-onValue(connectedRef, (snapshot) => {
-  if (snapshot.val() === true) {
-    registerDisconnect();
-  }
 });
 
-// Derselbe Firebase-Listener wie beim funktionierenden Counter,
-// aber mit Status-/Timeout-Auswertung.
-onValue(onlineRootRef, (snapshot) => {
-  latestOnlineData = snapshot.val() || {};
-  renderOnlineCount();
-});
+// Falls ein Snapshot älter wird, den sichtbaren Counter regelmäßig neu berechnen.
+setInterval(async () => {
+  const snapshot = await new Promise((resolve) => {
+    onValue(onlineRootRef, resolve, { onlyOnce: true });
+  });
 
-// Alle 15 Sekunden pingen und den Counter neu berechnen.
-setInterval(() => {
-  heartbeat();
-  renderOnlineCount();
-}, HEARTBEAT_INTERVAL);
-
-// Nach 5 Minuten alte OFFLINE-Einträge aus Firebase entfernen.
-// Dadurch wird ein geschlossener Tab nicht sofort gelöscht.
-async function cleanupOldPresence() {
+  const data = snapshot.val() || {};
   const now = Date.now();
+  let count = 0;
 
-  for (const [id, entry] of Object.entries(latestOnlineData)) {
-    if (!entry) continue;
-
+  for (const entry of Object.values(data)) {
+    if (!entry || entry.online !== true) continue;
     const t = Number(entry.time);
-    if (Number.isFinite(t) && now - t >= PRESENCE_TIMEOUT && entry.online !== true) {
-      try {
-        await set(ref(db, "online/" + id), null);
-      } catch (err) {
-        console.error("Firebase online cleanup:", err);
-      }
-    }
+    if (Number.isFinite(t) && now - t <= ACTIVE_WINDOW) count++;
   }
-}
 
-setInterval(cleanupOldPresence, 30 * 1000);
-
-document.addEventListener("visibilitychange", () => {
-  if (!document.hidden) {
-    registerDisconnect();
-  }
-});
-
-window.addEventListener("focus", () => {
-  registerDisconnect();
-});
-
+  const counter = document.getElementById("onlineCounter");
+  if (counter) counter.textContent = "🟢 Online " + count;
+}, 5000);
 </script>
 
 
