@@ -75,7 +75,7 @@ firebase.database().ref("announcements/history").on("value",(snap)=>{
 history.pushState(null, "", location.href);
 
 window.addEventListener("popstate", () => {
-    window.open("https://kenzydice.pages.dev/", "_blank");
+    window.location.href = "/";
 });
 </script>
 </body>
