@@ -1273,49 +1273,114 @@ window.saveKzCode = async function(id, data){
   }
 };
 
-let sessionId = localStorage.getItem("kenzyOnlineId");
+// Firebase Online Presence
+// Jede geöffnete Seite bekommt eine eigene Session-ID.
+// Dadurch zählen mehrere Tabs korrekt, und alte/stale Einträge werden nicht mitgezählt.
+let sessionId = sessionStorage.getItem("kenzyOnlineSessionId");
 if (!sessionId) {
     sessionId = crypto.randomUUID();
-    localStorage.setItem("kenzyOnlineId", sessionId);
+    sessionStorage.setItem("kenzyOnlineSessionId", sessionId);
 }
+
 const userRef = ref(db, "online/" + sessionId);
-
-function heartbeat() {
-  return set(userRef, {
-    online: true,
-    time: serverTimestamp()
-  });
-}
-
 const connectedRef = ref(db, ".info/connected");
+
+const PRESENCE_TIMEOUT = 5 * 60 * 1000; // Eintrag bleibt bis zu 5 Minuten ohne Ping erhalten.
 let heartbeatStarted = false;
 
-onValue(connectedRef, async (snap) => {
-  if (snap.val() === true) {
-    await onDisconnect(userRef).remove();
-
-    heartbeat();
-
-    if (!heartbeatStarted) {
-      heartbeatStarted = true;
-      setInterval(heartbeat, 15000);
-
-      document.addEventListener("visibilitychange", () => {
-        if (!document.hidden) heartbeat();
-      });
-
-      window.addEventListener("focus", heartbeat);
+async function pingPresence() {
+    try {
+        await set(userRef, {
+            online: true,
+            lastSeen: serverTimestamp()
+        });
+    } catch (e) {
+        console.warn("Online-Ping fehlgeschlagen:", e);
     }
-  }
+}
+
+onValue(connectedRef, async (snap) => {
+    if (snap.val() !== true) return;
+
+    try {
+        // Firebase entfernt den Eintrag automatisch bei echter Verbindungstrennung.
+        // Nicht sofort bei Disconnect löschen: Der Firebase-Eintrag soll erst nach
+        // 5 Minuten ohne erfolgreichen Ping als veraltet gelten.
+        await pingPresence();
+
+        if (!heartbeatStarted) {
+            heartbeatStarted = true;
+
+            // Regelmäßiger Ping verhindert, dass ein noch offener Tab
+            // durch einen veralteten Firebase-Eintrag als Online-Nutzer gezählt wird.
+            setInterval(pingPresence, 10000);
+
+            document.addEventListener("visibilitychange", () => {
+                if (!document.hidden) pingPresence();
+            });
+
+            window.addEventListener("focus", pingPresence);
+            window.addEventListener("pageshow", pingPresence);
+        }
+    } catch (e) {
+        console.warn("Presence konnte nicht initialisiert werden:", e);
+    }
 });
 
-onValue(ref(db, "online"), (snapshot) => {
-  document.getElementById("onlineCounter").textContent =
-    "🟢 Online " + (snapshot.exists() ? Object.keys(snapshot.val()).length : 0);
+// Nur Sessions mit einem Ping innerhalb der letzten 5 Minuten zählen.
+// Zusätzlich werden veraltete Einträge von aktiven Clients aus Firebase entfernt.
+const onlineRef = ref(db, "online");
+
+async function cleanupStalePresence() {
+    try {
+        const snapshot = await new Promise((resolve, reject) => {
+            onValue(onlineRef, resolve, reject, { onlyOnce: true });
+        });
+
+        if (!snapshot.exists()) return;
+
+        const now = Date.now();
+        const users = snapshot.val();
+
+        for (const [id, user] of Object.entries(users)) {
+            if (user && typeof user.lastSeen === "number" && (now - user.lastSeen) > PRESENCE_TIMEOUT) {
+                await set(ref(db, "online/" + id), null);
+            }
+        }
+    } catch (e) {
+        console.warn("Presence-Cleanup fehlgeschlagen:", e);
+    }
+}
+
+onValue(onlineRef, (snapshot) => {
+    const now = Date.now();
+    let onlineCount = 0;
+
+    if (snapshot.exists()) {
+        const users = snapshot.val();
+
+        Object.values(users).forEach((user) => {
+            if (
+                user &&
+                user.online === true &&
+                typeof user.lastSeen === "number" &&
+                (now - user.lastSeen) <= PRESENCE_TIMEOUT
+            ) {
+                onlineCount++;
+            }
+        });
+    }
+
+    const counter = document.getElementById("onlineCounter");
+    if (counter) {
+        counter.textContent = "🟢 Online " + onlineCount;
+    }
 });
 
-
-</script>
+// Alle 30 Sekunden nach Sessions suchen, die länger als 5 Minuten
+// keinen Ping mehr geschickt haben, und diese aus Firebase entfernen.
+cleanupStalePresence();
+setInterval(cleanupStalePresence, 30000);
 
 
 
