@@ -20,7 +20,7 @@ a{display:inline-block;margin-top:20px;background:#3399ff;color:#fff;padding:12p
 <div class="wrap">
 <h1>📢 Announcements</h1>
 <div id="list"><div class="card">Loading...</div></div>
-<a href="/">⬅ Back</a>
+<a href="#" onclick="history.back(); return false;">⬅ Back</a>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -71,8 +71,6 @@ firebase.database().ref("announcements/history").on("value",(snap)=>{
 });
 </script>
 
-<script>
 
-</script>
 </body>
 </html>
