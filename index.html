@@ -1273,64 +1273,83 @@ window.saveKzCode = async function(id, data){
   }
 };
 
-let sessionId = localStorage.getItem("kenzyOnlineId");
+let sessionId = sessionStorage.getItem("kenzyOnlineId");
 if (!sessionId) {
     sessionId = crypto.randomUUID();
-    localStorage.setItem("kenzyOnlineId", sessionId);
+    sessionStorage.setItem("kenzyOnlineId", sessionId);
 }
-const userRef = ref(db, "online/" + sessionId);
 
-function heartbeat() {
-  return set(userRef, {
-    online: true,
-    time: serverTimestamp()
-  });
+const userRef = ref(db, "online/" + sessionId);
+const ONLINE_TIMEOUT = 5 * 60 * 1000; // 5 Minuten
+const PING_INTERVAL = 15000; // 15 Sekunden
+
+async function heartbeat() {
+  try {
+    await set(userRef, {
+      online: true,
+      time: Date.now()
+    });
+  } catch (e) {
+    console.error("Firebase online heartbeat failed:", e);
+  }
 }
 
 const connectedRef = ref(db, ".info/connected");
 let heartbeatStarted = false;
-const ONLINE_TIMEOUT = 5 * 60 * 1000; // 5 Minuten ohne Ping = entfernen
 
-onValue(connectedRef, (snap) => {
-  if (snap.val() === true) {
-    heartbeat();
+onValue(connectedRef, async (snap) => {
+  if (snap.val() !== true) return;
 
-    if (!heartbeatStarted) {
-      heartbeatStarted = true;
-      setInterval(heartbeat, 15000); // Ping alle 15 Sekunden
+  // Bei echtem Verbindungsabbruch NICHT sofort löschen.
+  // Der Eintrag bleibt bis zu 5 Minuten bestehen.
+  try {
+    await onDisconnect(userRef).cancel();
+  } catch (e) {
+    console.warn("onDisconnect cancel failed:", e);
+  }
 
-      document.addEventListener("visibilitychange", () => {
-        if (!document.hidden) heartbeat();
-      });
+  await heartbeat();
 
-      window.addEventListener("focus", heartbeat);
-    }
+  if (!heartbeatStarted) {
+    heartbeatStarted = true;
+    setInterval(heartbeat, PING_INTERVAL);
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) heartbeat();
+    });
+
+    window.addEventListener("focus", heartbeat);
   }
 });
 
-// Alte/verwaiste Sessions werden erst nach 5 Minuten ohne Ping entfernt.
-// Dadurch verschwindet jemand bei einem kurzen Verbindungsabbruch nicht sofort.
+// Online-Anzahl: Nur Sessions mit einem Ping aus den letzten 5 Minuten zählen.
+// Veraltete Sessions werden anschließend aus Firebase entfernt.
 onValue(ref(db, "online"), async (snapshot) => {
   const data = snapshot.val() || {};
   const now = Date.now();
   let onlineCount = 0;
+  const staleIds = [];
 
   for (const [id, entry] of Object.entries(data)) {
-    const lastPing = entry && typeof entry.time === "number" ? entry.time : 0;
+    const lastPing = Number(entry?.time) || 0;
 
-    if (lastPing > 0 && (now - lastPing) < ONLINE_TIMEOUT) {
+    if (entry?.online === true && lastPing > 0 && (now - lastPing) < ONLINE_TIMEOUT) {
       onlineCount++;
     } else if (lastPing > 0 && (now - lastPing) >= ONLINE_TIMEOUT) {
-      try {
-        await set(ref(db, "online/" + id), null);
-      } catch (e) {
-        console.warn("Online cleanup failed:", e);
-      }
+      staleIds.push(id);
     }
   }
 
   const counter = document.getElementById("onlineCounter");
   if (counter) counter.textContent = "🟢 Online " + onlineCount;
+
+  for (const id of staleIds) {
+    try {
+      await set(ref(db, "online/" + id), null);
+    } catch (e) {
+      console.warn("Firebase online cleanup failed:", e);
+    }
+  }
 });
 
 
