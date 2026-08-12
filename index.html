@@ -1313,48 +1313,52 @@ onValue(connectedRef, async (snap) => {
 const onlineRootRef = ref(db, "online");
 const ACTIVE_WINDOW = 45 * 1000;
 
-onValue(onlineRootRef, (snapshot) => {
+async function cleanAndCount(snapshot) {
   const data = snapshot.val() || {};
   const now = Date.now();
   let count = 0;
 
-  for (const entry of Object.values(data)) {
-    if (!entry || entry.online !== true) continue;
+  for (const [id, entry] of Object.entries(data)) {
+    if (!entry) continue;
 
     const t = Number(entry.time);
 
-    // Nur wirklich frisch gepingte Tabs zählen.
-    // Alte/stale Einträge werden dadurch nicht als online gezählt.
+    // Alte Presence-Struktur (z.B. disconnected/disconnectedAt) sofort entfernen.
+    if (entry.online !== true) {
+      try {
+        await set(ref(db, "online/" + id), null);
+      } catch (err) {
+        console.error("Presence cleanup:", err);
+      }
+      continue;
+    }
+
+    // Aktive Einträge müssen einen frischen Ping haben.
     if (Number.isFinite(t) && now - t <= ACTIVE_WINDOW) {
       count++;
+    } else if (Number.isFinite(t) && now - t > ACTIVE_WINDOW) {
+      // Kein Ping mehr -> alten Eintrag aus Firebase entfernen.
+      try {
+        await set(ref(db, "online/" + id), null);
+      } catch (err) {
+        console.error("Stale presence cleanup:", err);
+      }
     }
   }
 
   const counter = document.getElementById("onlineCounter");
-  if (counter) {
-    counter.textContent = "🟢 Online " + count;
-  }
+  if (counter) counter.textContent = "🟢 Online " + count;
+}
+
+onValue(onlineRootRef, (snapshot) => {
+  cleanAndCount(snapshot);
 });
 
-// Falls ein Snapshot älter wird, den sichtbaren Counter regelmäßig neu berechnen.
-setInterval(async () => {
-  const snapshot = await new Promise((resolve) => {
-    onValue(onlineRootRef, resolve, { onlyOnce: true });
-  });
-
-  const data = snapshot.val() || {};
-  const now = Date.now();
-  let count = 0;
-
-  for (const entry of Object.values(data)) {
-    if (!entry || entry.online !== true) continue;
-    const t = Number(entry.time);
-    if (Number.isFinite(t) && now - t <= ACTIVE_WINDOW) count++;
-  }
-
-  const counter = document.getElementById("onlineCounter");
-  if (counter) counter.textContent = "🟢 Online " + count;
+// Auch ohne neue Firebase-Änderung regelmäßig aufräumen.
+setInterval(() => {
+  onValue(onlineRootRef, (snapshot) => cleanAndCount(snapshot), { onlyOnce: true });
 }, 5000);
+
 </script>
 
 
