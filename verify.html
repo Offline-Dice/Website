@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kenzy Verify</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(rgba(205,175,80,.55),rgba(205,175,80,.55)),url('https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1200&q=60') center/cover fixed;color:#fff;display:flex;justify-content:center;align-items:center;min-height:100vh}
+.card{width:min(92vw,430px);background:rgba(255,255,255,.08);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.25);border-radius:24px;padding:28px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+h1{text-align:center;margin:18px 0 24px;font-size:42px}
+label{font-weight:bold;display:block;margin-bottom:8px}
+textarea{width:100%;height:70px;border:none;border-radius:12px;padding:14px;font-size:24px;box-sizing:border-box}
+button{width:100%;margin-top:14px;padding:15px;border:none;border-radius:12px;background:#ffd400;font-size:28px;font-weight:bold;color:#fff;cursor:pointer}
+pre{white-space:pre-wrap;background:rgba(0,0,0,.25);border-radius:12px;padding:14px;min-height:80px}
+
+.dice-result{margin:20px auto;display:flex;justify-content:center;gap:12px;min-height:90px}
+.color-block{width:70px;height:70px;border-radius:18px;border:8px solid #fff;background:#ddd;box-shadow:0 4px 10px rgba(0,0,0,.3)}
+.rolling-dice{animation:shake .1s infinite}
+@keyframes shake{0%,100%{transform:translate(0,0)}25%{transform:translate(-3px,3px) rotate(5deg)}50%{transform:translate(3px,-3px) rotate(-5deg)}75%{transform:translate(-3px,-3px)}}
+
+</style>
+</head>
+<body>
+<div class="card">
+<h1>VERIFY</h1>
+<label>🎲 GAME ID:</label>
+<textarea id="code" placeholder="KZ-XXXXXX"></textarea>
+<button id="verifyBtn" onclick="verify()">🎲 VERIFY</button>
+<div id="dice" class="dice-result"></div><pre id="out"></pre>
+</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+const firebaseConfig={
+apiKey:"AIzaSyBUT0t1I9Dkee5Ok_uYMzs4WfdwapOA5As",
+authDomain:"kenzy-dice.firebaseapp.com",
+projectId:"kenzy-dice",
+databaseURL:"https://kenzy-dice-default-rtdb.europe-west1.firebasedatabase.app",
+storageBucket:"kenzy-dice.firebasestorage.app",
+messagingSenderId:"578956722062",
+appId:"1:578956722062:web:5156f5737e51ef75246edf"};
+const app=initializeApp(firebaseConfig);const db=getDatabase(app);
+
+const map={red:'#e53935',orange:'#fb8c00',gold:'#fdd835',yellow:'#fdd835',green:'#43a047',blue:'#1e88e5',purple:'#8e24aa'};
+function showDice(cols){
+ const d=document.getElementById('dice'); d.innerHTML='';
+ cols.forEach(c=>{let b=document.createElement('div');b.className='color-block rolling-dice';d.appendChild(b);
+ setTimeout(()=>b.classList.remove('rolling-dice'),1200);
+  setTimeout(()=>b.style.background=map[c]||'#ccc',1200);
+ });
+}
+
+window.verify=async()=>{const btn=document.getElementById("verifyBtn");btn.disabled=true;const oldText=btn.innerHTML;btn.innerHTML="🎲 ROLLING...";const code=document.getElementById("code").value.trim();const id=code.replace("KZ-","");const snap=await get(ref(db,"verifyCodes/"+id));const out=document.getElementById("out");if(!snap.exists()){out.textContent="❌ Invalid code";return;}const obj=snap.val();const names={red:"🟥 Red",orange:"🟧 Orange",gold:"🟨 Yellow",yellow:"🟨 Yellow",green:"🟩 Green",blue:"🟦 Blue",purple:"🟪 Purple"};let t="✅ CODE VALID\n\n🎲 Colors:\n";(obj.colors||[]).forEach((c,i)=>t+=`${i+1}. ${names[c]||c}\n`);out.textContent=t;showDice(obj.colors||[]);setTimeout(()=>{btn.innerHTML=oldText;btn.disabled=false;},1500);}
+</script>
+</body></html>
