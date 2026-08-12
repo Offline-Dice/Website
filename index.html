@@ -1275,7 +1275,7 @@ window.saveKzCode = async function(id, data){
 
 let sessionId = sessionStorage.getItem("kenzyOnlineId");
 if (!sessionId) {
-  sessionId = crypto.randomUUID();
+  sessionId = (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now());
   sessionStorage.setItem("kenzyOnlineId", sessionId);
 }
 
@@ -1283,12 +1283,18 @@ const userRef = ref(db, "online/" + sessionId);
 const PING_INTERVAL = 15000;
 const OFFLINE_TIMEOUT = 5 * 60 * 1000;
 
-function heartbeat() {
-  return set(userRef, {
-    online: true,
-    disconnected: false,
-    time: serverTimestamp()
-  }).catch((e) => console.error("Firebase presence heartbeat:", e));
+// Write a normal numeric client timestamp. This avoids any problems with
+// serverTimestamp() being unresolved while the local write is being read.
+async function heartbeat() {
+  try {
+    await set(userRef, {
+      online: true,
+      disconnected: false,
+      time: Date.now()
+    });
+  } catch (e) {
+    console.error("Firebase presence heartbeat:", e);
+  }
 }
 
 const connectedRef = ref(db, ".info/connected");
@@ -1297,10 +1303,13 @@ let heartbeatStarted = false;
 onValue(connectedRef, (snap) => {
   if (snap.val() !== true) return;
 
+  // Do NOT remove immediately on disconnect. Keep the record for 5 minutes.
+  // Marking it offline makes the counter drop immediately, while the record
+  // itself remains available for the requested 5-minute grace period.
   onDisconnect(userRef).set({
-    online: true,
+    online: false,
     disconnected: true,
-    time: serverTimestamp()
+    time: Date.now()
   }).catch((e) => console.error("Firebase onDisconnect:", e));
 
   heartbeat();
@@ -1313,11 +1322,12 @@ onValue(connectedRef, (snap) => {
     });
     window.addEventListener("focus", heartbeat);
   }
+}, (error) => {
+  console.error("Firebase connection listener:", error);
 });
 
-// Dauerhafter Listener statt onlyOnce.
-// Dadurch aktualisiert sich der Counter sofort, sobald Firebase einen
-// neuen/entfernten Online-Eintrag meldet.
+// Count only sessions that are actively pinging and are not older than 5 min.
+// Keep stale records for 5 minutes, then clean them up.
 onValue(ref(db, "online"), (snapshot) => {
   const data = snapshot.val() || {};
   const now = Date.now();
@@ -1325,11 +1335,14 @@ onValue(ref(db, "online"), (snapshot) => {
   let onlineCount = 0;
 
   for (const [id, entry] of Object.entries(data)) {
-    const lastPing = Number(entry && entry.time) || 0;
+    const lastPing = Number(entry?.time) || 0;
+    const age = lastPing > 0 ? now - lastPing : Infinity;
 
-    if (lastPing > 0 && (now - lastPing) < OFFLINE_TIMEOUT) {
+    if (entry?.online === true && age < OFFLINE_TIMEOUT) {
       onlineCount++;
-    } else if (lastPing > 0 && (now - lastPing) >= OFFLINE_TIMEOUT) {
+    }
+
+    if (lastPing > 0 && age >= OFFLINE_TIMEOUT) {
       staleIds.push(id);
     }
   }
@@ -1337,11 +1350,15 @@ onValue(ref(db, "online"), (snapshot) => {
   const counter = document.getElementById("onlineCounter");
   if (counter) counter.textContent = "🟢 Online " + onlineCount;
 
-  // Alte Einträge erst nach 5 Minuten entfernen.
   for (const id of staleIds) {
-    set(ref(db, "online/" + id), null)
-      .catch((e) => console.error("Firebase stale cleanup:", e));
+    set(ref(db, "online/" + id), null).catch((e) => {
+      console.error("Firebase stale cleanup:", e);
+    });
   }
+}, (error) => {
+  console.error("Firebase online listener:", error);
+  const counter = document.getElementById("onlineCounter");
+  if (counter) counter.textContent = "🟢 Online 0";
 });
 </script>
 
