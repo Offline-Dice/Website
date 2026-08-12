@@ -866,17 +866,21 @@ if (vc) vc.textContent = window.provablyFair.lastVerify;
             updateNumDiceOptions();
             numDiceSelect.value = numDice;
 
+            const verifyBox = document.getElementById("verifyBox");
+
             if (isColorMode) {
                 diceResultArea.style.display = 'flex';
                 wheelWrapper.style.display = 'none';
                 numDiceSelect.style.display = 'block';
                 rollButton.textContent = "ROLL AGAIN !";
+                if (verifyBox) verifyBox.style.display = 'block';
                 rollDice();
             } else {
                 diceResultArea.style.display = 'none';
                 wheelWrapper.style.display = 'flex';
                 numDiceSelect.style.display = 'block';
                 rollButton.textContent = "SPIN AGAIN!";
+                if (verifyBox) verifyBox.style.display = 'none';
                 resetWheel();
                 spinWheel();
             }
@@ -1369,6 +1373,9 @@ function applyAntiBan(){
     if(!antiBan) return;
 
     document.querySelectorAll("select").forEach(e=>e.classList.add("antiBlur"));
+
+    // Logo im Anti-Ban Mode ebenfalls dauerhaft verwischen.
+    document.querySelectorAll(".top-logo").forEach(e=>e.classList.add("antiBlur"));
 
     document.querySelectorAll("*").forEach(e=>{
         if(e.textContent.trim().toUpperCase()==="ROLL COLOR DICE")
