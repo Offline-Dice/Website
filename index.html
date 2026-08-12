@@ -552,6 +552,65 @@ box-shadow:0 4px 10px rgba(0,0,0,.3);
 
 <style>
 .last5panel{position:fixed;left:15px;bottom:68px;top:auto;width:220px;background:linear-gradient(180deg,#47b3ff,#0066cc);backdrop-filter:blur(10px);border:3px solid #7cc8ff;border-radius:18px;padding:12px;z-index:9999;opacity:0;visibility:hidden;transform:translateY(14px) scale(.96);transform-origin:bottom left;transition:opacity .22s ease,transform .22s ease,visibility .22s ease}.last5panel.show{opacity:1;visibility:visible;transform:translateY(0) scale(1)}.last5title{text-align:center;color:#fff;font-family:Luckiest Guy,cursive;font-size:22px;margin-bottom:10px}.last5row{display:flex;gap:6px;justify-content:center;margin:8px 0}.last5cell{width:22px;height:22px;border-radius:7px;border:2px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,.4)}</style>
+
+<style id="miniCounterStyle">
+.mini-counter{
+  width:100%;
+  margin:38px auto 8px;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  background:transparent !important;
+}
+.mini-counter-side{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.mini-counter-side button{
+  all:unset;
+  box-sizing:border-box;
+  width:48px !important;
+  height:27px !important;
+  padding:0 !important;
+  margin:0 !important;
+  display:flex !important;
+  align-items:center;
+  justify-content:center;
+  border:0 !important;
+  border-radius:8px !important;
+  background:linear-gradient(180deg,#5d96cf 0%,#4a84bf 100%) !important;
+  color:#fff !important;
+  font-family:Arial,sans-serif !important;
+  font-size:14px !important;
+  font-weight:800 !important;
+  line-height:1 !important;
+  text-transform:none !important;
+  -webkit-text-stroke:0 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 2px 4px rgba(0,0,0,.18) !important;
+  cursor:pointer;
+  transition:transform .1s ease,filter .1s ease;
+}
+.mini-counter-side button:hover{
+  transform:translateY(-1px) !important;
+  filter:brightness(1.06);
+}
+.mini-counter-side button:active{
+  transform:translateY(1px) scale(.97) !important;
+}
+.mini-counter-value{
+  width:42px;
+  text-align:center;
+  color:#fff;
+  font-family:'Luckiest Guy',Arial,sans-serif;
+  font-size:29px;
+  font-weight:900;
+  line-height:1;
+  text-shadow:0 2px 4px rgba(0,0,0,.32);
+}
+</style>
 </head>
 <body>
 <button id="last5Toggle">LAST 5 SPINS</button>
@@ -631,6 +690,19 @@ box-shadow:0 4px 10px rgba(0,0,0,.3);
 <span id="nonceValue">0</span>
 </div>
 
+<div id="miniCounter" class="mini-counter">
+  <div class="mini-counter-side">
+    <button type="button" onclick="changeMiniCounter(-1)">-1</button>
+    <button type="button" onclick="changeMiniCounter(-10)">-10</button>
+  </div>
+
+  <div id="miniCounterValue" class="mini-counter-value">0</div>
+
+  <div class="mini-counter-side">
+    <button type="button" onclick="changeMiniCounter(1)">+1</button>
+    <button type="button" onclick="changeMiniCounter(10)">+10</button>
+  </div>
+</div>
 <div id="verifyBox" style="
 margin:20px auto;
 padding:10px;
@@ -658,9 +730,12 @@ Roll to generate code
 
 
 <a href="verify.html" target="_blank">
+
 <button style="padding:7px 24px;border-radius:10px;font-size:16px;font-family:Arial,sans-serif;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;">VERIFY</button>
 </a>
 </div>
+
+
 
 </div>
 
@@ -1439,5 +1514,15 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 </script>
 
+
+
+<script>
+let miniCounterValue = 0;
+function changeMiniCounter(amount) {
+  miniCounterValue += amount;
+  const el = document.getElementById("miniCounterValue");
+  if (el) el.textContent = miniCounterValue;
+}
+</script>
 </body>
 </html>
