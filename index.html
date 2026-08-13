@@ -532,6 +532,61 @@ box-shadow:0 4px 10px rgba(0,0,0,.3);
   100% { transform: translateY(0) rotateY(1980deg); }
 }
 
+
+/* Verify line + persistent second announcement */
+
+.verify-id-line{
+  display:flex;
+  align-items:baseline;
+  justify-content:center;
+  gap:5px;
+  min-height:34px;
+  font-family:Arial,sans-serif;
+}
+.verify-id-prefix{
+  font-size:16px;
+  font-weight:400;
+}
+.verify-code-inline{
+  font-size:26px;
+  font-weight:700;
+  letter-spacing:2px;
+  color:#fff;
+  text-shadow:0 3px 6px rgba(0,0,0,.75);
+}
+.verify-text-link{
+  color:#fff;
+  text-decoration:underline;
+  cursor:pointer;
+  font-family:Arial,sans-serif;
+  font-size:16px;
+  font-weight:400;
+  display:inline-block;
+  margin-left:1px;
+}
+.verify-text-link:hover{opacity:.8;}
+
+#persistentAnnouncementBox{
+  width:90%;
+  max-width:650px;
+  min-height:42px;
+  box-sizing:border-box;
+  margin:8px auto 14px;
+  padding:10px 16px;
+  background:#fff;
+  color:#111;
+  border-radius:8px;
+  text-align:center;
+  font-family:Arial,sans-serif;
+  font-size:16px;
+  line-height:1.35;
+  box-shadow:0 3px 10px rgba(0,0,0,.18);
+}
+#persistentAnnouncementText{
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+
 </style>
 </meta>
 <style>
@@ -702,6 +757,22 @@ text-align:center !important; justify-content:center !important; align-items:cen
 </select>
 </div>
 <div class="dice-result" id="diceResultArea"></div>
+
+<div id="verifyBox" style="
+margin:8px auto 4px;
+padding:0;
+color:white;
+width:90%;
+max-width:650px;
+text-align:center;
+background:transparent;
+">
+  <div class="verify-id-line">
+    <span class="verify-id-prefix">ID:</span>
+    <span id="verifyCodeDisplay" class="verify-code-inline">Roll to generate code</span>
+    <a href="verify.html" target="_blank" class="verify-text-link">- Verify</a>
+  </div>
+</div>
 <div class="wheel-wrapper" id="wheelWrapper" style="display: none;">
 <div class="coin-stage">
   <div class="coin" id="coin">
@@ -710,6 +781,10 @@ text-align:center !important; justify-content:center !important; align-items:cen
   </div>
 </div>
 <div id="winnerText"></div>
+</div>
+
+<div id="persistentAnnouncementBox" style="display:none;">
+  <div id="persistentAnnouncementText"></div>
 </div>
 <button id="rollButton">ROLL AGAIN !</button>
 <div id="provablyFairBox" style="display:none;">
@@ -730,41 +805,6 @@ text-align:center !important; justify-content:center !important; align-items:cen
     <button type="button" onclick="changeMiniCounter(1)">+1</button>
     <button type="button" onclick="changeMiniCounter(10)">+10</button>
   </div>
-</div>
-<div id="verifyBox" style="
-margin:20px auto;
-padding:10px;
-color:white;
-width:90%;
-max-width:650px;
-text-align:center;
-background:transparent;
-">
-
-<h3 style="margin:0 0 10px 0;">VERIFY CODE</h3>
-
-<div id="verifyCodeDisplay" style="
-font-size:26px;
-font-weight:bold;
-letter-spacing:2px;
-margin:10px;
-color:white;
-text-shadow:0 3px 6px black;
-">
-Roll to generate code
-</div>
-
-<div style="display:flex;gap:12px;justify-content:center;margin-top:12px;">
-
-
-<a href="verify.html" target="_blank">
-
-<button style="padding:7px 24px;border-radius:10px;font-size:16px;font-family:Arial,sans-serif;font-weight:700;line-height:1;display:inline-flex;align-items:center;justify-content:center;">VERIFY</button>
-</a>
-</div>
-
-
-
 </div>
 
 <div class="color-container">
@@ -1243,6 +1283,23 @@ onValue(ref(db, "control/restart"), (snap) => {
 });
 
 
+
+
+// Persistent second announcement: stays visible until deleted in the admin panel.
+onValue(ref(db, "announcements/permanent"), (snap)=>{
+  const data = snap.val();
+  const box = document.getElementById("persistentAnnouncementBox");
+  const text = document.getElementById("persistentAnnouncementText");
+  if(!box || !text) return;
+
+  if(data && data.message){
+    text.textContent = data.message;
+    box.style.display = "block";
+  }else{
+    text.textContent = "";
+    box.style.display = "none";
+  }
+});
 
 // Announcement popup
 let firstAnnouncementLoad = true;
