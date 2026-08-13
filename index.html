@@ -1275,8 +1275,6 @@ window.saveKzCode = async function(id, data){
 
 
 // Firebase Presence: eigene ID pro Browser-Tab.
-// sessionStorage statt localStorage, damit mehrere Tabs niemals dieselbe
-// Presence-ID teilen.
 let sessionId = sessionStorage.getItem("offlineDiceOnlineId");
 if (!sessionId) {
     sessionId = crypto.randomUUID();
@@ -1284,6 +1282,7 @@ if (!sessionId) {
 }
 
 const userRef = ref(db, "online/" + sessionId);
+const ONE_MINUTE = 60 * 1000;
 
 function heartbeat() {
   return set(userRef, {
@@ -1297,9 +1296,7 @@ let heartbeatStarted = false;
 
 onValue(connectedRef, async (snap) => {
   if (snap.val() === true) {
-    // Nur diese Tab-Session wird bei einer echten Verbindungstrennung gelöscht.
     await onDisconnect(userRef).remove();
-
     await heartbeat();
 
     if (!heartbeatStarted) {
@@ -1308,7 +1305,6 @@ onValue(connectedRef, async (snap) => {
       // Ping alle 15 Sekunden.
       setInterval(heartbeat, 15000);
 
-      // Nach Rückkehr aus einem Hintergrund-Tab sofort aktualisieren.
       document.addEventListener("visibilitychange", () => {
         if (!document.hidden) heartbeat();
       });
@@ -1319,20 +1315,43 @@ onValue(connectedRef, async (snap) => {
   }
 });
 
-// Kein eigener 45-Sekunden-Timeout mehr.
-// AFK/Hintergrund-Tabs werden nicht künstlich offline gesetzt.
-// Firebase/onDisconnect entscheidet, wann die Verbindung wirklich weg ist.
-onValue(ref(db, "online"), (snapshot) => {
+// Eine Session gilt nur dann als online, wenn ihr letzter Ping
+// höchstens 1 Minute alt ist. Ältere Einträge werden aus Firebase gelöscht.
+async function cleanPresence() {
+  const snapshot = await new Promise((resolve) => {
+    onValue(ref(db, "online"), resolve, { onlyOnce: true });
+  });
+
   const data = snapshot.val() || {};
+  const now = Date.now();
   let count = 0;
 
-  for (const entry of Object.values(data)) {
-    if (entry && entry.online === true) count++;
+  for (const [id, entry] of Object.entries(data)) {
+    if (!entry) continue;
+
+    const timestamp = Number(entry.time);
+
+    if (
+      entry.online === true &&
+      Number.isFinite(timestamp) &&
+      now - timestamp <= ONE_MINUTE
+    ) {
+      count++;
+    } else {
+      try {
+        await set(ref(db, "online/" + id), null);
+      } catch (err) {
+        console.error("Presence cleanup failed:", err);
+      }
+    }
   }
 
   const counter = document.getElementById("onlineCounter");
   if (counter) counter.textContent = "🟢 Online " + count;
-});
+}
+
+cleanPresence();
+setInterval(cleanPresence, 5000);
 
 </script>
 
