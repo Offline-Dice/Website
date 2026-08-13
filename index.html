@@ -1274,11 +1274,15 @@ window.saveKzCode = async function(id, data){
 };
 
 
-let sessionId = localStorage.getItem("kenzyOnlineId");
+// Firebase Presence: eigene ID pro Browser-Tab.
+// sessionStorage statt localStorage, damit mehrere Tabs niemals dieselbe
+// Presence-ID teilen.
+let sessionId = sessionStorage.getItem("offlineDiceOnlineId");
 if (!sessionId) {
     sessionId = crypto.randomUUID();
-    localStorage.setItem("kenzyOnlineId", sessionId);
+    sessionStorage.setItem("offlineDiceOnlineId", sessionId);
 }
+
 const userRef = ref(db, "online/" + sessionId);
 
 function heartbeat() {
@@ -1293,71 +1297,42 @@ let heartbeatStarted = false;
 
 onValue(connectedRef, async (snap) => {
   if (snap.val() === true) {
+    // Nur diese Tab-Session wird bei einer echten Verbindungstrennung gelöscht.
     await onDisconnect(userRef).remove();
 
-    heartbeat();
+    await heartbeat();
 
     if (!heartbeatStarted) {
       heartbeatStarted = true;
+
+      // Ping alle 15 Sekunden.
       setInterval(heartbeat, 15000);
 
+      // Nach Rückkehr aus einem Hintergrund-Tab sofort aktualisieren.
       document.addEventListener("visibilitychange", () => {
         if (!document.hidden) heartbeat();
       });
 
       window.addEventListener("focus", heartbeat);
+      window.addEventListener("pageshow", heartbeat);
     }
   }
 });
 
-const onlineRootRef = ref(db, "online");
-const ACTIVE_WINDOW = 45 * 1000;
-
-async function cleanAndCount(snapshot) {
+// Kein eigener 45-Sekunden-Timeout mehr.
+// AFK/Hintergrund-Tabs werden nicht künstlich offline gesetzt.
+// Firebase/onDisconnect entscheidet, wann die Verbindung wirklich weg ist.
+onValue(ref(db, "online"), (snapshot) => {
   const data = snapshot.val() || {};
-  const now = Date.now();
   let count = 0;
 
-  for (const [id, entry] of Object.entries(data)) {
-    if (!entry) continue;
-
-    const t = Number(entry.time);
-
-    // Alte Presence-Struktur (z.B. disconnected/disconnectedAt) sofort entfernen.
-    if (entry.online !== true) {
-      try {
-        await set(ref(db, "online/" + id), null);
-      } catch (err) {
-        console.error("Presence cleanup:", err);
-      }
-      continue;
-    }
-
-    // Aktive Einträge müssen einen frischen Ping haben.
-    if (Number.isFinite(t) && now - t <= ACTIVE_WINDOW) {
-      count++;
-    } else if (Number.isFinite(t) && now - t > ACTIVE_WINDOW) {
-      // Kein Ping mehr -> alten Eintrag aus Firebase entfernen.
-      try {
-        await set(ref(db, "online/" + id), null);
-      } catch (err) {
-        console.error("Stale presence cleanup:", err);
-      }
-    }
+  for (const entry of Object.values(data)) {
+    if (entry && entry.online === true) count++;
   }
 
   const counter = document.getElementById("onlineCounter");
   if (counter) counter.textContent = "🟢 Online " + count;
-}
-
-onValue(onlineRootRef, (snapshot) => {
-  cleanAndCount(snapshot);
 });
-
-// Auch ohne neue Firebase-Änderung regelmäßig aufräumen.
-setInterval(() => {
-  onValue(onlineRootRef, (snapshot) => cleanAndCount(snapshot), { onlyOnce: true });
-}, 5000);
 
 </script>
 
