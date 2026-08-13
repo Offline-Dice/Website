@@ -1533,12 +1533,6 @@ let antiBan = localStorage.getItem("antiBanMode")==="on";
 function createAntiBan(){
     if(document.getElementById("antiBanBox")) return;
 
-    const verify=[...document.querySelectorAll("button")].find(b=>
-        b.textContent.toUpperCase().includes("VERIFY")
-    );
-
-    if(!verify) return;
-
     const box=document.createElement("div");
     box.id="antiBanBox";
     box.innerHTML='<span id="antiBanText">Anti-Ban Mode</span><button type="button" id="antiBanSwitch"></button>';
@@ -1627,22 +1621,18 @@ function changeMiniCounter(amount) {
   if (el) el.textContent = miniCounterValue;
 }
 </script>
-<footer class="site-copyright">© 2026 OFFLINE-DICE.DE</footer>
+
 <style>
-.site-copyright{
+.offline-dice-footer{
   width:100%;
-  box-sizing:border-box;
   text-align:center;
-  margin:32px 0 18px;
-  padding:0 16px;
-  color:rgba(255,255,255,.65);
-  font-family:Arial,sans-serif;
-  font-size:13px;
+  margin:28px 0 18px;
+  color:rgba(255,255,255,.55);
+  font-size:12px;
   font-weight:600;
-  letter-spacing:.4px;
-  position:static;
+  pointer-events:none;
 }
 </style>
-
+<div class="offline-dice-footer">© 2026 OFFLINE-DICE.DE</div>
 </body>
 </html>
