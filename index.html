@@ -1282,39 +1282,28 @@ if (!sessionId) {
 }
 
 const userRef = ref(db, "online/" + sessionId);
-const ONE_MINUTE = 60 * 1000;
 
-let heartbeatTimer = null;
-let presenceRegistered = false;
-let presenceRemoved = false;
-
-async function heartbeat() {
-  // Sobald diese Session nach 1 Minute ohne Ping entfernt wurde,
-  // darf derselbe alte Tab sie nicht direkt wieder neu erzeugen.
-  if (presenceRemoved) return;
-
-  try {
-    await set(userRef, {
-      online: true,
-      time: serverTimestamp()
-    });
-    presenceRegistered = true;
-  } catch (err) {
-    console.error("Presence heartbeat failed:", err);
-  }
+function heartbeat() {
+  return set(userRef, {
+    online: true,
+    time: serverTimestamp()
+  });
 }
 
 const connectedRef = ref(db, ".info/connected");
+let heartbeatStarted = false;
 
 onValue(connectedRef, async (snap) => {
-  if (snap.val() !== true || presenceRemoved) return;
-
-  try {
+  if (snap.val() === true) {
+    // Firebase löscht diese Session bei einem echten Disconnect.
     await onDisconnect(userRef).remove();
     await heartbeat();
 
-    if (!heartbeatTimer) {
-      heartbeatTimer = setInterval(heartbeat, 15000);
+    if (!heartbeatStarted) {
+      heartbeatStarted = true;
+
+      // Heartbeat nur als Lebenszeichen, nicht als Offline-Timer.
+      setInterval(heartbeat, 15000);
 
       document.addEventListener("visibilitychange", () => {
         if (!document.hidden) heartbeat();
@@ -1323,60 +1312,23 @@ onValue(connectedRef, async (snap) => {
       window.addEventListener("focus", heartbeat);
       window.addEventListener("pageshow", heartbeat);
     }
-  } catch (err) {
-    console.error("Presence connection setup failed:", err);
   }
 });
 
-// Wenn genau diese Session aus Firebase entfernt wurde (z.B. weil 1 Minute
-// lang kein Ping kam), wird ihr Heartbeat endgültig gestoppt.
-// Dadurch entsteht nicht mehr: offline -> sofort wieder online.
-onValue(userRef, (snapshot) => {
-  if (presenceRegistered && !snapshot.exists()) {
-    presenceRemoved = true;
-
-    if (heartbeatTimer) {
-      clearInterval(heartbeatTimer);
-      heartbeatTimer = null;
-    }
-  }
-});
-
-async function cleanPresence() {
-  const snapshot = await new Promise((resolve) => {
-    onValue(ref(db, "online"), resolve, { onlyOnce: true });
-  });
-
+// Nur aktive Firebase-Presence-Sessions zählen.
+// Kein künstliches Löschen nach einer bestimmten Ping-Zeit.
+onValue(ref(db, "online"), (snapshot) => {
   const data = snapshot.val() || {};
-  const now = Date.now();
   let count = 0;
 
-  for (const [id, entry] of Object.entries(data)) {
-    if (!entry) continue;
-
-    const timestamp = Number(entry.time);
-
-    if (
-      entry.online === true &&
-      Number.isFinite(timestamp) &&
-      now - timestamp <= ONE_MINUTE
-    ) {
-      count++;
-    } else {
-      try {
-        await set(ref(db, "online/" + id), null);
-      } catch (err) {
-        console.error("Presence cleanup failed:", err);
-      }
-    }
+  for (const entry of Object.values(data)) {
+    if (entry && entry.online === true) count++;
   }
 
   const counter = document.getElementById("onlineCounter");
   if (counter) counter.textContent = "🟢 Online " + count;
-}
+});
 
-cleanPresence();
-setInterval(cleanPresence, 5000);
 </script>
 
 
