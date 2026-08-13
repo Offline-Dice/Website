@@ -1284,26 +1284,37 @@ if (!sessionId) {
 const userRef = ref(db, "online/" + sessionId);
 const ONE_MINUTE = 60 * 1000;
 
-function heartbeat() {
-  return set(userRef, {
-    online: true,
-    time: serverTimestamp()
-  });
+let heartbeatTimer = null;
+let presenceRegistered = false;
+let presenceRemoved = false;
+
+async function heartbeat() {
+  // Sobald diese Session nach 1 Minute ohne Ping entfernt wurde,
+  // darf derselbe alte Tab sie nicht direkt wieder neu erzeugen.
+  if (presenceRemoved) return;
+
+  try {
+    await set(userRef, {
+      online: true,
+      time: serverTimestamp()
+    });
+    presenceRegistered = true;
+  } catch (err) {
+    console.error("Presence heartbeat failed:", err);
+  }
 }
 
 const connectedRef = ref(db, ".info/connected");
-let heartbeatStarted = false;
 
 onValue(connectedRef, async (snap) => {
-  if (snap.val() === true) {
+  if (snap.val() !== true || presenceRemoved) return;
+
+  try {
     await onDisconnect(userRef).remove();
     await heartbeat();
 
-    if (!heartbeatStarted) {
-      heartbeatStarted = true;
-
-      // Ping alle 15 Sekunden.
-      setInterval(heartbeat, 15000);
+    if (!heartbeatTimer) {
+      heartbeatTimer = setInterval(heartbeat, 15000);
 
       document.addEventListener("visibilitychange", () => {
         if (!document.hidden) heartbeat();
@@ -1312,11 +1323,25 @@ onValue(connectedRef, async (snap) => {
       window.addEventListener("focus", heartbeat);
       window.addEventListener("pageshow", heartbeat);
     }
+  } catch (err) {
+    console.error("Presence connection setup failed:", err);
   }
 });
 
-// Eine Session gilt nur dann als online, wenn ihr letzter Ping
-// höchstens 1 Minute alt ist. Ältere Einträge werden aus Firebase gelöscht.
+// Wenn genau diese Session aus Firebase entfernt wurde (z.B. weil 1 Minute
+// lang kein Ping kam), wird ihr Heartbeat endgültig gestoppt.
+// Dadurch entsteht nicht mehr: offline -> sofort wieder online.
+onValue(userRef, (snapshot) => {
+  if (presenceRegistered && !snapshot.exists()) {
+    presenceRemoved = true;
+
+    if (heartbeatTimer) {
+      clearInterval(heartbeatTimer);
+      heartbeatTimer = null;
+    }
+  }
+});
+
 async function cleanPresence() {
   const snapshot = await new Promise((resolve) => {
     onValue(ref(db, "online"), resolve, { onlyOnce: true });
@@ -1352,7 +1377,6 @@ async function cleanPresence() {
 
 cleanPresence();
 setInterval(cleanPresence, 5000);
-
 </script>
 
 
