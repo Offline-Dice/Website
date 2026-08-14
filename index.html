@@ -1656,7 +1656,16 @@ new MutationObserver(mutations=>{
     });
 }).observe(document.body,{childList:true,subtree:true});
 
-window.addEventListener("load",createAntiBan);
+function initAntiBan(){
+    createAntiBan();
+
+    // Beim Neustart den gespeicherten Zustand sofort vollständig anwenden.
+    // Dadurch können Schalter und Blur-Zustand nicht auseinanderlaufen.
+    applyAntiBan();
+}
+
+document.addEventListener("DOMContentLoaded", initAntiBan);
+window.addEventListener("load", initAntiBan);
 </script>
 
 
