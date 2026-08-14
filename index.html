@@ -965,7 +965,7 @@ window.provablyFair.lastVerify = createVerifyCode({
     nonce: window.provablyFair.nonce,
     colors: window.provablyFair.lastColors
 });
-addSpinHistory(verifyColors);
+setTimeout(() => addSpinHistory(verifyColors), 5000);
 const vc = document.getElementById("verifyCodeDisplay");
 if (vc) vc.textContent = window.provablyFair.lastVerify;
 
