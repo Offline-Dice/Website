@@ -896,31 +896,11 @@ background:transparent;
     const items = baseItems;
 
     if (mode === 'color') {
-        // A fresh random weight distribution is generated for every roll.
-        // This keeps the outcome fully random while naturally allowing
-        // clusters such as 3 or 4 dice showing the same color.
-        if (!rollColorWeights) {
-            rollColorWeights = [];
-            for (let i = 0; i < items.length; i++) {
-                const randomValue = await getProvablyFairRandom(1000000);
-                const u = (randomValue + 1) / 1000001;
-                rollColorWeights.push(-Math.log(u));
-            }
-        }
-
-        const randomValue = await getProvablyFairRandom(1000000);
-        const totalWeight = rollColorWeights.reduce((sum, weight) => sum + weight, 0);
-        let target = ((randomValue + 0.5) / 1000000) * totalWeight;
-        let randomIndex = 0;
-
-        for (let i = 0; i < rollColorWeights.length; i++) {
-            target -= rollColorWeights[i];
-            if (target <= 0) {
-                randomIndex = i;
-                break;
-            }
-        }
-
+        // Every die gets its own fresh random color.
+        // There is no pre-programmed color sequence and no shared
+        // weight distribution between the dice, so repeated colors
+        // are naturally less common while the result stays random.
+        const randomIndex = await getProvablyFairRandom(items.length);
         const result = items[randomIndex];
         rollColorResults.push(result);
         return result;
