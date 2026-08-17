@@ -207,12 +207,43 @@ flex-wrap:wrap;
 
         /* Während des Rolls wird die Seite wie im Referenzvideo auf den Hintergrund reduziert.
            Die Würfel kommen clean ins Zentrum und bleiben ruhig – keine Wackel-Animation. */
+        /* Sofortiger Fokusmodus: kein kurzes Aufblitzen der normalen Seite beim Roll-Again-Klick. */
+        body.dice-focus-mode {
+            overflow: hidden !important;
+        }
+
         body.dice-focus-mode > * {
+            display: none !important;
             visibility: hidden !important;
         }
 
         body.dice-focus-mode > #diceResultArea {
+            display: flex !important;
             visibility: visible !important;
+        }
+
+        body.dice-focus-mode #diceResultArea,
+        body.dice-focus-mode #diceResultArea * {
+            visibility: visible !important;
+        }
+
+        /* The Roll Again button must never flash or remain clickable during the focused roll. */
+        body.dice-focus-mode #rollButton {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        body.dice-roll-active #rollButton {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        body.dice-focus-mode {
+            cursor: default !important;
         }
 
         body.dice-focus-mode #diceResultArea {
@@ -973,10 +1004,9 @@ background:transparent;
             const mode = document.getElementById("colorDice").value;
             const btn = this;
 
-            btn.classList.remove("pressed");
-            void btn.offsetWidth;
-            btn.classList.add("pressed");
-
+            // The roll animation handles the visual transition itself.
+            // Do not animate the button here because it can flash for a frame
+            // while the focus mode is being activated.
             if (mode === "color") {
                 rollDice();
             } else {
@@ -984,9 +1014,18 @@ background:transparent;
             }
         });
 
+        let diceRollInProgress = false;
+
         async function rollDice() {
+            // Prevent double-clicks / overlapping rolls. Overlapping async rolls were
+            // causing the Roll Again button and result area to briefly reappear.
+            if (diceRollInProgress) return;
+            diceRollInProgress = true;
+
             const resultDiv = document.getElementById("diceResultArea");
             const rollButton = document.getElementById("rollButton");
+            rollButton.disabled = true;
+            rollButton.classList.remove("pressed");
 
             // Referenzposition merken, damit nach dem Roll alles exakt an seinen
             // ursprünglichen Platz zurückgeht. Während des Rolls wird nur der
@@ -994,12 +1033,21 @@ background:transparent;
             const originalParent = resultDiv.parentElement;
             const originalNextSibling = resultDiv.nextSibling;
 
+            /* Fokusmodus zuerst aktivieren, damit zwischen Klick und Würfelansicht
+               kein Frame der normalen Website sichtbar werden kann. */
+            // Enter the clean roll screen before touching the button/result DOM.
+            // The button is explicitly hidden for the entire roll so it can never
+            // flash between the dice animation and the final colors.
+            document.body.classList.add("dice-focus-mode", "dice-roll-active");
+            rollButton.style.display = "none";
+            rollButton.style.visibility = "hidden";
+            rollButton.style.opacity = "0";
+            rollButton.style.pointerEvents = "none";
+            document.body.appendChild(resultDiv);
+
             resultDiv.innerHTML = "";
             rollColorResults = [];
             rollColorWeights = null;
-
-            document.body.classList.add("dice-focus-mode");
-            document.body.appendChild(resultDiv);
 
             const status = document.createElement("div");
             status.className = "dice-rolling-status";
@@ -1062,12 +1110,21 @@ background:transparent;
                 block.querySelector('.dot').style.backgroundColor = '#FFFFFF';
             });
 
-            document.body.classList.remove("dice-focus-mode");
             if (originalNextSibling && originalNextSibling.parentNode === originalParent) {
                 originalParent.insertBefore(resultDiv, originalNextSibling);
             } else {
                 originalParent.appendChild(resultDiv);
             }
+
+            // Restore the normal page only after the result is back in place.
+            // This prevents any intermediate frame where ROLL AGAIN is visible.
+            document.body.classList.remove("dice-focus-mode", "dice-roll-active");
+            rollButton.style.display = "";
+            rollButton.style.visibility = "";
+            rollButton.style.opacity = "";
+            rollButton.style.pointerEvents = "";
+            rollButton.disabled = false;
+            diceRollInProgress = false;
 
             console.log("CURRENT COLORS:", verifyColors);
             window.provablyFair.lastColors = verifyColors.map(c => c.toLowerCase());
