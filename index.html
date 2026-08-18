@@ -265,13 +265,16 @@ flex-wrap:wrap;
         }
 
         .rolling-dice {
-            animation: dice-roll-entry .22s ease-out both !important;
-            transform: none !important;
+            animation: dice-roll-shake .16s ease-in-out infinite !important;
         }
 
-        @keyframes dice-roll-entry {
-            from { opacity: 0; transform: scale(.92); }
-            to { opacity: 1; transform: scale(1); }
+        @keyframes dice-roll-shake {
+            0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+            20%  { transform: translate(-4px, 2px) rotate(-1.5deg) scale(1.01); }
+            40%  { transform: translate(4px, -2px) rotate(1.5deg) scale(1.01); }
+            60%  { transform: translate(-3px, -1px) rotate(-1deg) scale(1.005); }
+            80%  { transform: translate(3px, 1px) rotate(1deg) scale(1.005); }
+            100% { transform: translate(0, 0) rotate(0deg) scale(1); }
         }
 
         .dot {
