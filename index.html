@@ -267,6 +267,14 @@ flex-wrap:wrap;
         .rolling-dice {
             animation: dice-roll-shake .16s ease-in-out infinite !important;
         }
+        .dice-clean-exit {
+            animation: dice-clean-exit .10s ease-out forwards !important;
+        }
+
+        @keyframes dice-clean-exit {
+            0%   { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(.985); }
+        }
 
         @keyframes dice-roll-shake {
             0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
@@ -1126,8 +1134,17 @@ background:transparent;
             // und die komplette normale Seite kommt wieder zurück.
             status.textContent = "";
             status.style.display = "none";
-            blocks.forEach((block, i) => {
+
+            // Clean, very short exit of the dice before the normal page returns.
+            blocks.forEach(block => {
                 block.classList.remove("rolling-dice");
+                void block.offsetWidth;
+                block.classList.add("dice-clean-exit");
+            });
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            blocks.forEach((block, i) => {
+                block.classList.remove("dice-clean-exit");
                 block.style.backgroundColor = verifyColors[i];
                 block.querySelector('.dot').style.backgroundColor = '#FFFFFF';
             });
