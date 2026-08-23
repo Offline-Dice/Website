@@ -668,7 +668,23 @@ box-shadow:0 4px 10px rgba(0,0,0,.3);
 #persistentAnnouncementText{
   white-space:pre-wrap;
   overflow-wrap:anywhere;
+  display:inline;
 }
+#persistentAnnouncementBox{
+  display:none;
+}
+#persistentAnnouncementLink{
+  display:none;
+  margin-left:8px;
+  white-space:nowrap;
+  vertical-align:baseline;
+}
+#persistentAnnouncementLink a{
+  color:#2196f3;
+  text-decoration:underline;
+  font-weight:bold;
+}
+
 
 </style>
 </meta>
@@ -902,7 +918,7 @@ background:transparent;
 </div>
 
 <div id="persistentAnnouncementBox" style="display:none;">
-  <div id="persistentAnnouncementText"></div>
+  <span id="persistentAnnouncementText"></span><span id="persistentAnnouncementLink"><a id="persistentAnnouncementLinkAnchor" href="#" target="_blank" rel="noopener noreferrer"></a></span>
 </div>
 <button id="rollButton">ROLL AGAIN !</button>
 <div id="provablyFairBox" style="display:none;">
@@ -1644,13 +1660,29 @@ onValue(ref(db, "announcements/permanent"), (snap)=>{
   const data = snap.val();
   const box = document.getElementById("persistentAnnouncementBox");
   const text = document.getElementById("persistentAnnouncementText");
+  const linkBox = document.getElementById("persistentAnnouncementLink");
+  const linkAnchor = document.getElementById("persistentAnnouncementLinkAnchor");
   if(!box || !text) return;
 
   if(data && data.message){
     text.textContent = data.message;
+    if(linkBox && linkAnchor && data.linkText && data.linkUrl){
+      linkAnchor.textContent = data.linkText;
+      linkAnchor.href = data.linkUrl;
+      linkBox.style.display = "inline";
+    }else if(linkBox){
+      linkAnchor.textContent = "";
+      linkAnchor.removeAttribute("href");
+      linkBox.style.display = "none";
+    }
     box.style.display = "block";
   }else{
     text.textContent = "";
+    if(linkBox){
+      linkBox.style.display = "none";
+      linkAnchor.textContent = "";
+      linkAnchor.removeAttribute("href");
+    }
     box.style.display = "none";
   }
 });
