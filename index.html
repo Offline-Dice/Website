@@ -814,6 +814,232 @@ text-align:center !important; justify-content:center !important; align-items:cen
   transform:translateY(1px) scale(.97);
 }
 </style>
+
+<style id="offline-dice-live-battle-style">
+#liveBattleArea{display:none;width:90%;max-width:650px;margin:0 auto 8px;box-sizing:border-box}
+#liveBattleArea.active{display:block}
+#liveBattleArea .lb-battle-dice-row{
+display:grid;grid-template-columns:1fr 120px 1fr;align-items:center;gap:8px;
+margin:18px auto 10px
+}
+#liveBattleArea .lb-battle-player{text-align:center;min-width:0}
+#liveBattleArea .lb-player-name{
+font-family:'Luckiest Guy',cursive;font-size:21px;line-height:1.1;
+color:var(--white);text-shadow:2px 3px 4px rgba(0,0,0,.3);
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+#liveBattleArea .lb-hits{
+font-family:'Luckiest Guy',cursive;font-size:13px;color:var(--white);
+margin:2px 0 6px;text-shadow:1px 2px 3px rgba(0,0,0,.3)
+}
+#liveBattleArea .lb-hits span{font-size:23px}
+#liveBattleArea .lb-single-battle-die{display:flex;justify-content:center;align-items:center}
+#liveBattleArea .lb-die{margin:0}
+#liveBattleArea .lb-current-color{
+font-size:12px;font-weight:800;color:var(--white);margin-top:4px;min-height:16px
+}
+#liveBattleArea .lb-roll-progress{
+font-family:'Luckiest Guy',cursive;font-size:16px;color:var(--white);
+text-align:center;margin:4px 0 9px;text-shadow:1px 2px 3px rgba(0,0,0,.3)
+}
+#liveBattleArea .lb-player-settings{
+display:grid;grid-template-columns:1fr 1fr;gap:10px
+}
+#liveBattleArea .lb-setting{
+background:rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.25);
+border-radius:10px;padding:9px;text-align:center
+}
+#liveBattleArea .lb-setting input{
+width:100%;height:38px;box-sizing:border-box;padding:7px 10px;
+border:4px solid var(--primary-blue);border-radius:10px;
+background:var(--white);color:var(--dark-blue);
+font-family:'Luckiest Guy',cursive;font-size:14px;outline:none
+}
+#liveBattleArea .lb-setting-label{
+font-family:'Luckiest Guy',cursive;font-size:13px;color:var(--white);margin:6px 0
+}
+#liveBattleArea .lb-colors{display:flex;justify-content:center;gap:5px;flex-wrap:wrap}
+#liveBattleArea .lb-color{
+width:28px;height:28px;border-radius:8px;border:3px solid transparent;
+cursor:pointer;padding:0
+}
+#liveBattleArea .lb-color.selected{
+border-color:var(--white);box-shadow:0 0 0 2px var(--primary-blue);transform:scale(1.06)
+}
+#liveBattleArea .lb-bottom{
+display:flex;justify-content:center;align-items:center;gap:8px;margin:10px 0 18px
+}
+#liveBattleArea #lbRollCount{
+height:42px;padding:5px 10px;border:4px solid var(--primary-blue);
+border-radius:10px;background:var(--white);color:var(--dark-blue);
+font-family:'Luckiest Guy',cursive;font-size:15px;outline:none
+}
+#liveBattleArea #lbSpinButton{
+height:46px;padding:7px 28px;border:0;border-radius:12px;
+background:var(--primary-blue);color:var(--white);
+font-family:'Luckiest Guy',cursive;font-size:21px;cursor:pointer;
+box-shadow:4px 4px 8px rgba(0,0,0,.25)
+}
+#liveBattleArea #lbSpinButton:disabled{opacity:.55;cursor:not-allowed}
+#liveBattleArea .lb-die.lb-battle-rolling{
+animation:dice-roll-shake .16s ease-in-out infinite !important
+}
+#liveBattleArea .lb-die.lb-battle-exit{
+animation:dice-clean-exit .10s ease-out forwards !important
+}
+@media(max-width:600px){
+#liveBattleArea .lb-player-settings{grid-template-columns:1fr}
+#liveBattleArea .lb-die{width:82px;height:82px;border-width:9px;border-radius:23px}
+#liveBattleArea .lb-battle-dice-row{grid-template-columns:1fr 95px 1fr}
+}
+
+#liveBattleArea .lb-single-battle-die{
+display:flex;justify-content:center;align-items:center;gap:12px;
+width:100%;min-height:105px;flex-wrap:nowrap;overflow:hidden
+}
+#liveBattleArea .lb-single-battle-die .lb-die{
+flex:0 0 78px;width:78px;height:78px;border-radius:22px;border-width:9px
+}
+@media(max-width:700px){
+#liveBattleArea .lb-single-battle-die{gap:7px}
+#liveBattleArea .lb-single-battle-die .lb-die{
+flex:0 0 62px;width:62px;height:62px;border-width:7px;border-radius:18px
+}
+}
+
+#liveBattleArea .lb-battle-dice-row{margin:8px auto 2px}
+#liveBattleArea .lb-roll-progress{margin:1px 0 5px}
+#liveBattleArea .lb-player-name{font-size:19px}
+#liveBattleArea .lb-hits{margin:1px 0 4px}
+#liveBattleArea .lb-player-settings{margin-top:2px}
+#liveBattleArea .lb-bottom{margin:7px 0 10px}
+
+/* Live Battle: full-width dice row, just like the normal Color Dice area */
+#liveBattleArea .lb-battle-dice-row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+width:100%;
+margin:10px auto 3px;
+align-items:start;
+}
+#liveBattleArea .lb-single-battle-die{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:12px;
+width:100%;
+min-height:105px;
+flex-wrap:nowrap;
+overflow:visible;
+box-sizing:border-box;
+}
+#liveBattleArea .lb-single-battle-die .lb-die{
+flex:0 0 78px;
+width:78px;
+height:78px;
+box-sizing:border-box;
+}
+@media(max-width:700px){
+#liveBattleArea .lb-single-battle-die{gap:7px}
+#liveBattleArea .lb-single-battle-die .lb-die{
+flex:0 0 60px;width:60px;height:60px;border-width:7px;border-radius:18px
+}
+}
+
+#liveBattleArea.lb-locked .lb-setting input,
+#liveBattleArea.lb-locked .lb-color,
+#liveBattleArea.lb-locked #lbRollCount{
+opacity:.55;
+cursor:not-allowed;
+}
+
+#lbWinnerOverlay{
+display:none;position:absolute;inset:0;z-index:50;align-items:center;justify-content:center;
+background:rgba(4,13,35,.88);backdrop-filter:blur(5px);border-radius:16px
+}
+#lbWinnerOverlay.active{display:flex;animation:lbWinnerFade .35s ease-out}
+#lbWinnerOverlay .lb-winner-box{
+text-align:center;padding:28px 35px;border-radius:18px;
+background:linear-gradient(145deg,rgba(16,83,180,.96),rgba(5,31,80,.98));
+border:3px solid rgba(255,255,255,.8);
+box-shadow:0 0 35px rgba(0,102,255,.55),0 15px 35px rgba(0,0,0,.45);
+animation:lbWinnerPop .55s cubic-bezier(.2,1.35,.4,1)
+}
+#lbWinnerOverlay .lb-winner-small{
+font-family:'Luckiest Guy',cursive;font-size:22px;color:#fff;
+letter-spacing:2px;text-shadow:2px 3px 4px rgba(0,0,0,.35)
+}
+#lbWinnerOverlay .lb-winner-name{
+font-family:'Luckiest Guy',cursive;font-size:48px;color:#fff;margin:3px 0;
+text-shadow:3px 4px 0 rgba(0,0,0,.2),0 0 18px rgba(255,255,255,.3)
+}
+#lbWinnerOverlay .lb-winner-score{
+font-family:'Luckiest Guy',cursive;font-size:20px;color:#fff;margin-bottom:18px
+}
+#lbWinnerOverlay #lbWinnerClose{
+border:0;border-radius:11px;padding:9px 22px;background:#fff;color:var(--dark-blue);
+font-family:'Luckiest Guy',cursive;font-size:18px;cursor:pointer
+}
+@keyframes lbWinnerFade{from{opacity:0}to{opacity:1}}
+@keyframes lbWinnerPop{from{transform:scale(.55) rotate(-3deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+@keyframes lbWinnerGlow{0%,100%{box-shadow:0 0 18px rgba(0,102,255,.4)}50%{box-shadow:0 0 45px rgba(0,102,255,.9)}}
+#lbWinnerOverlay.active .lb-winner-box{animation:lbWinnerPop .55s cubic-bezier(.2,1.35,.4,1),lbWinnerGlow 1.2s .55s ease-in-out 2}
+#liveBattleArea.lb-in-round .lb-mode-lock{
+pointer-events:none;opacity:.55
+}
+
+/* Winner overlay: smooth intro/outro */
+#lbWinnerOverlay{
+opacity:0;
+pointer-events:none;
+transition:opacity .32s ease;
+}
+#lbWinnerOverlay.active{
+opacity:1;
+pointer-events:auto;
+}
+#lbWinnerOverlay .lb-winner-box{
+transform:translateY(18px) scale(.88);
+opacity:0;
+transition:transform .42s cubic-bezier(.2,1.25,.35,1),opacity .28s ease;
+}
+#lbWinnerOverlay.active .lb-winner-box{
+transform:translateY(0) scale(1);
+opacity:1;
+}
+#lbWinnerOverlay.lb-closing .lb-winner-box{
+transform:translateY(18px) scale(.88);
+opacity:0;
+}
+#lbWinnerOverlay .lb-winner-small{
+letter-spacing:3px;
+}
+#lbWinnerOverlay #lbWinnerClose{
+min-width:175px;
+height:46px;
+padding:8px 24px;
+border:3px solid rgba(255,255,255,.85);
+border-radius:13px;
+background:linear-gradient(180deg,#ffffff,#e8f3ff);
+color:#087fd1;
+font-family:'Luckiest Guy',cursive;
+font-size:19px;
+letter-spacing:.3px;
+box-shadow:0 5px 0 rgba(0,40,100,.25),0 8px 18px rgba(0,0,0,.22);
+transition:transform .15s ease,box-shadow .15s ease,filter .15s ease;
+}
+#lbWinnerOverlay #lbWinnerClose:hover{
+transform:translateY(-2px) scale(1.025);
+box-shadow:0 7px 0 rgba(0,40,100,.22),0 11px 22px rgba(0,0,0,.25);
+filter:brightness(1.03);
+}
+#lbWinnerOverlay #lbWinnerClose:active{
+transform:translateY(2px) scale(.98);
+box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
+}
+</style>
+
 </head>
 <body>
 <button id="last5Toggle">LAST 5 SPINS</button>
@@ -871,6 +1097,7 @@ text-align:center !important; justify-content:center !important; align-items:cen
 <select id="colorDice">
 <option value="color">Color Dice</option>
 <option value="coinflip">Coinflip</option>
+<option value="livebattle">COLOR DICE Battle</option>
 </select>
 <select id="themeSelect">
 <option selected="" value="default">SELECT THEME</option>
@@ -892,6 +1119,73 @@ text-align:center !important; justify-content:center !important; align-items:cen
 </div>
 <div class="dice-result" id="diceResultArea"></div>
 
+<div id="lbWinnerOverlay" aria-hidden="true">
+  <div class="lb-winner-box">
+    <div class="lb-winner-small">WINNER</div>
+    <div class="lb-winner-name" id="lbWinnerName">PLAYER</div>
+    <div class="lb-winner-score" id="lbWinnerScore">0 HITS</div>
+    <button type="button" id="lbWinnerClose">CONTINUE</button>
+  </div>
+</div>
+<div id="liveBattleArea" aria-hidden="true">
+  <div class="lb-battle-dice-row">
+    <div class="lb-battle-player">
+      <div class="lb-player-name" id="lbPlayerDisplay1">PLAYER 1</div>
+      <div class="lb-hits"><span id="lbHits1">0</span> HITS</div>
+      <div class="lb-current-color" id="lbCurrentColor1">🔵 Blue</div>
+    </div>
+
+    <div class="lb-battle-player">
+      <div class="lb-player-name" id="lbPlayerDisplay2">PLAYER 2</div>
+      <div class="lb-hits"><span id="lbHits2">0</span> HITS</div>
+      <div class="lb-current-color" id="lbCurrentColor2">🟢 Green</div>
+    </div>
+  </div>
+
+  <div class="lb-single-battle-die" id="lbDiceArea"></div>
+
+  <div class="lb-roll-progress" id="lbRollProgress">ROLL 0 / 10</div>
+
+  <div class="lb-player-settings">
+    <div class="lb-setting">
+      <input id="lbName1" maxlength="16" placeholder="PLAYER 1 NAME" autocomplete="off">
+      <div class="lb-setting-label">CHOOSE COLOR</div>
+      <div class="lb-colors">
+        <button type="button" class="lb-color selected" data-player="1" data-name="Blue" data-color="#0066ff" style="background:#0066ff"></button>
+        <button type="button" class="lb-color" data-player="1" data-name="Red" data-color="#ef4444" style="background:#ef4444"></button>
+        <button type="button" class="lb-color" data-player="1" data-name="Orange" data-color="#f59e0b" style="background:#f59e0b"></button>
+        <button type="button" class="lb-color" data-player="1" data-name="Yellow" data-color="#facc15" style="background:#facc15"></button>
+        <button type="button" class="lb-color" data-player="1" data-name="Green" data-color="#008b00" style="background:#008b00"></button>
+        <button type="button" class="lb-color" data-player="1" data-name="Purple" data-color="#8b2be2" style="background:#8b2be2"></button>
+      </div>
+    </div>
+
+    <div class="lb-setting">
+      <input id="lbName2" maxlength="16" placeholder="PLAYER 2 NAME" autocomplete="off">
+      <div class="lb-setting-label">CHOOSE COLOR</div>
+      <div class="lb-colors">
+        <button type="button" class="lb-color" data-player="2" data-name="Blue" data-color="#0066ff" style="background:#0066ff"></button>
+        <button type="button" class="lb-color" data-player="2" data-name="Red" data-color="#ef4444" style="background:#ef4444"></button>
+        <button type="button" class="lb-color" data-player="2" data-name="Orange" data-color="#f59e0b" style="background:#f59e0b"></button>
+        <button type="button" class="lb-color" data-player="2" data-name="Yellow" data-color="#facc15" style="background:#facc15"></button>
+        <button type="button" class="lb-color selected" data-player="2" data-name="Green" data-color="#008b00" style="background:#008b00"></button>
+        <button type="button" class="lb-color" data-player="2" data-name="Purple" data-color="#8b2be2" style="background:#8b2be2"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="lb-bottom">
+    <select id="lbRollCount" aria-label="Number of rolls">
+      <option value="5">5 ROLLS</option>
+      <option value="10" selected>10 ROLLS</option>
+      <option value="20">20 ROLLS</option>
+      <option value="50">50 ROLLS</option>
+    </select>
+    <button id="lbSpinButton" type="button">ROLL AGAIN !</button>
+  </div>
+</div>
+
+<div id="verifyBox"
 <div id="verifyBox" style="
 margin:8px auto 4px;
 padding:0;
@@ -988,7 +1282,8 @@ background:transparent;
 
         const modeValues = {
             color: 1,
-            coinflip: 1
+            coinflip: 1,
+            livebattle: 1
         };
 
         const validColors = ["red", "orange", "gold", "green", "blue", "purple"];
@@ -1043,7 +1338,25 @@ background:transparent;
 }
 
         document.getElementById("numDice").addEventListener("change", function () {
-            numDice = parseInt(this.value);
+            const mode = document.getElementById("colorDice").value;
+
+            if (mode === "livebattle") {
+                const selected = Math.max(1, Math.min(6, parseInt(this.value) || 1));
+                modeValues.livebattle = selected;
+                numDice = selected;
+                if (typeof resetLiveBattle === 'function') resetLiveBattle();
+                if (typeof renderPreview === 'function') renderPreview();
+                return;
+            }
+
+            modeValues[mode] = parseInt(this.value);
+            numDice = modeValues[mode];
+
+            if (mode === "color") {
+                rollDice();
+            } else {
+                spinWheel();
+            }
         });
 
         document.getElementById("rollButton").addEventListener("click", function () {
@@ -1255,13 +1568,44 @@ background:transparent;
             const wheelWrapper = document.getElementById("wheelWrapper");
             const numDiceSelect = document.getElementById("numDice");
             const rollButton = document.getElementById("rollButton");
+            const verifyBox = document.getElementById("verifyBox");
+            const liveBattleArea = document.getElementById("liveBattleArea");
             const isColorMode = mode === "color";
+            const isLiveBattle = mode === "livebattle";
+
+            if (isLiveBattle) {
+                // Live Battle is based on the ORIGINAL Color Dice layout.
+                // It never uses the coin/head/tails wheel and never shows seconds.
+                const savedLiveDice = Math.max(1, Math.min(6, Number(modeValues.livebattle) || 1));
+                numDice = savedLiveDice;
+                numDiceSelect.innerHTML = '';
+                for (let i = 1; i <= 6; i++) {
+                    const option = document.createElement('option');
+                    option.value = String(i);
+                    option.textContent = i + ' Dice';
+                    numDiceSelect.appendChild(option);
+                }
+                numDiceSelect.value = String(savedLiveDice);
+                numDiceSelect.style.display = 'block';
+
+                diceResultArea.style.display = 'none';
+                wheelWrapper.style.display = 'none';
+                if (verifyBox) verifyBox.style.display = 'none';
+                rollButton.style.display = 'none';
+                liveBattleArea.classList.add('active');
+                liveBattleArea.setAttribute('aria-hidden','false');
+
+                resetLiveBattle();
+                updateInfoContainer(true);
+                return;
+            }
+
+            liveBattleArea.classList.remove('active');
+            liveBattleArea.setAttribute('aria-hidden','true');
 
             numDice = modeValues[mode];
             updateNumDiceOptions();
             numDiceSelect.value = numDice;
-
-            const verifyBox = document.getElementById("verifyBox");
 
             if (isColorMode) {
                 diceResultArea.style.display = 'flex';
@@ -1288,6 +1632,13 @@ background:transparent;
 
         document.getElementById("numDice").addEventListener("change", function () {
             const mode = document.getElementById("colorDice").value;
+            if (mode === "livebattle") {
+                modeValues.livebattle = Math.max(1, Math.min(6, parseInt(this.value) || 1));
+                numDice = modeValues.livebattle;
+                if (typeof resetLiveBattle === 'function') resetLiveBattle();
+                return;
+            }
+
             modeValues[mode] = parseInt(this.value);
             numDice = modeValues[mode];
 
@@ -1301,7 +1652,7 @@ background:transparent;
         function updateNumDiceOptions() {
             const numDiceSelect = document.getElementById("numDice");
             const mode = document.getElementById("colorDice").value;
-            const isColorMode = mode === "color";
+            const isColorMode = mode === "color" || mode === "livebattle";
 
             numDiceSelect.innerHTML = "";
 
@@ -2743,6 +3094,229 @@ function changeMiniCounter(amount) {
   } else {
     startIntro();
   }
+})();
+</script>
+
+
+<script id="offline-dice-live-battle-script">
+(function(){
+  const gameSelect=document.getElementById('colorDice');
+  const area=document.getElementById('liveBattleArea');
+  const spin=document.getElementById('lbSpinButton');
+  const rollCount=document.getElementById('lbRollCount');
+  if(!gameSelect||!area||!spin)return;
+
+  const colors=[
+    {name:'Red',color:'#ef4444',emoji:'🔴'},
+    {name:'Orange',color:'#f59e0b',emoji:'🟠'},
+    {name:'Yellow',color:'#facc15',emoji:'🟡'},
+    {name:'Green',color:'#008b00',emoji:'🟢'},
+    {name:'Blue',color:'#0066ff',emoji:'🔵'},
+    {name:'Purple',color:'#8b2be2',emoji:'🟣'}
+  ];
+
+  const p=[
+    {name:'PLAYER 1',color:'#0066ff',colorName:'Blue',hits:0},
+    {name:'PLAYER 2',color:'#008b00',colorName:'Green',hits:0}
+  ];
+  let roll=0,rolling=false;
+
+  function setModeLocked(locked){
+    gameSelect.disabled=locked;
+    document.getElementById('numDice').disabled=locked;
+    area.classList.toggle('lb-in-round',locked);
+  }
+
+  function showWinner(){
+    const overlay=document.getElementById('lbWinnerOverlay');
+    const name=document.getElementById('lbWinnerName');
+    const score=document.getElementById('lbWinnerScore');
+    let winner='DRAW';
+    if(p[0].hits>p[1].hits) winner=p[0].name;
+    else if(p[1].hits>p[0].hits) winner=p[1].name;
+    name.textContent=winner;
+    score.textContent=(p[0].hits+' - '+p[1].hits+' HITS');
+    overlay.classList.remove('lb-closing');
+    overlay.classList.add('active');
+    overlay.setAttribute('aria-hidden','false');
+  }
+
+  function hideWinner(){
+    const overlay=document.getElementById('lbWinnerOverlay');
+    overlay.classList.remove('active');
+    overlay.setAttribute('aria-hidden','true');
+  }
+
+  function updateNames(){
+    p[0].name=(document.getElementById('lbName1').value.trim()||'PLAYER 1').slice(0,16);
+    p[1].name=(document.getElementById('lbName2').value.trim()||'PLAYER 2').slice(0,16);
+    document.getElementById('lbPlayerDisplay1').textContent=p[0].name;
+    document.getElementById('lbPlayerDisplay2').textContent=p[1].name;
+  }
+
+  function chooseColor(player,btn){
+    if(area.classList.contains('lb-locked')) return;
+    const x=p[player-1];
+    x.color=btn.dataset.color;
+    x.colorName=btn.dataset.name;
+    btn.parentElement.querySelectorAll('.lb-color').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    const c=colors.find(v=>v.name===x.colorName);
+    document.getElementById('lbCurrentColor'+player).textContent=(c?c.emoji:'🎨')+' '+x.colorName;
+    renderPreview();
+    // Changing the target color starts a fresh battle.
+    x.hits=0;
+    document.getElementById('lbHits'+player).textContent='0';
+    roll=0;
+    document.getElementById('lbRollProgress').textContent='ROLL 0 / '+rollCount.value;
+  }
+
+  document.querySelectorAll('#liveBattleArea .lb-color').forEach(btn=>{
+    btn.addEventListener('click',()=>chooseColor(Number(btn.dataset.player),btn));
+  });
+  document.getElementById('lbName1').addEventListener('input',()=>{if(!area.classList.contains('lb-locked'))updateNames();});
+  document.getElementById('lbName2').addEventListener('input',()=>{if(!area.classList.contains('lb-locked'))updateNames();});
+
+  function setBattleLocked(locked){
+    const name1=document.getElementById('lbName1');
+    const name2=document.getElementById('lbName2');
+    const diceSelect=document.getElementById('numDice');
+    const colorButtons=document.querySelectorAll('#liveBattleArea .lb-color');
+
+    name1.disabled=locked;
+    name2.disabled=locked;
+    rollCount.disabled=locked;
+    diceSelect.disabled=locked;
+    colorButtons.forEach(btn=>btn.disabled=locked);
+    area.classList.toggle('lb-locked',locked);
+  }
+
+  function resetLiveBattle(){
+    hideWinner();
+    setModeLocked(false);
+    setBattleLocked(false);
+    rolling=false;roll=0;
+    p[0].hits=0;p[1].hits=0;
+    document.getElementById('lbHits1').textContent='0';
+    document.getElementById('lbHits2').textContent='0';
+    document.getElementById('lbRollProgress').textContent='ROLL 0 / '+rollCount.value;
+    renderPreview();
+    updateNames();
+  }
+
+  window.resetLiveBattle=resetLiveBattle;
+
+  rollCount.addEventListener('change',()=>{
+    if(area.classList.contains('lb-locked')) return;
+    if(gameSelect.value==='livebattle'){
+      roll=0;p[0].hits=0;p[1].hits=0;
+      document.getElementById('lbHits1').textContent='0';
+      document.getElementById('lbHits2').textContent='0';
+      document.getElementById('lbRollProgress').textContent='ROLL 0 / '+rollCount.value;
+    }
+  });
+
+  function createBattleDie(color){
+    const d=document.createElement('div');
+    d.className='color-block lb-die';
+    d.style.backgroundColor=color;
+    const dot=document.createElement('div');
+    dot.className='dot';
+    d.appendChild(dot);
+    return d;
+  }
+
+  function renderPreview(){
+    const area=document.getElementById('lbDiceArea');
+    const n=Math.max(1,Math.min(6,Number(document.getElementById('numDice').value)||1));
+    area.innerHTML='';
+    for(let i=0;i<n;i++) area.appendChild(createBattleDie('#bdbdbd'));
+  }
+
+  async function spinBattle(){
+    if(rolling||gameSelect.value!=='livebattle')return;
+    rolling=true;spin.disabled=true;
+    setBattleLocked(true);
+    setModeLocked(true);
+    updateNames();
+
+    const total=Number(rollCount.value)||10;
+    const n=Math.max(1,Math.min(6,Number(document.getElementById('numDice').value)||1));
+
+    if(roll===0){
+      p[0].hits=0;p[1].hits=0;
+      document.getElementById('lbHits1').textContent='0';
+      document.getElementById('lbHits2').textContent='0';
+    }
+
+    roll++;
+    document.getElementById('lbRollProgress').textContent='ROLL '+roll+' / '+total;
+
+    const area=document.getElementById('lbDiceArea');
+    area.innerHTML='';
+    const dice=[];
+    for(let i=0;i<n;i++){
+      const d=createBattleDie('#e0e0e0');
+      d.classList.add('lb-battle-rolling');
+      area.appendChild(d);
+      dice.push(d);
+    }
+
+    try{ if(typeof playDiceRollSound==='function') playDiceRollSound(); }catch(e){}
+    await new Promise(r=>setTimeout(r,1000));
+
+    let matches1=0,matches2=0;
+    for(let i=0;i<n;i++){
+      const result=colors[Math.floor(Math.random()*colors.length)];
+      dice[i].classList.remove('lb-battle-rolling');
+      dice[i].style.backgroundColor=result.color;
+      dice[i].classList.add('lb-battle-exit');
+
+      if(result.color.toLowerCase()===p[0].color.toLowerCase())matches1++;
+      if(result.color.toLowerCase()===p[1].color.toLowerCase())matches2++;
+      setTimeout(()=>dice[i].classList.remove('lb-battle-exit'),120);
+    }
+
+    p[0].hits+=matches1;
+    p[1].hits+=matches2;
+    document.getElementById('lbHits1').textContent=p[0].hits;
+    document.getElementById('lbHits2').textContent=p[1].hits;
+
+    await new Promise(r=>setTimeout(r,180));
+    rolling=false;spin.disabled=false;
+
+    if(roll>=total){
+      document.getElementById('lbRollProgress').textContent='FINISHED · '+total+' ROLLS';
+      roll=0;
+      showWinner();
+      setModeLocked(true);
+    }
+  }
+
+  spin.addEventListener('click',spinBattle);
+
+  document.getElementById('lbWinnerClose').addEventListener('click',()=>{
+    const overlay=document.getElementById('lbWinnerOverlay');
+    overlay.classList.add('lb-closing');
+    setTimeout(()=>{
+      overlay.classList.remove('active','lb-closing');
+      overlay.setAttribute('aria-hidden','true');
+      setModeLocked(false);
+      setBattleLocked(false);
+      resetLiveBattle();
+    },320);
+  });
+
+  // Keep Live Battle isolated from the original Color Dice/Coinflip logic.
+  gameSelect.addEventListener('change',()=>{
+    if(gameSelect.value==='livebattle'){
+      const select=document.getElementById('numDice');
+      const saved=Math.max(1,Math.min(6,Number(modeValues.livebattle)||1));
+      select.value=String(saved);
+      resetLiveBattle();
+      renderPreview();
+    }
+  });
 })();
 </script>
 
