@@ -1040,8 +1040,40 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
 }
 </style>
 
-</head>
+
+
+<style id="od-ban-overlay-css">
+#od-ban-overlay{
+  position:fixed;inset:0;z-index:2147483647;display:none;
+  align-items:center;justify-content:center;
+  background:rgba(4,7,14,.96);backdrop-filter:blur(12px);
+  color:#fff;text-align:center;padding:24px;box-sizing:border-box;
+}
+#od-ban-overlay.od-ban-visible{display:flex}
+.od-ban-card{
+  width:min(520px,100%);padding:42px 30px;border-radius:26px;
+  background:linear-gradient(145deg,#151b29,#080c15);
+  border:1px solid rgba(255,80,80,.35);
+  box-shadow:0 25px 90px rgba(0,0,0,.65),0 0 60px rgba(220,30,30,.12);
+}
+.od-ban-icon{font-size:54px;margin-bottom:12px}
+.od-ban-title{font-size:36px;font-weight:900;margin-bottom:10px}
+.od-ban-text{color:rgba(255,255,255,.62);font-size:16px;line-height:1.5}
+</style>
+
+<style id="od-vip-room-css">#od-vip-room{display:none;position:relative;width:min(360px,calc(100% - 32px));margin:0 auto 18px;padding:9px;box-sizing:border-box;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,rgba(130,80,255,.55),rgba(20,20,35,.92));box-shadow:0 10px 35px rgba(0,0,0,.28)}#od-vip-room:after{content:"VIP ROOM";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:1000;letter-spacing:5px;color:rgba(255,255,255,.09);transform:rotate(-8deg);z-index:0;pointer-events:none}.od-vip-content{position:relative;z-index:1;display:flex;align-items:center;gap:12px}.od-vip-image{width:58px;height:58px;border-radius:13px;object-fit:cover;flex:none;border:1px solid rgba(255,255,255,.3)}.od-vip-name{font-size:19px;font-weight:900;color:#fff}.od-vip-label{font-size:11px;font-weight:900;letter-spacing:2px;color:rgba(255,255,255,.68);margin-top:3px}</style></head>
 <body>
+
+<div id="od-ban-overlay" aria-hidden="true">
+  <div class="od-ban-card">
+    <div class="od-ban-icon">⛔</div>
+    <div class="od-ban-title">You are banned</div>
+    <div class="od-ban-text">
+      Your access to Offline Dice has been blocked by an administrator.
+    </div>
+  </div>
+</div>
+
 <button id="last5Toggle">LAST 5 SPINS</button>
 
 <div id="announcementBox" style="display:none;"><div id="announcementTitle">📢 Announcement</div><div id="announcementText"></div></div>
@@ -1117,7 +1149,7 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
 <option value="spongebob">SPONGEBOB</option>
 </select>
 </div>
-<div class="dice-result" id="diceResultArea"></div>
+<div id="od-vip-room"><div class="od-vip-content"><img class="od-vip-image" id="od-vip-image"><div><div class="od-vip-name" id="od-vip-name"></div><div class="od-vip-label">VIP ROOM</div></div></div></div><div class="dice-result" id="diceResultArea"></div>
 
 <div id="lbWinnerOverlay" aria-hidden="true">
   <div class="lb-winner-box">
@@ -1856,7 +1888,8 @@ font-weight:bold;
 z-index:9999;">
 🟢 Online 0
 </div>
-
+<span class="od-user-box-name" id="od-user-box-name">Guest</span>
+</span>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import { getDatabase, ref, onValue, onDisconnect, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
@@ -1873,6 +1906,43 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+/* Registered users registry — separate from the existing website online counter. */
+(function(){
+  const REGISTERED_USERS_PATH = "registeredUsers";
+
+  window.addEventListener("offlineDiceLogin", function(event){
+    const name = event.detail && event.detail.name;
+    if(!name) return;
+
+    let userId = localStorage.getItem("offlineDiceFirebaseUserId");
+    if(!userId){
+      userId = (crypto.randomUUID ? crypto.randomUUID() :
+        ("u_" + Date.now() + "_" + Math.random().toString(36).slice(2)));
+      localStorage.setItem("offlineDiceFirebaseUserId", userId);
+    }
+
+    const userRef = ref(db, REGISTERED_USERS_PATH + "/" + userId);
+
+    set(userRef, {
+      name: name,
+      registeredAt: serverTimestamp(),
+      lastSeen: serverTimestamp(),
+      online: true
+    }).catch(function(err){
+      console.error("registeredUsers:", err);
+    });
+
+    // Only changes this user's registry record. It never removes the user
+    // and never touches the existing website online counter.
+    onDisconnect(userRef).update({
+      online: false,
+      lastSeen: serverTimestamp()
+    }).catch(function(err){
+      console.error("registeredUsers disconnect:", err);
+    });
+  });
+})();
+
 
 /* Separate Website-Paused overlay. */
 (function(){
@@ -3060,40 +3130,186 @@ function changeMiniCounter(amount) {
   <div class="website-paused-text">The website is paused.</div>
 </div>
 
+
+
+
+<style id="offline-dice-login-css">
+#od-intro .od-login-phase{position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;overflow:hidden;opacity:0;visibility:hidden;pointer-events:none;transform:scale(1.04);transition:opacity .7s ease,transform .8s cubic-bezier(.16,1,.3,1),visibility 0s linear .8s}
+#od-intro.od-show-login .od-login-phase{opacity:1;visibility:visible;pointer-events:auto;transform:scale(1);transition:opacity .7s ease,transform .8s cubic-bezier(.16,1,.3,1),visibility 0s}
+#od-intro .od-login-stars{position:absolute;inset:-10%;opacity:.23;background-image:radial-gradient(circle,#fff 0 1px,transparent 1.5px);background-size:105px 105px;animation:od-login-stars 18s linear infinite}
+#od-intro .od-login-card{position:relative;z-index:3;width:min(450px,calc(100vw - 44px));padding:42px 36px 34px;border:1px solid rgba(120,210,255,.28);border-radius:28px;background:linear-gradient(145deg,rgba(15,28,49,.9),rgba(4,10,21,.94));box-shadow:0 35px 100px rgba(0,0,0,.62),0 0 70px rgba(0,135,255,.14);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);text-align:center;transform:translateY(35px) scale(.94);opacity:0;transition:transform .8s cubic-bezier(.16,1,.3,1),opacity .6s ease}
+#od-intro.od-show-login .od-login-card{transform:translateY(0) scale(1);opacity:1}
+#od-intro .od-login-icon{width:68px;height:68px;margin:0 auto 18px;display:grid;place-items:center;border-radius:20px;background:rgba(0,150,255,.1);border:1px solid rgba(80,195,255,.25);font-size:31px}
+#od-intro .od-login-title{margin:0 0 8px;color:#fff;font-size:clamp(30px,5vw,40px);font-weight:900}
+#od-intro .od-login-subtitle{margin:0 0 25px;color:rgba(255,255,255,.58);font-size:15px}
+#od-intro .od-login-input{width:100%;height:56px;box-sizing:border-box;padding:0 17px;border:1px solid rgba(255,255,255,.13);border-radius:15px;outline:none;background:rgba(255,255,255,.055);color:#fff;font-size:16px}
+#od-intro .od-login-input:focus{border-color:rgba(0,180,255,.8);box-shadow:0 0 0 4px rgba(0,160,255,.1)}
+#od-intro .od-login-button{width:100%;height:56px;margin-top:13px;border:0;border-radius:15px;color:#fff;font-size:16px;font-weight:800;cursor:pointer;background:linear-gradient(110deg,#007fff,#00b9ff,#007fff);background-size:200% 100%;animation:od-login-shimmer 4s linear infinite}
+#od-intro .od-login-error{min-height:18px;margin-top:10px;color:#ff7180;font-size:13px}
+@keyframes od-login-stars{from{transform:translate(0,0)}to{transform:translate(-105px,-80px)}}
+@keyframes od-login-shimmer{from{background-position:0 0}to{background-position:200% 0}}
+</style>
+
+<style id="offline-dice-welcome-css">
+#od-intro .od-welcome-phase{
+  position:absolute;inset:0;z-index:21;display:flex;align-items:center;justify-content:center;
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .65s ease,visibility .65s ease;
+}
+#od-intro.od-show-welcome .od-welcome-phase{
+  opacity:1;visibility:visible;pointer-events:auto;
+}
+#od-intro .od-welcome-glow{
+  position:absolute;width:620px;height:620px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,150,255,.18),rgba(0,150,255,.04) 35%,transparent 70%);
+  animation:od-welcome-pulse 3.5s ease-in-out infinite;
+}
+#od-intro .od-welcome-stars{
+  position:absolute;inset:-10%;opacity:.22;
+  background-image:radial-gradient(circle,#fff 0 1px,transparent 1.5px);
+  background-size:100px 100px;
+  animation:od-welcome-stars 18s linear infinite;
+}
+#od-intro .od-welcome-box{
+  position:relative;z-index:2;text-align:center;
+  transform:translateY(25px) scale(.94);opacity:0;
+  transition:transform .75s cubic-bezier(.16,1,.3,1),opacity .6s ease;
+}
+#od-intro.od-show-welcome .od-welcome-box{
+  transform:translateY(0) scale(1);opacity:1;
+}
+#od-intro .od-welcome-small{
+  color:#fff;font-size:15px;margin-bottom:10px;letter-spacing:1.5px;
+  text-transform:uppercase;font-weight:800;
+  -webkit-text-stroke:1px rgba(0,174,255,.85);
+  text-shadow:0 0 5px rgba(0,174,255,.9),0 0 14px rgba(0,140,255,.7),0 0 28px rgba(0,110,255,.35);
+}
+#od-intro .od-welcome-name{
+  color:#fff;font-size:clamp(38px,7vw,70px);font-weight:900;line-height:1.05;
+  -webkit-text-stroke:2px rgba(0,174,255,.9);
+  text-shadow:0 0 6px rgba(0,190,255,1),0 0 16px rgba(0,150,255,.85),0 0 35px rgba(0,110,255,.5);
+}
+#od-intro .od-welcome-line{
+  width:70px;height:3px;margin:20px auto 0;border-radius:10px;
+  background:linear-gradient(90deg,#008cff,#00c2ff);
+  box-shadow:0 0 20px rgba(0,170,255,.5);
+}
+#od-intro.od-show-welcome .od-intro-logo{
+  animation:od-logo-exit 1.15s cubic-bezier(.16,1,.3,1) forwards;
+}
+@keyframes od-welcome-pulse{0%,100%{transform:scale(.9);opacity:.65}50%{transform:scale(1.08);opacity:1}}
+@keyframes od-welcome-stars{from{transform:translate(0,0)}to{transform:translate(-100px,-80px)}}
+@keyframes od-logo-exit{
+  0%{opacity:1;transform:scale(1);filter:blur(0) drop-shadow(0 0 28px rgba(0,174,255,.5))}
+  45%{opacity:.75;transform:scale(1.08);filter:blur(2px) drop-shadow(0 0 42px rgba(0,174,255,.7))}
+  100%{opacity:0;transform:scale(1.28) translateY(-12px);filter:blur(12px);visibility:hidden}
+}
+</style>
 <div id="od-intro" aria-hidden="true">
   <div class="od-intro-ring"></div>
   <div class="od-intro-core"></div>
   <img class="od-intro-logo" alt="Offline Dice">
   <div class="od-intro-shine"></div>
+
+  <div class="od-login-phase" aria-hidden="true">
+    <div class="od-login-stars"></div>
+    <form class="od-login-card" id="od-login-form" autocomplete="on">
+      <div class="od-login-icon">👤</div>
+      <h2 class="od-login-title">Welcome</h2>
+      <p class="od-login-subtitle">Choose your name to continue</p>
+      <input id="od-login-name" class="od-login-input" type="text" maxlength="24" autocomplete="nickname" placeholder="Your name" required>
+      <button class="od-login-button" type="submit">Continue</button>
+      <div id="od-login-error" class="od-login-error" aria-live="polite"></div>
+    </form>
+  </div>
+
+  <div class="od-welcome-phase" aria-hidden="true">
+    <div class="od-welcome-stars"></div>
+    <div class="od-welcome-glow"></div>
+    <div class="od-welcome-box">
+      <div class="od-welcome-small">Welcome back</div>
+      <div class="od-welcome-name" id="od-welcome-name"></div>
+      <div class="od-welcome-line"></div>
+    </div>
+  </div>
 </div>
 
+
 <script id="clean-blue-intro-script">
-(function () {
-  const intro = document.getElementById("od-intro");
-  if (!intro) return;
+(function(){
+  const intro=document.getElementById("od-intro");
+  const phase=intro&&intro.querySelector(".od-login-phase");
+  const welcome=intro&&intro.querySelector(".od-welcome-phase");
+  const welcomeName=document.getElementById("od-welcome-name");
+  const form=document.getElementById("od-login-form");
+  const input=document.getElementById("od-login-name");
+  const error=document.getElementById("od-login-error");
+  const NAME_KEY="offlineDicePlayerName";
+  if(!intro||!phase||!welcome||!welcomeName||!form||!input)return;
 
-  function startIntro() {
-    const originalLogo = document.querySelector(".top-logo");
-    const introLogo = intro.querySelector(".od-intro-logo");
+  let done=false;
 
-    if (originalLogo && introLogo) {
-      introLogo.src = originalLogo.currentSrc || originalLogo.src;
+  function finish(){
+    if(done)return;
+    done=true;
+    intro.classList.add("is-done");
+    setTimeout(function(){if(intro.parentNode)intro.remove();},650);
+  }
+
+  function showWelcome(name){
+    welcomeName.textContent=name;
+    welcome.setAttribute("aria-hidden","false");
+    intro.classList.add("od-show-welcome");
+    // Welcome animation remains visible for 3 seconds.
+    setTimeout(finish,3000);
+  }
+
+  function finishLogin(name){
+    const cleanName=String(name||"").trim().replace(/\s+/g," ").slice(0,24);
+    if(!cleanName)return;
+    localStorage.setItem(NAME_KEY,cleanName);
+    window.dispatchEvent(new CustomEvent("offlineDiceLogin",{detail:{name:cleanName}}));
+    intro.classList.remove("od-show-login");
+    phase.setAttribute("aria-hidden","true");
+    setTimeout(function(){showWelcome(cleanName);},350);
+  }
+
+  function showLogin(){
+    phase.setAttribute("aria-hidden","false");
+    intro.classList.add("od-show-login");
+    setTimeout(function(){input.focus();},550);
+  }
+
+  form.addEventListener("submit",function(e){
+    e.preventDefault();
+    const name=String(input.value||"").trim().replace(/\s+/g," ").slice(0,24);
+    if(!name){
+      error.textContent="Please enter your name.";
+      input.focus();
+      return;
     }
+    finishLogin(name);
+  });
+  input.addEventListener("input",function(){error.textContent="";});
 
-    /* Let the logo animation finish, then cleanly reveal the real page. */
-    window.setTimeout(function () {
-      intro.classList.add("is-done");
-      window.setTimeout(function () {
-        if (intro && intro.parentNode) intro.remove();
-      }, 650);
-    }, 2350);
+  function start(){
+    const original=document.querySelector(".top-logo");
+    const logo=intro.querySelector(".od-intro-logo");
+    if(original&&logo)logo.src=original.currentSrc||original.src;
+
+    setTimeout(function(){
+      const saved=localStorage.getItem(NAME_KEY);
+      if(saved){
+        // Already logged in: personalized welcome, no login prompt.
+        showWelcome(saved);
+      }else{
+        showLogin();
+      }
+    },2350);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", startIntro, { once: true });
-  } else {
-    startIntro();
-  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});
+  else start();
 })();
 </script>
 
@@ -3320,5 +3536,61 @@ function changeMiniCounter(amount) {
 })();
 </script>
 
-</body>
+
+<script type="module" id="od-ban-check">
+import { initializeApp as odBanInitializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import { getDatabase as odBanGetDatabase, ref as odBanRef, onValue as odBanOnValue } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+
+const odBanFirebaseConfig = {
+  apiKey: "AIzaSyBUT0t1I9Dkee5Ok_uYMzs4WfdwapOA5As",
+  authDomain: "kenzy-dice.firebaseapp.com",
+  projectId: "kenzy-dice",
+  databaseURL: "https://kenzy-dice-default-rtdb.europe-west1.firebasedatabase.app",
+  storageBucket: "kenzy-dice.firebasestorage.app",
+  messagingSenderId: "578956722062",
+  appId: "1:578956722062:web:5156f5737e51ef75246edf"
+};
+
+const odBanApp = odBanInitializeApp(odBanFirebaseConfig, "offlineDiceBanCheck");
+const odBanDb = odBanGetDatabase(odBanApp);
+
+function odShowBan(){
+  const overlay=document.getElementById("od-ban-overlay");
+  if(!overlay)return;
+  overlay.classList.add("od-ban-visible");
+  overlay.setAttribute("aria-hidden","false");
+  document.body.style.overflow="hidden";
+}
+
+function odHideBan(){
+  const overlay=document.getElementById("od-ban-overlay");
+  if(!overlay)return;
+  overlay.classList.remove("od-ban-visible");
+  overlay.setAttribute("aria-hidden","true");
+  document.body.style.overflow="";
+}
+
+function odCheckBan(){
+  const userId=localStorage.getItem("offlineDiceFirebaseUserId");
+  if(!userId)return;
+
+  odBanOnValue(odBanRef(odBanDb,"registeredUsers/"+userId+"/banned"),snap=>{
+    if(snap.val()===true) odShowBan();
+    else odHideBan();
+  });
+}
+
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",odCheckBan,{once:true});
+}else{
+  odCheckBan();
+}
+</script>
+
+<script type="module" id="od-vip-room-listener">
+import {getDatabase,ref,onValue} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+const odVipDb=getDatabase();
+function odVipStart(){const uid=localStorage.getItem("offlineDiceFirebaseUserId");if(!uid)return;onValue(ref(odVipDb,"registeredUsers/"+uid+"/vipRoom"),s=>{const v=s.val(),b=document.getElementById("od-vip-room");if(!b)return;if(!v?.name||!v?.image){b.style.display="none";return}document.getElementById("od-vip-image").src=v.image;document.getElementById("od-vip-name").textContent=v.name;b.style.display="block"})}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",odVipStart,{once:true});else odVipStart();
+</script></body>
 </html>
