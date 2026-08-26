@@ -1065,60 +1065,55 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
 <style id="od-vip-room-css">
 #od-vip-room{
   display:none;
-  width:min(650px,92%);
+  width:100%;
   margin:0 auto 12px;
-  padding:8px 12px;
+  padding:8px 18px;
   box-sizing:border-box;
   position:relative;
   overflow:hidden;
-  border-radius:16px;
-  border:2px solid rgba(255,211,65,.9);
-  background:linear-gradient(110deg,rgba(18,10,35,.92),rgba(62,25,105,.78),rgba(18,10,35,.92));
-  box-shadow:0 0 22px rgba(255,200,45,.28),inset 0 0 24px rgba(255,255,255,.05);
-}
-#od-vip-room::after{
-  content:"VIP ROOM";
-  position:absolute;
-  right:18px;
-  top:50%;
-  transform:translateY(-50%);
-  font-size:32px;
-  font-weight:1000;
-  letter-spacing:3px;
-  color:rgba(255,215,70,.14);
-  pointer-events:none;
+  border-radius:18px;
+  background:#050505;
+  border:2px solid rgba(255,255,255,.8);
+  box-shadow:0 8px 24px rgba(0,0,0,.28);
 }
 .od-vip-inner{
-  position:relative;
-  z-index:1;
   display:flex;
   align-items:center;
-  gap:12px;
+  justify-content:center;
+  gap:16px;
+  min-height:70px;
 }
 .od-vip-image{
-  width:52px;
-  height:52px;
-  border-radius:12px;
+  width:62px;
+  height:62px;
+  min-width:62px;
+  min-height:62px;
+  border-radius:50%;
   object-fit:cover;
-  flex:none;
-  border:2px solid rgba(255,215,70,.75);
-  background:rgba(0,0,0,.3);
+  display:block;
+  border:2px solid rgba(255,255,255,.9);
+  background:#111;
 }
-.od-vip-copy{min-width:0}
+.od-vip-copy{
+  min-width:0;
+  text-align:left;
+}
 .od-vip-name{
   color:#fff;
-  font-size:19px;
+  font-size:24px;
+  line-height:1.1;
   font-weight:900;
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
 }
 .od-vip-label{
-  color:#ffd447;
-  font-size:11px;
+  color:#fff;
+  font-size:14px;
+  line-height:1.2;
   font-weight:900;
-  letter-spacing:2px;
-  margin-top:2px;
+  letter-spacing:2.5px;
+  margin-top:5px;
 }
 </style>
 
