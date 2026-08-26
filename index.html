@@ -1065,13 +1065,19 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
 <style id="od-vip-room-css">
 #od-vip-room{
   display:none;
-  width:min(650px,92%);
-  margin:0 auto 10px;
+  position:fixed;
+  left:50%;
+  top:calc(50% - 280px);
+  transform:translateX(-50%);
+  width:min(700px,92vw);
+  height:auto;
+  margin:0;
   padding:0;
-  box-sizing:border-box;
   background:transparent;
   border:0;
   box-shadow:none;
+  z-index:9999;
+  pointer-events:none;
 }
 .od-vip-inner{
   display:flex;
@@ -1092,18 +1098,15 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
 }
 .od-vip-copy{
   display:flex;
-  align-items:baseline;
+  align-items:center;
   gap:10px;
-  min-width:0;
+  white-space:nowrap;
 }
 .od-vip-name{
   color:#fff;
   font-size:22px;
   line-height:1;
   font-weight:900;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
   text-shadow:0 2px 6px rgba(0,0,0,.45);
 }
 .od-vip-label{
@@ -1111,8 +1114,13 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
   font-size:20px;
   line-height:1;
   font-weight:900;
-  white-space:nowrap;
   text-shadow:0 2px 6px rgba(0,0,0,.45);
+}
+@media(max-width:700px){
+  #od-vip-room{top:calc(50% - 245px)}
+  .od-vip-image{width:42px;height:42px;min-width:42px;min-height:42px}
+  .od-vip-name{font-size:19px}
+  .od-vip-label{font-size:17px}
 }
 </style>
 
