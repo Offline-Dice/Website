@@ -130,6 +130,56 @@ const colorNames = {
   purple:"Purple"
 };
 
+/*
+ * Keep the Verify page on the same background that is currently selected
+ * on the Dice page. The index.html file does not need to be changed:
+ * when Verify is opened with target="_blank", the opener is the Dice page
+ * and both pages are same-origin, so we can read its live background.
+ */
+(function syncDiceThemeToVerify(){
+  const body = document.body;
+
+  function copyBackgroundFromDice(){
+    try{
+      if(!window.opener || window.opener.closed) return;
+
+      const diceDoc = window.opener.document;
+      const diceBody = diceDoc.body;
+      const themeSelect = diceDoc.getElementById("themeSelect");
+
+      if(!diceBody) return;
+
+      // Copy the live background exactly as it appears on the Dice page.
+      const style = window.opener.getComputedStyle(diceBody);
+
+      body.style.background = style.background;
+      body.style.backgroundColor = style.backgroundColor;
+      body.style.backgroundImage = style.backgroundImage;
+      body.style.backgroundRepeat = style.backgroundRepeat;
+      body.style.backgroundSize = style.backgroundSize;
+      body.style.backgroundPosition = style.backgroundPosition;
+      body.style.backgroundAttachment = style.backgroundAttachment;
+      body.style.backgroundOrigin = style.backgroundOrigin;
+      body.style.backgroundClip = style.backgroundClip;
+      body.style.backgroundBlendMode = style.backgroundBlendMode;
+
+      // If a theme selector exists, keep a data attribute for the active theme.
+      if(themeSelect){
+        body.dataset.diceTheme = themeSelect.value || "default";
+      }
+    }catch(error){
+      // Ignore cross-window access errors and keep the normal Verify background.
+    }
+  }
+
+  copyBackgroundFromDice();
+
+  // Also update if the user changes the Dice background while Verify is open.
+  const syncTimer = setInterval(copyBackgroundFromDice, 300);
+
+  window.addEventListener("beforeunload", () => clearInterval(syncTimer));
+})();
+
 function formatRollTime(value){
   if(value === undefined || value === null || value === "") return null;
 
