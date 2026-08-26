@@ -326,5 +326,40 @@ document.getElementById("code").addEventListener("keydown", e => {
   if(e.key === "Enter") verify();
 });
 </script>
+<script>
+(function(){
+  // Use the exact theme selected on the Dice page that opened this Verify page.
+  // The index.html is intentionally not changed.
+  const themeMap = {
+    'default':'ChatGPT Image 27. Juni 2026, 19_14_28.png',
+    'sab-blue':'bg-sab-blue.png',
+    'green':'gruen.png',
+    'sab-green':'bg-sab-green.png',
+    'red':'rot.png',
+    'sab-red':'bg-sab-red.png',
+    'pink':'ChatGPT Image 4. Juli 2026, 22_27_11.png'
+  };
+
+  function applyDiceTheme(){
+    try {
+      const opener = window.opener;
+      if (!opener || opener.closed) return;
+      const select = opener.document.getElementById('themeSelect');
+      if (!select) return;
+      const value = select.value;
+      const bg = themeMap[value];
+      if (bg) {
+        document.body.style.background = 'url("' + bg.replace(/"/g,'\\"') + '") center center / cover no-repeat fixed';
+        document.body.style.backgroundColor = '#07111f';
+      }
+    } catch(e) {
+      // Same-origin access is required; silently keep Verify's fallback if unavailable.
+    }
+  }
+
+  applyDiceTheme();
+  setInterval(applyDiceTheme, 250);
+})();
+</script>
 </body>
 </html>
