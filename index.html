@@ -1065,12 +1065,10 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
 <style id="od-vip-room-css">
 #od-vip-room{
   display:none;
-  width:100%;
-  margin:0 0 12px 0;
+  width:min(650px,92%);
+  margin:0 auto 10px;
   padding:0;
   box-sizing:border-box;
-  position:relative;
-  overflow:visible;
   background:transparent;
   border:0;
   box-shadow:none;
@@ -1079,56 +1077,42 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:14px;
-  min-height:64px;
-  padding:0;
+  gap:12px;
+  min-height:52px;
 }
 .od-vip-image{
-  width:58px;
-  height:58px;
-  min-width:58px;
-  min-height:58px;
+  width:48px;
+  height:48px;
+  min-width:48px;
+  min-height:48px;
   border-radius:50%;
   object-fit:cover;
-  display:block;
-  border:2px solid rgba(255,255,255,.9);
+  border:2px solid rgba(255,255,255,.95);
   background:#111;
-  box-shadow:0 2px 10px rgba(0,0,0,.25);
 }
 .od-vip-copy{
-  min-width:0;
   display:flex;
   align-items:baseline;
-  justify-content:center;
-  gap:12px;
-  text-align:left;
+  gap:10px;
+  min-width:0;
 }
 .od-vip-name{
-  color:#fff;
-  font-size:25px;
-  line-height:1;
-  font-weight:900;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  text-shadow:0 2px 7px rgba(0,0,0,.45);
-}
-.od-vip-label{
   color:#fff;
   font-size:22px;
   line-height:1;
   font-weight:900;
-  letter-spacing:1px;
-  margin:0;
   white-space:nowrap;
-  text-shadow:0 2px 7px rgba(0,0,0,.45);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  text-shadow:0 2px 6px rgba(0,0,0,.45);
 }
-@media(max-width:600px){
-  .od-vip-inner{gap:10px;min-height:54px}
-  .od-vip-image{width:48px;height:48px;min-width:48px;min-height:48px}
-  .od-vip-copy{gap:8px}
-  .od-vip-name{font-size:19px}
-  .od-vip-label{font-size:17px}
+.od-vip-label{
+  color:#fff;
+  font-size:20px;
+  line-height:1;
+  font-weight:900;
+  white-space:nowrap;
+  text-shadow:0 2px 6px rgba(0,0,0,.45);
 }
 </style>
 
@@ -1186,9 +1170,6 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
 </a>
 </div>
 </div>
-<div class="wrapper">
-<div class="title">ROLL COLOR DICE</div>
-
 <div id="od-vip-room" aria-hidden="true">
   <div class="od-vip-inner">
     <img id="od-vip-image" class="od-vip-image" alt="">
@@ -1198,6 +1179,10 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
     </div>
   </div>
 </div>
+<div class="wrapper">
+<div class="title">ROLL COLOR DICE</div>
+
+
 
 <div class="dropdown-container">
 <select id="numDice">
