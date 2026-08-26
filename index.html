@@ -1061,7 +1061,68 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
 .od-ban-text{color:rgba(255,255,255,.62);font-size:16px;line-height:1.5}
 </style>
 
-<style id="od-vip-room-css">#od-vip-room{display:none;position:relative;width:min(360px,calc(100% - 32px));margin:0 auto 18px;padding:9px;box-sizing:border-box;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,rgba(130,80,255,.55),rgba(20,20,35,.92));box-shadow:0 10px 35px rgba(0,0,0,.28)}#od-vip-room:after{content:"VIP ROOM";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:1000;letter-spacing:5px;color:rgba(255,255,255,.09);transform:rotate(-8deg);z-index:0;pointer-events:none}.od-vip-content{position:relative;z-index:1;display:flex;align-items:center;gap:12px}.od-vip-image{width:58px;height:58px;border-radius:13px;object-fit:cover;flex:none;border:1px solid rgba(255,255,255,.3)}.od-vip-name{font-size:19px;font-weight:900;color:#fff}.od-vip-label{font-size:11px;font-weight:900;letter-spacing:2px;color:rgba(255,255,255,.68);margin-top:3px}</style></head>
+
+<style id="od-vip-room-css">
+#od-vip-room{
+  display:none;
+  width:min(650px,92%);
+  margin:0 auto 12px;
+  padding:8px 12px;
+  box-sizing:border-box;
+  position:relative;
+  overflow:hidden;
+  border-radius:16px;
+  border:2px solid rgba(255,211,65,.9);
+  background:linear-gradient(110deg,rgba(18,10,35,.92),rgba(62,25,105,.78),rgba(18,10,35,.92));
+  box-shadow:0 0 22px rgba(255,200,45,.28),inset 0 0 24px rgba(255,255,255,.05);
+}
+#od-vip-room::after{
+  content:"VIP ROOM";
+  position:absolute;
+  right:18px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:32px;
+  font-weight:1000;
+  letter-spacing:3px;
+  color:rgba(255,215,70,.14);
+  pointer-events:none;
+}
+.od-vip-inner{
+  position:relative;
+  z-index:1;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.od-vip-image{
+  width:52px;
+  height:52px;
+  border-radius:12px;
+  object-fit:cover;
+  flex:none;
+  border:2px solid rgba(255,215,70,.75);
+  background:rgba(0,0,0,.3);
+}
+.od-vip-copy{min-width:0}
+.od-vip-name{
+  color:#fff;
+  font-size:19px;
+  font-weight:900;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.od-vip-label{
+  color:#ffd447;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:2px;
+  margin-top:2px;
+}
+</style>
+
+</head>
 <body>
 
 <div id="od-ban-overlay" aria-hidden="true">
@@ -1117,6 +1178,17 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
 </div>
 <div class="wrapper">
 <div class="title">ROLL COLOR DICE</div>
+
+<div id="od-vip-room" aria-hidden="true">
+  <div class="od-vip-inner">
+    <img id="od-vip-image" class="od-vip-image" alt="">
+    <div class="od-vip-copy">
+      <div id="od-vip-name" class="od-vip-name"></div>
+      <div class="od-vip-label">VIP ROOM</div>
+    </div>
+  </div>
+</div>
+
 <div class="dropdown-container">
 <select id="numDice">
 <option value="1">1 Dice</option>
@@ -1149,7 +1221,7 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
 <option value="spongebob">SPONGEBOB</option>
 </select>
 </div>
-<div id="od-vip-room"><div class="od-vip-content"><img class="od-vip-image" id="od-vip-image"><div><div class="od-vip-name" id="od-vip-name"></div><div class="od-vip-label">VIP ROOM</div></div></div></div><div class="dice-result" id="diceResultArea"></div>
+<div class="dice-result" id="diceResultArea"></div>
 
 <div id="lbWinnerOverlay" aria-hidden="true">
   <div class="lb-winner-box">
@@ -1892,7 +1964,7 @@ z-index:9999;">
 </span>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getDatabase, ref, onValue, onDisconnect, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+import { getDatabase, ref, onValue, onDisconnect, set, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBUT0t1I9Dkee5Ok_uYMzs4WfdwapOA5As",
@@ -1923,9 +1995,8 @@ const db = getDatabase(app);
 
     const userRef = ref(db, REGISTERED_USERS_PATH + "/" + userId);
 
-    set(userRef, {
+    update(userRef, {
       name: name,
-      registeredAt: serverTimestamp(),
       lastSeen: serverTimestamp(),
       online: true
     }).catch(function(err){
@@ -3587,10 +3658,60 @@ if(document.readyState==="loading"){
 }
 </script>
 
+
 <script type="module" id="od-vip-room-listener">
-import {getDatabase,ref,onValue} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
-const odVipDb=getDatabase();
-function odVipStart(){const uid=localStorage.getItem("offlineDiceFirebaseUserId");if(!uid)return;onValue(ref(odVipDb,"registeredUsers/"+uid+"/vipRoom"),s=>{const v=s.val(),b=document.getElementById("od-vip-room");if(!b)return;if(!v?.name||!v?.image){b.style.display="none";return}document.getElementById("od-vip-image").src=v.image;document.getElementById("od-vip-name").textContent=v.name;b.style.display="block"})}
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",odVipStart,{once:true});else odVipStart();
-</script></body>
+import { initializeApp as odVipInit, getApps as odVipGetApps } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import { getDatabase as odVipGetDatabase, ref as odVipRef, onValue as odVipOnValue } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+
+const odVipConfig = {
+  apiKey: "AIzaSyBUT0t1I9Dkee5Ok_uYMzs4WfdwapOA5As",
+  authDomain: "kenzy-dice.firebaseapp.com",
+  projectId: "kenzy-dice",
+  databaseURL: "https://kenzy-dice-default-rtdb.europe-west1.firebasedatabase.app",
+  storageBucket: "kenzy-dice.firebasestorage.app",
+  messagingSenderId: "578956722062",
+  appId: "1:578956722062:web:5156f5737e51ef75246edf"
+};
+
+const odVipApp = getApps().length ? getApps()[0] : odVipInit(odVipConfig, "offlineDiceVipRoom");
+const odVipDb = odVipGetDatabase(odVipApp);
+
+function renderVipRoom(vip){
+  const box = document.getElementById("od-vip-room");
+  const image = document.getElementById("od-vip-image");
+  const name = document.getElementById("od-vip-name");
+  if(!box || !image || !name) return;
+
+  const src = vip && (vip.imageData || vip.image);
+  if(!vip || !vip.name || !src){
+    box.style.display = "none";
+    box.setAttribute("aria-hidden","true");
+    return;
+  }
+
+  image.src = src;
+  image.onerror = function(){
+    box.style.display = "none";
+  };
+  name.textContent = vip.name;
+  box.style.display = "block";
+  box.setAttribute("aria-hidden","false");
+}
+
+function startVipRoom(){
+  const uid = localStorage.getItem("offlineDiceFirebaseUserId");
+  if(!uid) return;
+  odVipOnValue(odVipRef(odVipDb, "registeredUsers/" + uid + "/vipRoom"), function(snapshot){
+    renderVipRoom(snapshot.val());
+  });
+}
+
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", startVipRoom, {once:true});
+}else{
+  startVipRoom();
+}
+</script>
+
+</body>
 </html>
