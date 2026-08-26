@@ -1066,54 +1066,69 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
 #od-vip-room{
   display:none;
   width:100%;
-  margin:0 auto 12px;
-  padding:8px 18px;
+  margin:0 0 12px 0;
+  padding:0;
   box-sizing:border-box;
   position:relative;
-  overflow:hidden;
-  border-radius:18px;
-  background:#050505;
-  border:2px solid rgba(255,255,255,.8);
-  box-shadow:0 8px 24px rgba(0,0,0,.28);
+  overflow:visible;
+  background:transparent;
+  border:0;
+  box-shadow:none;
 }
 .od-vip-inner{
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:16px;
-  min-height:70px;
+  gap:14px;
+  min-height:64px;
+  padding:0;
 }
 .od-vip-image{
-  width:62px;
-  height:62px;
-  min-width:62px;
-  min-height:62px;
+  width:58px;
+  height:58px;
+  min-width:58px;
+  min-height:58px;
   border-radius:50%;
   object-fit:cover;
   display:block;
   border:2px solid rgba(255,255,255,.9);
   background:#111;
+  box-shadow:0 2px 10px rgba(0,0,0,.25);
 }
 .od-vip-copy{
   min-width:0;
+  display:flex;
+  align-items:baseline;
+  justify-content:center;
+  gap:12px;
   text-align:left;
 }
 .od-vip-name{
   color:#fff;
-  font-size:24px;
-  line-height:1.1;
+  font-size:25px;
+  line-height:1;
   font-weight:900;
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
+  text-shadow:0 2px 7px rgba(0,0,0,.45);
 }
 .od-vip-label{
   color:#fff;
-  font-size:14px;
-  line-height:1.2;
+  font-size:22px;
+  line-height:1;
   font-weight:900;
-  letter-spacing:2.5px;
-  margin-top:5px;
+  letter-spacing:1px;
+  margin:0;
+  white-space:nowrap;
+  text-shadow:0 2px 7px rgba(0,0,0,.45);
+}
+@media(max-width:600px){
+  .od-vip-inner{gap:10px;min-height:54px}
+  .od-vip-image{width:48px;height:48px;min-width:48px;min-height:48px}
+  .od-vip-copy{gap:8px}
+  .od-vip-name{font-size:19px}
+  .od-vip-label{font-size:17px}
 }
 </style>
 
