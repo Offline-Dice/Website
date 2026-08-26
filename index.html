@@ -1063,13 +1063,21 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
 
 
 <style id="od-vip-room-css">
+.layout-row{
+  position:relative;
+}
 #od-vip-room{
   display:none;
-  position:relative;
-  width:min(700px,92vw);
+  position:absolute;
+  left:50%;
+  top:20px;
+  transform:translate(-50%,-100%);
+  width:700px;
+  max-width:90%;
   height:52px;
-  margin:0 auto 8px;
+  margin:0;
   padding:0;
+  box-sizing:border-box;
   background:transparent;
   border:0;
   box-shadow:none;
@@ -1077,16 +1085,12 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
   pointer-events:none;
 }
 .od-vip-inner{
-  position:absolute;
-  left:50%;
-  bottom:0;
-  transform:translateX(-50%);
   display:flex;
   align-items:center;
   justify-content:center;
   gap:12px;
   width:100%;
-  min-height:52px;
+  height:52px;
 }
 .od-vip-image{
   width:48px;
@@ -1119,9 +1123,16 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
   text-shadow:0 2px 6px rgba(0,0,0,.45);
 }
 @media(max-width:700px){
-  #od-vip-room{width:92vw;height:46px;margin-bottom:6px}
-  .od-vip-inner{min-height:46px}
-  .od-vip-image{width:42px;height:42px;min-width:42px;min-height:42px}
+  #od-vip-room{
+    width:90%;
+    height:46px;
+    top:20px;
+  }
+  .od-vip-inner{height:46px}
+  .od-vip-image{
+    width:42px;height:42px;
+    min-width:42px;min-height:42px;
+  }
   .od-vip-name{font-size:19px}
   .od-vip-label{font-size:17px}
 }
