@@ -1628,7 +1628,7 @@ body.dice-roll-active #od-public-chat{
 </style>
 
 
-<style id="chat-role-gold">
+<style id="chat-role-gold-stable">
 .od-chat-name-row{display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:5px!important}
 .od-chat-role{display:inline-flex!important;align-items:center!important;padding:2px 6px!important;border-radius:6px!important;color:#ffd75a!important;background:rgba(255,215,90,.10)!important;border:1px solid rgba(255,215,90,.25)!important;font-size:9px!important;font-weight:800!important;line-height:1.1!important;text-shadow:0 1px 4px rgba(0,0,0,.35)!important}
 </style>
@@ -2609,22 +2609,6 @@ const odChatConfig = {
 const odChatApp = getApps().length ? getApps()[0] : initializeApp(odChatConfig);
 const odChatDb = getDatabase(odChatApp);
 const OD_CHAT_PATH = "publicChat";
-const OD_CHAT_ROLES_PATH = "chatRoles";
-let odChatRoles = {};
-
-function odRoleKey(name){
-  return encodeURIComponent(String(name || "").trim()).replace(/\./g,"%2E");
-}
-
-function odGetRole(name){
-  return odChatRoles[odRoleKey(name)] || "";
-}
-
-onValue(ref(odChatDb, OD_CHAT_ROLES_PATH), snap=>{
-  odChatRoles = snap.val() || {};
-  renderMessages(window.__odLastChatData || {});
-});
-
 
 const chat = document.getElementById("od-public-chat");
 const messagesEl = document.getElementById("od-chat-messages");
@@ -2660,7 +2644,7 @@ function formatTime(value){
 }
 
 function renderMessages(data){
-  window.__odLastChatData = data || {};
+  window.__odChatData = data || {};
   messagesEl.innerHTML = "";
   const entries = Object.entries(data || {});
   if(!entries.length){
@@ -2671,7 +2655,7 @@ function renderMessages(data){
     if(!m || !m.text || !m.name) return;
     const box=document.createElement("div");
     box.className="od-chat-message";
-    const role = odGetRole(m.name);
+    const role = window.__odChatRoles ? window.__odChatRoles[encodeURIComponent(String(m.name).trim()).replace(/\./g,"%2E")] || "" : "";
     box.innerHTML =
       '<span class="od-chat-name-row"><span class="od-chat-name">'+escapeHtml(m.name)+'</span>'+
       (role ? '<span class="od-chat-role">'+escapeHtml(role)+'</span>' : '')+
@@ -2693,6 +2677,16 @@ onValue(
     console.error("Public chat read error:",err);
     status.textContent="Chat nicht verfügbar";
   }
+);
+
+// Roles are read separately so the normal message send path stays unchanged.
+onValue(
+  ref(odChatDb, "chatRoles"),
+  snap=>{
+    window.__odChatRoles = snap.val() || {};
+    renderMessages(window.__odChatData || {});
+  },
+  err=>console.warn("Chat roles read error:", err)
 );
 
 form.addEventListener("submit", async e=>{
