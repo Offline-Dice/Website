@@ -2757,7 +2757,7 @@ z-index:9999;">
 </span>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getDatabase, ref, onValue, onDisconnect, set, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+import { getDatabase, ref, onValue, onDisconnect, set, update, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBUT0t1I9Dkee5Ok_uYMzs4WfdwapOA5As",
@@ -4144,7 +4144,7 @@ function changeMiniCounter(amount) {
     setTimeout(function(){input.focus();},550);
   }
 
-  form.addEventListener("submit",function(e){
+  form.addEventListener("submit",async function(e){
     e.preventDefault();
     const name=String(input.value||"").trim().replace(/\s+/g," ").slice(0,24);
     if(!name){
@@ -4152,7 +4152,36 @@ function changeMiniCounter(amount) {
       input.focus();
       return;
     }
-    finishLogin(name);
+
+    const normalizedName=name.toLowerCase();
+    const ownUserId=localStorage.getItem("offlineDiceFirebaseUserId");
+    const button=form.querySelector("button[type=submit]");
+    button.disabled=true;
+    error.textContent="Checking name...";
+
+    try{
+      const snapshot=await get(ref(db,"registeredUsers"));
+      const users=snapshot.val()||{};
+      const nameTaken=Object.entries(users).some(([id,user])=>{
+        if(id===ownUserId || !user || typeof user.name!=="string") return false;
+        return user.name.trim().replace(/\s+/g," ").toLowerCase()===normalizedName;
+      });
+
+      if(nameTaken){
+        error.textContent="This name is already taken. Please choose another name.";
+        input.focus();
+        input.select();
+        return;
+      }
+
+      error.textContent="";
+      finishLogin(name);
+    }catch(err){
+      console.error("Name check:",err);
+      error.textContent="Could not check the name. Please try again.";
+    }finally{
+      button.disabled=false;
+    }
   });
   input.addEventListener("input",function(){error.textContent="";});
 
