@@ -881,6 +881,14 @@ font-family:'Luckiest Guy',cursive;font-size:21px;cursor:pointer;
 box-shadow:4px 4px 8px rgba(0,0,0,.25)
 }
 #liveBattleArea #lbSpinButton:disabled{opacity:.55;cursor:not-allowed}
+#liveBattleArea #lbAutoRollButton{
+height:46px;padding:7px 22px;border:0;border-radius:12px;
+background:var(--primary-blue);color:var(--white);
+font-family:'Luckiest Guy',cursive;font-size:21px;cursor:pointer;
+box-shadow:4px 4px 8px rgba(0,0,0,.25)
+}
+#liveBattleArea #lbAutoRollButton.active{background:#16a34a}
+#liveBattleArea #lbAutoRollButton:disabled{opacity:.55;cursor:not-allowed}
 #liveBattleArea .lb-die.lb-battle-rolling{
 animation:dice-roll-shake .16s ease-in-out infinite !important
 }
@@ -1798,6 +1806,7 @@ body.dice-roll-active #od-public-chat{
       <option value="50">50 ROLLS</option>
     </select>
     <button id="lbSpinButton" type="button">ROLL AGAIN !</button>
+    <button id="lbAutoRollButton" type="button">AUTO ROLL</button>
   </div>
 </div>
 
@@ -2218,6 +2227,9 @@ background:transparent;
 
             liveBattleArea.classList.remove('active');
             liveBattleArea.setAttribute('aria-hidden','true');
+            // Beim Wechsel zurück zu Color Dice oder Coin Flip den normalen Spin/Roll-Button
+            // ausdrücklich wieder einblenden. Dice Battles blendet ihn vorher aus.
+            rollButton.style.display = 'block';
 
             numDice = modeValues[mode];
             updateNumDiceOptions();
@@ -4170,7 +4182,10 @@ function changeMiniCounter(amount) {
   const gameSelect=document.getElementById('colorDice');
   const area=document.getElementById('liveBattleArea');
   const spin=document.getElementById('lbSpinButton');
+  const autoRollButton=document.getElementById('lbAutoRollButton');
   const rollCount=document.getElementById('lbRollCount');
+  let autoRolling=false;
+  let autoRollToken=0;
   if(!gameSelect||!area||!spin)return;
 
   const colors=[
@@ -4259,6 +4274,7 @@ function changeMiniCounter(amount) {
   }
 
   function resetLiveBattle(){
+    stopAutoRoll();
     hideWinner();
     setModeLocked(false);
     setBattleLocked(false);
@@ -4357,10 +4373,55 @@ function changeMiniCounter(amount) {
       roll=0;
       showWinner();
       setModeLocked(true);
+      stopAutoRoll();
     }
   }
 
+  async function startAutoRoll(){
+    if(autoRolling || gameSelect.value!=='livebattle' || rolling) return;
+
+    autoRolling=true;
+    const token=++autoRollToken;
+    autoRollButton.classList.add('active');
+    autoRollButton.textContent='AUTO ROLL ON';
+
+    while(autoRolling && token===autoRollToken && gameSelect.value==='livebattle'){
+      // A round that has already reached its configured roll count is done.
+      const total=Number(rollCount.value)||10;
+      if(roll>=total){
+        autoRolling=false;
+        break;
+      }
+
+      const startedAt=performance.now();
+      await spinBattle();
+
+      if(!autoRolling || token!==autoRollToken || gameSelect.value!=='livebattle') break;
+
+      // 1.3 seconds from one roll start to the next.
+      const wait=Math.max(0,2000-(performance.now()-startedAt));
+      if(wait) await new Promise(r=>setTimeout(r,wait));
+    }
+
+    if(token===autoRollToken){
+      autoRolling=false;
+      autoRollButton.classList.remove('active');
+      autoRollButton.textContent='AUTO ROLL';
+    }
+  }
+
+  function stopAutoRoll(){
+    autoRolling=false;
+    autoRollToken++;
+    autoRollButton.classList.remove('active');
+    autoRollButton.textContent='AUTO ROLL';
+  }
+
   spin.addEventListener('click',spinBattle);
+  autoRollButton.addEventListener('click',()=>{
+    if(autoRolling) stopAutoRoll();
+    else startAutoRoll();
+  });
 
   document.getElementById('lbWinnerClose').addEventListener('click',()=>{
     const overlay=document.getElementById('lbWinnerOverlay');
