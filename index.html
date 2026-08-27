@@ -4625,20 +4625,13 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 </script>
 
 
-<script id="chat-role-runtime">
-(function(){
-  // Roles are stored by account/name in Firebase at chatRoles/{safeName}.
-  // The chat renderer can read the role from each message when available.
-  // This listener also keeps a local role cache for messages that predate the role field.
-  window.odChatRoles = {};
-  window.odChatRoleKey = function(name){
-    return encodeURIComponent(String(name || "").trim()).replace(/\./g,"%2E");
-  };
-})();
-</script>
 
 
-<script type="module" id="chat-role-loader">
+
+
+
+
+<script type="module" id="chat-role-runtime-final">
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
 
@@ -4655,35 +4648,56 @@ import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12
   const app = getApps().length ? getApps()[0] : initializeApp(config);
   const db = getDatabase(app);
 
+  window.odChatRoles = {};
+  window.odCurrentChatRole = "";
+
+  function key(name){
+    return encodeURIComponent(String(name || "").trim()).replace(/\./g,"%2E");
+  }
+
+  function addRoleToMessage(el){
+    const nameEl = el.querySelector(".od-chat-name");
+    if(!nameEl) return;
+    const name = nameEl.textContent.replace(/^👤\s*/,"").trim();
+    const role = window.odChatRoles[key(name)] || "";
+    const row = nameEl.parentElement;
+
+    let badge = row.querySelector(".od-chat-role");
+    if(role){
+      if(!badge){
+        badge = document.createElement("span");
+        badge.className = "od-chat-role";
+        row.appendChild(badge);
+      }
+      badge.textContent = role;
+    }else if(badge){
+      badge.remove();
+    }
+  }
+
+  function refresh(){
+    document.querySelectorAll(".od-chat-message").forEach(addRoleToMessage);
+  }
+
+  // Admin roles are stored here.
   onValue(ref(db,"chatRoles"), snap => {
     window.odChatRoles = snap.val() || {};
-    document.querySelectorAll(".od-chat-message").forEach(el => {
-      const nameEl = el.querySelector(".od-chat-name");
-      if(!nameEl) return;
-      const name = nameEl.textContent.replace(/^👤\s*/,"").trim();
-      const key = encodeURIComponent(name).replace(/\./g,"%2E");
-      const role = window.odChatRoles[key] || "";
-      let badge = el.querySelector(".od-chat-role");
-      if(role){
-        if(!badge){
-          badge = document.createElement("span");
-          badge.className = "od-chat-role";
-          const row = nameEl.parentElement;
-          row.appendChild(badge);
-        }
-        badge.textContent = role;
-      } else if(badge) {
-        badge.remove();
-      }
-    });
+    refresh();
   });
 
-  window.odChatRoles = window.odChatRoles || {};
-  const name = localStorage.getItem("offlineDicePlayerName") || "";
-  const key = encodeURIComponent(name).replace(/\./g,"%2E");
-  onValue(ref(db,"chatRoles/"+key), snap => {
-    window.odCurrentChatRole = snap.val() || "";
-  });
+  // Keep the current user's role available when sending a new message.
+  const currentName = localStorage.getItem("offlineDicePlayerName") || "";
+  if(currentName){
+    onValue(ref(db,"chatRoles/"+key(currentName)), snap => {
+      window.odCurrentChatRole = snap.val() || "";
+    });
+  }
+
+  const box = document.querySelector(".od-chat-messages");
+  if(box){
+    new MutationObserver(refresh).observe(box,{childList:true,subtree:true});
+  }
+  setTimeout(refresh,500);
 })();
 </script>
 
