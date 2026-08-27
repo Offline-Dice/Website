@@ -4545,8 +4545,20 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     unread = 0;
     updateBadge();
   }
+  window.clearChatUnread = clearUnread;
 
-  launcher.addEventListener("click", clearUnread);
+  // The launcher has its own open/close handler. Clear the badge on the
+  // actual opening event, not just on every click.
+  function isChatOpen(){
+    return !chat.classList.contains("od-chat-hidden") &&
+           getComputedStyle(chat).display !== "none";
+  }
+
+  launcher.addEventListener("click", function(){
+    setTimeout(function(){
+      if(isChatOpen()) clearUnread();
+    }, 0);
+  });
 
   onValue(chatRef, snap => {
     const data = snap.val() || {};
@@ -4610,8 +4622,11 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     e.stopImmediatePropagation();
     const hidden = chat.classList.contains("od-chat-hidden") ||
                    getComputedStyle(chat).display === "none";
-    if(hidden) openChatAnimated();
-    else closeChatAnimated();
+    if(hidden) {
+      // Clear unread state immediately when the chat is opened.
+      if(typeof window.clearChatUnread === "function") window.clearChatUnread();
+      openChatAnimated();
+    } else closeChatAnimated();
   }, true);
 
   const close = chat.querySelector(".od-chat-close");
