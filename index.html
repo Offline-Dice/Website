@@ -4099,7 +4099,21 @@ function changeMiniCounter(amount) {
 </div>
 
 
-<script id="clean-blue-intro-script">
+<script type="module" id="clean-blue-intro-script">
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+
+const cleanBlueFirebaseConfig = {
+  apiKey: "AIzaSyBUT0t1I9Dkee5Ok_uYMzs4WfdwapOA5As",
+  authDomain: "kenzy-dice.firebaseapp.com",
+  projectId: "kenzy-dice",
+  databaseURL: "https://kenzy-dice-default-rtdb.europe-west1.firebasedatabase.app",
+  storageBucket: "kenzy-dice.firebasestorage.app",
+  messagingSenderId: "578956722062",
+  appId: "1:578956722062:web:5156f5737e51ef75246edf"
+};
+const cleanBlueApp = getApps().length ? getApps()[0] : initializeApp(cleanBlueFirebaseConfig);
+const cleanBlueDb = getDatabase(cleanBlueApp);
 (function(){
   const intro=document.getElementById("od-intro");
   const phase=intro&&intro.querySelector(".od-login-phase");
@@ -4160,7 +4174,7 @@ function changeMiniCounter(amount) {
     error.textContent="Checking name...";
 
     try{
-      const snapshot=await get(ref(db,"registeredUsers"));
+      const snapshot=await get(ref(cleanBlueDb,"registeredUsers"));
       const users=snapshot.val()||{};
       const nameTaken=Object.entries(users).some(([id,user])=>{
         if(id===ownUserId || !user || typeof user.name!=="string") return false;
