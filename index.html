@@ -1642,6 +1642,14 @@ body.dice-roll-active #od-public-chat{
 .od-chat-role{display:inline-flex!important;align-items:center!important;padding:2px 6px!important;border-radius:6px!important;color:#ffd75a!important;background:rgba(255,215,90,.10)!important;border:1px solid rgba(255,215,90,.25)!important;font-size:9px!important;font-weight:800!important;line-height:1.1!important;text-shadow:0 1px 4px rgba(0,0,0,.35)!important}
 </style>
 
+
+<style id="offline-dice-admin-control-enhancements">
+#website-paused-overlay .website-paused-text{
+  white-space:pre-wrap;
+  max-width:min(720px,90vw);
+  text-align:center;
+}
+</style>
 </head>
 <body>
 
@@ -2866,6 +2874,10 @@ const db = getDatabase(app);
     onValue(ref(db,"control/websitePaused"),function(snapshot){
       applyWebsitePausedOverlay(snapshot.val()===true);
     });
+    onValue(ref(db,"control/websitePausedMessage"),function(snapshot){
+      const el=document.querySelector("#website-paused-overlay .website-paused-text");
+      if(el && snapshot.val()) el.textContent=String(snapshot.val());
+    });
   }
 
   if(document.readyState==="loading"){
@@ -2989,6 +3001,11 @@ onValue(ref(db, "announcements/permanent"), (snap)=>{
 // Announcement popup
 let firstAnnouncementLoad = true;
 let lastAnnouncement = null;
+let announcementDurationMs = 5000;
+onValue(ref(db, "control/announcementDuration"), (snap)=>{
+  const seconds=Number(snap.val());
+  if(Number.isFinite(seconds) && seconds>=1 && seconds<=120) announcementDurationMs=seconds*1000;
+});
 
 onValue(ref(db, "announcements/current"), (snap)=>{
   const data = snap.val();
