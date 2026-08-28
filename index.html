@@ -1645,19 +1645,18 @@ body.dice-roll-active #od-public-chat{
 
 <script>
 (() => {
-  const stop = e => { e.preventDefault(); e.stopPropagation(); return false; };
-  document.addEventListener('contextmenu', stop, true);
-  document.addEventListener('copy', stop, true);
-  document.addEventListener('cut', stop, true);
-  document.addEventListener('dragstart', stop, true);
-  document.addEventListener('selectstart', stop, true);
-  document.addEventListener('keydown', e => {
-    const k = e.key.toLowerCase();
+  const blocked = new Set(["F12"]);
+  document.addEventListener("contextmenu", e => e.preventDefault());
+  document.addEventListener("keydown", e => {
+    const k = e.key;
     if (
-      k === 'f12' ||
-      (e.ctrlKey && ['u','s','c','x','a'].includes(k)) ||
-      (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(k))
-    ) stop(e);
+      blocked.has(k) ||
+      (e.ctrlKey && e.shiftKey && ["I","J","C"].includes(k.toUpperCase())) ||
+      (e.ctrlKey && k.toUpperCase() === "U")
+    ) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
   }, true);
 })();
 </script>
