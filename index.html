@@ -2085,6 +2085,20 @@ background:transparent;
             );
 
             await Promise.all([Promise.all(colorPromises), soundDone]);
+
+            // Mildly reduce rolls with four or more different colors by
+            // occasionally repeating one of the already rolled colors.
+            if (verifyColors.length >= 4) {
+                const uniqueColors = [...new Set(verifyColors)];
+                if (uniqueColors.length >= 4 && Math.random() < 0.35) {
+                    const replaceIndex = Math.floor(Math.random() * verifyColors.length);
+                    let duplicateColor = verifyColors.find((c, i) => i !== replaceIndex && verifyColors.indexOf(c) !== i);
+                    if (!duplicateColor) duplicateColor = verifyColors[(replaceIndex + 1) % verifyColors.length];
+                    verifyColors[replaceIndex] = duplicateColor;
+                    rollColorResults[replaceIndex] = duplicateColor;
+                }
+            }
+
             // Ergebnis sauber anzeigen. Danach verschwindet der Fokusmodus
             // und die komplette normale Seite kommt wieder zurück.
             status.textContent = "";
