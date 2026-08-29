@@ -408,8 +408,10 @@ var firebaseConfig = {
   appId: "1:578956722062:web:5156f5737e51ef75246edf"
 };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+// Use the SAME Firebase app/session as the secure admin login.
+// This makes auth.uid available to Realtime Database Rules.
+const secureAdminApp = firebase.app("secureAdminAuthApp");
+const db = firebase.database(secureAdminApp);
 
 
 // ============================================================
