@@ -1650,127 +1650,6 @@ body.dice-roll-active #od-public-chat{
   text-align:center;
 }
 </style>
-
-<!-- DEVTOOLS-PROTECTION -->
-<style id="devtools-protection-style">
-  #devtools-blocker {
-    position: fixed;
-    inset: 0;
-    z-index: 2147483647;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    box-sizing: border-box;
-    background:
-      radial-gradient(circle at 50% 35%, rgba(95, 40, 180, .22), transparent 42%),
-      #08070d;
-    color: #fff;
-    font-family: Arial, Helvetica, sans-serif;
-    text-align: center;
-  }
-  #devtools-blocker .db-card {
-    width: min(560px, 92vw);
-    padding: 34px 28px;
-    border: 1px solid rgba(255,255,255,.14);
-    border-radius: 20px;
-    background: rgba(20,18,30,.94);
-    box-shadow: 0 20px 70px rgba(0,0,0,.55);
-  }
-  #devtools-blocker .db-icon {
-    font-size: 44px;
-    margin-bottom: 12px;
-  }
-  #devtools-blocker h2 {
-    margin: 0 0 10px;
-    font-size: 26px;
-  }
-  #devtools-blocker p {
-    margin: 0;
-    color: rgba(255,255,255,.72);
-    line-height: 1.55;
-    font-size: 15px;
-  }
-  html.devtools-open body > *:not(#devtools-blocker) {
-    visibility: hidden !important;
-  }
-  html.devtools-open #devtools-blocker {
-    display: flex !important;
-    visibility: visible !important;
-  }
-</style>
-
-<div id="devtools-blocker" aria-hidden="true">
-  <div class="db-card">
-    <div class="db-icon">🔒</div>
-    <h2>Entwicklertools erkannt</h2>
-    <p>
-      Die Seite wurde aus Sicherheitsgründen angehalten.<br>
-      Bitte schließe die Entwicklertools, um fortzufahren.
-    </p>
-  </div>
-</div>
-
-<script id="devtools-protection-script">
-(function () {
-  "use strict";
-
-  var root = document.documentElement;
-  var blocker = document.getElementById("devtools-blocker");
-  if (!root || !blocker) return;
-
-  var isBlocked = false;
-
-  function detectDevTools() {
-    /*
-      Erkennt die üblichen Chrome/Edge-DevTools:
-      - angedockt: deutlicher Unterschied zwischen outer/inner window
-      - abgedockt: ebenfalls meist ein deutlicher Unterschied
-    */
-    var widthGap = Math.abs(window.outerWidth - window.innerWidth);
-    var heightGap = Math.abs(window.outerHeight - window.innerHeight);
-
-    var desktopDevTools =
-      window.innerWidth > 700 &&
-      (widthGap > 180 || heightGap > 180);
-
-    if (desktopDevTools !== isBlocked) {
-      isBlocked = desktopDevTools;
-      root.classList.toggle("devtools-open", isBlocked);
-      blocker.setAttribute("aria-hidden", isBlocked ? "false" : "true");
-    }
-  }
-
-  // Häufige Tastenkürzel für die Entwicklertools abfangen.
-  document.addEventListener("keydown", function (e) {
-    var key = String(e.key || "").toLowerCase();
-
-    if (
-      key === "f12" ||
-      (e.ctrlKey && e.shiftKey && (key === "i" || key === "j" || key === "c")) ||
-      (e.metaKey && e.altKey && (key === "i" || key === "j" || key === "c"))
-    ) {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
-    }
-  }, true);
-
-  // Kontextmenü erschweren.
-  document.addEventListener("contextmenu", function (e) {
-    e.preventDefault();
-  }, true);
-
-  window.addEventListener("resize", detectDevTools, { passive: true });
-  window.addEventListener("load", detectDevTools, { once: true });
-
-  // Regelmäßig prüfen, falls DevTools ohne Resize geöffnet/geschlossen werden.
-  setInterval(detectDevTools, 700);
-  detectDevTools();
-})();
-</script>
-<!-- /DEVTOOLS-PROTECTION -->
-
 </head>
 <body>
 
@@ -4895,6 +4774,54 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
   }
 })();
 </script>
+
+
+<!-- SAFE DEVTOOLS GUARD -->
+<style id="safe-devtools-guard-style">
+#safe-devtools-guard{display:none;position:fixed;inset:0;z-index:2147483647;
+align-items:center;justify-content:center;background:#08070d;color:#fff;
+font-family:Arial,Helvetica,sans-serif;text-align:center}
+#safe-devtools-guard .safe-card{width:min(560px,90vw);padding:32px 26px;
+border-radius:20px;background:#17151f;box-shadow:0 20px 70px rgba(0,0,0,.55)}
+#safe-devtools-guard h2{margin:0 0 10px;font-size:26px}
+#safe-devtools-guard p{margin:0;color:#bbb;line-height:1.5}
+html.safe-devtools-open #safe-devtools-guard{display:flex}
+html.safe-devtools-open body>*:not(#safe-devtools-guard){visibility:hidden!important}
+</style>
+<div id="safe-devtools-guard" aria-hidden="true">
+  <div class="safe-card">
+    <h2>🔒 Entwicklertools erkannt</h2>
+    <p>Die Seite wurde aus Sicherheitsgründen angehalten.<br>
+    Bitte schließe die Entwicklertools, um fortzufahren.</p>
+  </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  var root=document.documentElement;
+  var guard=document.getElementById('safe-devtools-guard');
+  if(!guard)return;
+
+  function check(){
+    var widthGap=Math.abs(window.outerWidth-window.innerWidth);
+    var heightGap=Math.abs(window.outerHeight-window.innerHeight);
+
+    // Nur bei einem wirklich großen Unterschied sperren.
+    // Kleine Unterschiede durch Browserleisten verursachen keine Sperre.
+    var detected =
+      window.innerWidth > 700 &&
+      (widthGap > 300 || heightGap > 300);
+
+    root.classList.toggle('safe-devtools-open',detected);
+    guard.setAttribute('aria-hidden',detected?'false':'true');
+  }
+
+  window.addEventListener('resize',check,{passive:true});
+  setInterval(check,1000);
+  check();
+})();
+</script>
+<!-- /SAFE DEVTOOLS GUARD -->
 
 </body>
 </html>
