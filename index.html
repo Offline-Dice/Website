@@ -4425,6 +4425,7 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
     // This includes the dice count, game mode, theme, roll count,
     // player names and player colors.
     const themeSelect=document.getElementById('themeSelect');
+    if(themeSelect)themeSelect.disabled=locked;
     const diceSelect=document.getElementById('numDice');
     if(diceSelect)diceSelect.disabled=locked;
     const modeSelect=document.getElementById('colorDice');
@@ -4489,17 +4490,16 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
     if(gameSelect)gameSelect.disabled=yes;
     if(rollCount)rollCount.disabled=yes;
     if(themeSelect)themeSelect.disabled=yes;
+    if(spin)spin.disabled=yes;
+    if(autoRollButton)autoRollButton.disabled=yes;
     sync();
     if(!yes){
+      const themeSelect=document.getElementById('themeSelect');
       const diceSelect=document.getElementById('numDice');
       if(diceSelect)diceSelect.disabled=false;
       if(gameSelect)gameSelect.disabled=false;
       if(rollCount)rollCount.disabled=false;
-    } else {
-      // These controls intentionally stay usable during a round.
-      const themeSelect=document.getElementById('themeSelect');
       if(themeSelect)themeSelect.disabled=false;
-      if(spin)spin.disabled=false;
       if(autoRollButton)autoRollButton.disabled=false;
     }
   }
@@ -4685,6 +4685,21 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
     }
     document.getElementById('lbRollProgress').textContent='ROLL 0 / '+rollCount.value;
   });
+
+  const themeSelectGuard=document.getElementById('themeSelect');
+  if(themeSelectGuard){
+    themeSelectGuard.addEventListener('change',function(){
+      if(area.classList.contains('lb-locked')){
+        this.__lbPreviousValue=this.__lbPreviousValue ?? this.value;
+        if(this.__lbPreviousValue!==this.value){
+          this.value=this.__lbPreviousValue;
+        }
+        return;
+      }
+      this.__lbPreviousValue=this.value;
+    });
+    themeSelectGuard.__lbPreviousValue=themeSelectGuard.value;
+  }
 
   gameSelect.addEventListener('change',function(){
     if(gameSelect.value==='livebattle'){
