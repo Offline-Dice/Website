@@ -4419,11 +4419,9 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
     if(playerCount)playerCount.textContent=activePlayers+' / 4 PLAYERS';
     const locked=area.classList.contains('lb-locked');
     if(add)add.disabled=locked||activePlayers>=4;
-    const themeSelect=document.getElementById('themeSelect');
-    if(themeSelect)themeSelect.disabled=locked;
-    if(spin)spin.disabled=locked;
-    if(autoRollButton)autoRollButton.disabled=locked;
     if(remove)remove.disabled=locked||activePlayers<=2;
+    const lbThemeLock=document.getElementById('themeSelect');
+    if(lbThemeLock)lbThemeLock.disabled=locked;
 
     // During an active round, don't allow settings to be changed.
     // This includes the dice count, game mode, theme, roll count,
@@ -4492,10 +4490,8 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
     if(diceSelect)diceSelect.disabled=yes;
     if(gameSelect)gameSelect.disabled=yes;
     if(rollCount)rollCount.disabled=yes;
-    if(spin)spin.disabled=yes;
-    if(autoRollButton)autoRollButton.disabled=yes;
-    const themeSelect2=document.getElementById('themeSelect');
-    if(themeSelect2)themeSelect2.disabled=yes;
+    const lbThemeLock2=document.getElementById('themeSelect');
+    if(lbThemeLock2)lbThemeLock2.disabled=yes;
     if(themeSelect)themeSelect.disabled=yes;
     sync();
     if(!yes){
@@ -4563,21 +4559,11 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
     score.textContent=p.slice(0,activePlayers).map(x=>x.hits).join(' - ')+' HITS';
     overlay.classList.add('active');
     overlay.setAttribute('aria-hidden','false');
-    // Winner reached: now the round controls become usable again.
     area.classList.remove('lb-locked');
-    const themeSelect3=document.getElementById('themeSelect');
-    if(themeSelect3)themeSelect3.disabled=false;
+    const lbThemeUnlock=document.getElementById('themeSelect');
+    if(lbThemeUnlock)lbThemeUnlock.disabled=false;
     if(spin)spin.disabled=false;
     if(autoRollButton)autoRollButton.disabled=false;
-    if(add)add.disabled=activePlayers>=4;
-    if(remove)remove.disabled=activePlayers<=2;
-    for(let i=1;i<=4;i++){
-      const input=document.getElementById('lbName'+i);
-      if(input)input.disabled=i>activePlayers;
-    }
-    document.querySelectorAll('#liveBattleArea .lb-color').forEach(b=>{
-      b.disabled=Number(b.dataset.player)>activePlayers;
-    });
   }
 
   async function spinBattle(){
