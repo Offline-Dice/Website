@@ -1785,19 +1785,18 @@ body.dice-roll-active #od-public-chat{
   </div>
 </div>
 <div id="liveBattleArea" aria-hidden="true">
-  <div class="lb-battle-dice-row">
-    <div class="lb-battle-player">
+  <div class="lb-battle-dice-row" id="lbBattlePlayers">
+    <div class="lb-battle-player" id="lbBattlePlayer1">
       <div class="lb-player-name" id="lbPlayerDisplay1">PLAYER 1</div>
       <div class="lb-hits"><span id="lbHits1">0</span> HITS</div>
       <div class="lb-current-color" id="lbCurrentColor1">🔵 Blue</div>
     </div>
 
-    <div class="lb-battle-player">
+    <div class="lb-battle-player" id="lbBattlePlayer2">
       <div class="lb-player-name" id="lbPlayerDisplay2">PLAYER 2</div>
       <div class="lb-hits"><span id="lbHits2">0</span> HITS</div>
       <div class="lb-current-color" id="lbCurrentColor2">🟢 Green</div>
     </div>
-  </div>
 
     <div class="lb-battle-player lb-extra-player" id="lbBattlePlayer3" hidden>
       <div class="lb-player-name" id="lbPlayerDisplay3">PLAYER 3</div>
@@ -1810,13 +1809,14 @@ body.dice-roll-active #od-public-chat{
       <div class="lb-hits"><span id="lbHits4">0</span> HITS</div>
       <div class="lb-current-color" id="lbCurrentColor4">🟡 Yellow</div>
     </div>
+  </div>
 
   <div class="lb-single-battle-die" id="lbDiceArea"></div>
 
   <div class="lb-roll-progress" id="lbRollProgress">ROLL 0 / 10</div>
 
-  <div class="lb-player-settings">
-    <div class="lb-setting">
+  <div class="lb-player-settings" id="lbPlayerSettings">
+    <div class="lb-setting" id="lbSetting1">
       <input id="lbName1" maxlength="16" placeholder="PLAYER 1 NAME" autocomplete="off">
       <div class="lb-setting-label">CHOOSE COLOR</div>
       <div class="lb-colors">
@@ -1829,7 +1829,7 @@ body.dice-roll-active #od-public-chat{
       </div>
     </div>
 
-    <div class="lb-setting">
+    <div class="lb-setting" id="lbSetting2">
       <input id="lbName2" maxlength="16" placeholder="PLAYER 2 NAME" autocomplete="off">
       <div class="lb-setting-label">CHOOSE COLOR</div>
       <div class="lb-colors">
@@ -1841,13 +1841,17 @@ body.dice-roll-active #od-public-chat{
         <button type="button" class="lb-color" data-player="2" data-name="Purple" data-color="#8b2be2" style="background:#8b2be2"></button>
       </div>
     </div>
-  </div>
 
     <div class="lb-setting lb-extra-setting" id="lbSetting3" hidden>
       <input id="lbName3" maxlength="16" placeholder="PLAYER 3 NAME" autocomplete="off">
       <div class="lb-setting-label">CHOOSE COLOR</div>
       <div class="lb-colors">
-        <button type="button" class="lb-color" data-player="3" data-name="Blue" data-color="#0066ff" style="background:#0066ff"></button> <button type="button" class="lb-color" data-player="3" data-name="Red" data-color="#ef4444" style="background:#ef4444"></button> <button type="button" class="lb-color selected" data-player="3" data-name="Orange" data-color="#f59e0b" style="background:#f59e0b"></button> <button type="button" class="lb-color" data-player="3" data-name="Yellow" data-color="#facc15" style="background:#facc15"></button> <button type="button" class="lb-color" data-player="3" data-name="Green" data-color="#008b00" style="background:#008b00"></button> <button type="button" class="lb-color" data-player="3" data-name="Purple" data-color="#8b2be2" style="background:#8b2be2"></button>
+        <button type="button" class="lb-color" data-player="3" data-name="Blue" data-color="#0066ff" style="background:#0066ff"></button>
+        <button type="button" class="lb-color" data-player="3" data-name="Red" data-color="#ef4444" style="background:#ef4444"></button>
+        <button type="button" class="lb-color selected" data-player="3" data-name="Orange" data-color="#f59e0b" style="background:#f59e0b"></button>
+        <button type="button" class="lb-color" data-player="3" data-name="Yellow" data-color="#facc15" style="background:#facc15"></button>
+        <button type="button" class="lb-color" data-player="3" data-name="Green" data-color="#008b00" style="background:#008b00"></button>
+        <button type="button" class="lb-color" data-player="3" data-name="Purple" data-color="#8b2be2" style="background:#8b2be2"></button>
       </div>
     </div>
 
@@ -1855,14 +1859,21 @@ body.dice-roll-active #od-public-chat{
       <input id="lbName4" maxlength="16" placeholder="PLAYER 4 NAME" autocomplete="off">
       <div class="lb-setting-label">CHOOSE COLOR</div>
       <div class="lb-colors">
-        <button type="button" class="lb-color" data-player="4" data-name="Blue" data-color="#0066ff" style="background:#0066ff"></button> <button type="button" class="lb-color" data-player="4" data-name="Red" data-color="#ef4444" style="background:#ef4444"></button> <button type="button" class="lb-color" data-player="4" data-name="Orange" data-color="#f59e0b" style="background:#f59e0b"></button> <button type="button" class="lb-color selected" data-player="4" data-name="Yellow" data-color="#facc15" style="background:#facc15"></button> <button type="button" class="lb-color" data-player="4" data-name="Green" data-color="#008b00" style="background:#008b00"></button> <button type="button" class="lb-color" data-player="4" data-name="Purple" data-color="#8b2be2" style="background:#8b2be2"></button>
+        <button type="button" class="lb-color" data-player="4" data-name="Blue" data-color="#0066ff" style="background:#0066ff"></button>
+        <button type="button" class="lb-color" data-player="4" data-name="Red" data-color="#ef4444" style="background:#ef4444"></button>
+        <button type="button" class="lb-color" data-player="4" data-name="Orange" data-color="#f59e0b" style="background:#f59e0b"></button>
+        <button type="button" class="lb-color selected" data-player="4" data-name="Yellow" data-color="#facc15" style="background:#facc15"></button>
+        <button type="button" class="lb-color" data-player="4" data-name="Green" data-color="#008b00" style="background:#008b00"></button>
+        <button type="button" class="lb-color" data-player="4" data-name="Purple" data-color="#8b2be2" style="background:#8b2be2"></button>
       </div>
     </div>
+  </div>
 
   <div class="lb-player-management">
     <button type="button" id="lbAddPlayerButton" class="lb-management-btn">＋ ADD PLAYER</button>
     <button type="button" id="lbRemovePlayerButton" class="lb-management-btn" disabled>− REMOVE PLAYER</button>
   </div>
+
   <div class="lb-player-count" id="lbPlayerCount">2 / 4 PLAYERS</div>
 
   <div class="lb-bottom">
@@ -4159,48 +4170,61 @@ function changeMiniCounter(amount) {
   100%{opacity:0;transform:scale(1.28) translateY(-12px);filter:blur(12px);visibility:hidden}
 }
 
-/* Color Dice Battles — 4 player controls */
+/* 4-player Battle layout */
 #liveBattleArea .lb-battle-dice-row{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:10px 12px;
+  gap:10px;
   align-items:start;
 }
 #liveBattleArea .lb-extra-player[hidden],
 #liveBattleArea .lb-extra-setting[hidden]{display:none!important}
+#liveBattleArea .lb-player-settings{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
 #liveBattleArea .lb-player-management{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
-  margin:8px 0 3px;
+  margin:10px 0 3px;
 }
 #liveBattleArea .lb-management-btn{
-  width:100%;
-  height:42px;
-  padding:6px 10px;
+  height:46px;
+  padding:7px 14px;
   border:0;
-  border-radius:10px;
+  border-radius:12px;
   background:var(--primary-blue);
   color:var(--white);
   font-family:'Luckiest Guy',cursive;
-  font-size:16px;
+  font-size:18px;
   cursor:pointer;
   box-shadow:4px 4px 8px rgba(0,0,0,.25);
 }
-#liveBattleArea .lb-management-btn:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-1px)}
-#liveBattleArea .lb-management-btn:active:not(:disabled){transform:translateY(1px)}
-#liveBattleArea .lb-management-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+#liveBattleArea .lb-management-btn:hover:not(:disabled){
+  filter:brightness(1.08);
+  transform:translateY(-1px);
+}
+#liveBattleArea .lb-management-btn:active:not(:disabled){
+  transform:translateY(1px);
+}
+#liveBattleArea .lb-management-btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  transform:none;
+}
 #liveBattleArea .lb-player-count{
   text-align:center;
-  margin:2px 0 5px;
+  margin:2px 0 7px;
   color:var(--white);
   font-family:'Luckiest Guy',cursive;
   font-size:12px;
   text-shadow:1px 2px 3px rgba(0,0,0,.3);
 }
 @media(max-width:700px){
-  #liveBattleArea .lb-player-management{gap:7px}
-  #liveBattleArea .lb-management-btn{font-size:14px}
+  #liveBattleArea .lb-battle-dice-row{gap:7px}
+  #liveBattleArea .lb-management-btn{font-size:15px}
 }
 </style>
 <div id="od-intro" aria-hidden="true">
@@ -4362,13 +4386,10 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
   const spin=document.getElementById('lbSpinButton');
   const autoRollButton=document.getElementById('lbAutoRollButton');
   const rollCount=document.getElementById('lbRollCount');
-  const addPlayer=document.getElementById('lbAddPlayerButton');
-  const removePlayer=document.getElementById('lbRemovePlayerButton');
+  const add=document.getElementById('lbAddPlayerButton');
+  const remove=document.getElementById('lbRemovePlayerButton');
   const playerCount=document.getElementById('lbPlayerCount');
-  let autoRolling=false, autoRollToken=0;
-  let activePlayers=2;
-  let roll=0,rolling=false;
-  if(!gameSelect||!area||!spin)return;
+  if(!gameSelect||!area||!spin||!rollCount)return;
 
   const colors=[
     {name:'Red',color:'#ef4444',emoji:'🔴'},
@@ -4386,57 +4407,26 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
     {name:'PLAYER 4',color:'#facc15',colorName:'Yellow',hits:0}
   ];
 
-  function updatePlayerCount(){
-    if(playerCount) playerCount.textContent=activePlayers+' / 4 PLAYERS';
-    if(addPlayer) addPlayer.disabled=activePlayers>=4 || area.classList.contains('lb-locked');
-    if(removePlayer) removePlayer.disabled=activePlayers<=2 || area.classList.contains('lb-locked');
-  }
+  let activePlayers=2, roll=0, rolling=false, autoRolling=false, autoToken=0;
 
-  function syncExtraPlayers(){
+  function sync(){
     for(let i=3;i<=4;i++){
       const card=document.getElementById('lbBattlePlayer'+i);
       const setting=document.getElementById('lbSetting'+i);
-      if(card) card.hidden=i>activePlayers;
-      if(setting) setting.hidden=i>activePlayers;
+      if(card)card.hidden=i>activePlayers;
+      if(setting)setting.hidden=i>activePlayers;
     }
-    updatePlayerCount();
-    updateNames();
-  }
-
-  function setModeLocked(locked){
-    gameSelect.disabled=locked;
-    document.getElementById('numDice').disabled=locked;
-    area.classList.toggle('lb-in-round',locked);
-  }
-
-  function showWinner(){
-    const overlay=document.getElementById('lbWinnerOverlay');
-    const name=document.getElementById('lbWinnerName');
-    const score=document.getElementById('lbWinnerScore');
-    let winner='DRAW', best=-1, tie=false;
-
-    for(let i=0;i<activePlayers;i++){
-      if(p[i].hits>best){
-        best=p[i].hits;
-        winner=p[i].name;
-        tie=false;
-      }else if(p[i].hits===best){
-        tie=true;
-      }
+    if(playerCount)playerCount.textContent=activePlayers+' / 4 PLAYERS';
+    const locked=area.classList.contains('lb-locked');
+    if(add)add.disabled=locked||activePlayers>=4;
+    if(remove)remove.disabled=locked||activePlayers<=2;
+    for(let i=1;i<=4;i++){
+      const input=document.getElementById('lbName'+i);
+      if(input)input.disabled=locked||i>activePlayers;
     }
-    if(tie) winner='DRAW';
-
-    name.textContent=winner;
-    score.textContent=p.slice(0,activePlayers).map(x=>x.hits).join(' - ')+' HITS';
-    overlay.classList.remove('lb-closing');
-    overlay.classList.add('active');
-    overlay.setAttribute('aria-hidden','false');
-  }
-
-  function hideWinner(){
-    const overlay=document.getElementById('lbWinnerOverlay');
-    overlay.classList.remove('active');
-    overlay.setAttribute('aria-hidden','true');
+    document.querySelectorAll('#liveBattleArea .lb-color').forEach(b=>{
+      b.disabled=locked||Number(b.dataset.player)>activePlayers;
+    });
   }
 
   function updateNames(){
@@ -4444,89 +4434,71 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
       const input=document.getElementById('lbName'+i);
       const display=document.getElementById('lbPlayerDisplay'+i);
       p[i-1].name=((input&&input.value.trim())||('PLAYER '+i)).slice(0,16);
-      if(display) display.textContent=p[i-1].name;
+      if(display)display.textContent=p[i-1].name;
     }
   }
 
-  function chooseColor(player,btn){
-    if(area.classList.contains('lb-locked')) return;
-    const x=p[player-1];
-    if(!x) return;
-    x.color=btn.dataset.color;
-    x.colorName=btn.dataset.name;
-    btn.parentElement.querySelectorAll('.lb-color').forEach(b=>b.classList.remove('selected'));
+  function chooseColor(btn){
+    if(area.classList.contains('lb-locked'))return;
+    const i=Number(btn.dataset.player);
+    if(!i||i>activePlayers)return;
+    p[i-1].color=btn.dataset.color;
+    p[i-1].colorName=btn.dataset.name;
+    btn.parentElement.querySelectorAll('.lb-color').forEach(x=>x.classList.remove('selected'));
     btn.classList.add('selected');
-
-    const c=colors.find(v=>v.name===x.colorName);
-    const display=document.getElementById('lbCurrentColor'+player);
-    if(display) display.textContent=(c?c.emoji:'🎨')+' '+x.colorName;
-
-    x.hits=0;
-    const hit=document.getElementById('lbHits'+player);
-    if(hit) hit.textContent='0';
+    const c=colors.find(x=>x.name===p[i-1].colorName);
+    const display=document.getElementById('lbCurrentColor'+i);
+    if(display)display.textContent=(c?c.emoji:'🎨')+' '+p[i-1].colorName;
+    p[i-1].hits=0;
+    document.getElementById('lbHits'+i).textContent='0';
     roll=0;
     document.getElementById('lbRollProgress').textContent='ROLL 0 / '+rollCount.value;
-    renderPreview();
   }
 
   document.querySelectorAll('#liveBattleArea .lb-color').forEach(btn=>{
-    btn.addEventListener('click',()=>chooseColor(Number(btn.dataset.player),btn));
+    btn.addEventListener('click',function(e){
+      e.preventDefault();
+      chooseColor(btn);
+    });
   });
 
   for(let i=1;i<=4;i++){
     const input=document.getElementById('lbName'+i);
-    if(input) input.addEventListener('input',()=>{
-      if(!area.classList.contains('lb-locked')) updateNames();
+    if(input)input.addEventListener('input',function(){
+      if(!area.classList.contains('lb-locked'))updateNames();
     });
   }
 
-  function setBattleLocked(locked){
-    const diceSelect=document.getElementById('numDice');
-    document.querySelectorAll('#liveBattleArea .lb-color').forEach(btn=>{
-      btn.disabled=locked || Number(btn.dataset.player)>activePlayers;
-    });
-    for(let i=1;i<=4;i++){
-      const input=document.getElementById('lbName'+i);
-      if(input) input.disabled=locked || i>activePlayers;
+  function lock(yes){
+    area.classList.toggle('lb-locked',yes);
+    document.getElementById('numDice').disabled=yes;
+    gameSelect.disabled=yes;
+    rollCount.disabled=yes;
+    spin.disabled=yes;
+    sync();
+  }
+
+  function reset(){
+    stopAuto();
+    const overlay=document.getElementById('lbWinnerOverlay');
+    if(overlay){
+      overlay.classList.remove('active','lb-closing');
+      overlay.setAttribute('aria-hidden','true');
     }
-    rollCount.disabled=locked;
-    diceSelect.disabled=locked;
-    area.classList.toggle('lb-locked',locked);
-    updatePlayerCount();
-  }
-
-  function resetLiveBattle(){
-    stopAutoRoll();
-    hideWinner();
-    setModeLocked(false);
-    setBattleLocked(false);
-    rolling=false;
-    roll=0;
+    rolling=false;roll=0;
+    lock(false);
     for(let i=0;i<4;i++){
       p[i].hits=0;
-      const hit=document.getElementById('lbHits'+(i+1));
-      if(hit) hit.textContent='0';
+      const h=document.getElementById('lbHits'+(i+1));
+      if(h)h.textContent='0';
     }
     document.getElementById('lbRollProgress').textContent='ROLL 0 / '+rollCount.value;
+    updateNames();
     renderPreview();
-    syncExtraPlayers();
   }
+  window.resetLiveBattle=reset;
 
-  window.resetLiveBattle=resetLiveBattle;
-
-  rollCount.addEventListener('change',()=>{
-    if(area.classList.contains('lb-locked')) return;
-    if(gameSelect.value==='livebattle'){
-      roll=0;
-      for(let i=0;i<activePlayers;i++){
-        p[i].hits=0;
-        document.getElementById('lbHits'+(i+1)).textContent='0';
-      }
-      document.getElementById('lbRollProgress').textContent='ROLL 0 / '+rollCount.value;
-    }
-  });
-
-  function createBattleDie(color){
+  function createDie(color){
     const d=document.createElement('div');
     d.className='color-block lb-die';
     d.style.backgroundColor=color;
@@ -4537,44 +4509,55 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
   }
 
   function renderPreview(){
-    const diceArea=document.getElementById('lbDiceArea');
+    const box=document.getElementById('lbDiceArea');
     const n=Math.max(1,Math.min(6,Number(document.getElementById('numDice').value)||1));
-    diceArea.innerHTML='';
-    for(let i=0;i<n;i++) diceArea.appendChild(createBattleDie('#bdbdbd'));
+    box.innerHTML='';
+    for(let i=0;i<n;i++)box.appendChild(createDie('#bdbdbd'));
+  }
+
+  function showWinner(){
+    const overlay=document.getElementById('lbWinnerOverlay');
+    const name=document.getElementById('lbWinnerName');
+    const score=document.getElementById('lbWinnerScore');
+    let best=-1,winner='DRAW',tie=false;
+    for(let i=0;i<activePlayers;i++){
+      if(p[i].hits>best){best=p[i].hits;winner=p[i].name;tie=false;}
+      else if(p[i].hits===best){tie=true;}
+    }
+    if(tie)winner='DRAW';
+    name.textContent=winner;
+    score.textContent=p.slice(0,activePlayers).map(x=>x.hits).join(' - ')+' HITS';
+    overlay.classList.add('active');
+    overlay.setAttribute('aria-hidden','false');
   }
 
   async function spinBattle(){
     if(rolling||gameSelect.value!=='livebattle')return;
     rolling=true;
-    spin.disabled=true;
-    setBattleLocked(true);
-    setModeLocked(true);
+    lock(true);
     updateNames();
 
     const total=Number(rollCount.value)||10;
     const n=Math.max(1,Math.min(6,Number(document.getElementById('numDice').value)||1));
-
     if(roll===0){
       for(let i=0;i<activePlayers;i++){
         p[i].hits=0;
         document.getElementById('lbHits'+(i+1)).textContent='0';
       }
     }
-
     roll++;
     document.getElementById('lbRollProgress').textContent='ROLL '+roll+' / '+total;
 
-    const diceArea=document.getElementById('lbDiceArea');
-    diceArea.innerHTML='';
+    const box=document.getElementById('lbDiceArea');
+    box.innerHTML='';
     const dice=[];
     for(let i=0;i<n;i++){
-      const d=createBattleDie('#e0e0e0');
+      const d=createDie('#e0e0e0');
       d.classList.add('lb-battle-rolling');
-      diceArea.appendChild(d);
+      box.appendChild(d);
       dice.push(d);
     }
-
-    try{ if(typeof playDiceRollSound==='function') playDiceRollSound(); }catch(e){}
+    try{if(typeof playDiceRollSound==='function')playDiceRollSound();}catch(e){}
     await new Promise(r=>setTimeout(r,1000));
 
     const matches=Array(activePlayers).fill(0);
@@ -4582,14 +4565,12 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
       const result=colors[Math.floor(Math.random()*colors.length)];
       dice[i].classList.remove('lb-battle-rolling');
       dice[i].style.backgroundColor=result.color;
-      dice[i].classList.add('lb-battle-exit');
-
       for(let j=0;j<activePlayers;j++){
-        if(result.color.toLowerCase()===p[j].color.toLowerCase()) matches[j]++;
+        if(result.color.toLowerCase()===p[j].color.toLowerCase())matches[j]++;
       }
       setTimeout(()=>dice[i].classList.remove('lb-battle-exit'),120);
+      dice[i].classList.add('lb-battle-exit');
     }
-
     for(let j=0;j<activePlayers;j++){
       p[j].hits+=matches[j];
       document.getElementById('lbHits'+(j+1)).textContent=p[j].hits;
@@ -4597,110 +4578,102 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
 
     await new Promise(r=>setTimeout(r,180));
     rolling=false;
-    spin.disabled=false;
-
     if(roll>=total){
       document.getElementById('lbRollProgress').textContent='FINISHED · '+total+' ROLLS';
       roll=0;
       showWinner();
-      setModeLocked(true);
-      stopAutoRoll();
+      stopAuto();
     }else{
-      setBattleLocked(false);
-      setModeLocked(false);
+      lock(false);
     }
   }
 
-  async function startAutoRoll(){
-    if(autoRolling||gameSelect.value!=='livebattle'||rolling)return;
-    autoRolling=true;
-    const token=++autoRollToken;
-    autoRollButton.classList.add('active');
-    autoRollButton.textContent='AUTO ROLL ON';
-
-    while(autoRolling&&token===autoRollToken&&gameSelect.value==='livebattle'){
-      const total=Number(rollCount.value)||10;
-      if(roll>=total){
-        autoRolling=false;
-        break;
-      }
-      const startedAt=performance.now();
-      await spinBattle();
-      if(!autoRolling||token!==autoRollToken||gameSelect.value!=='livebattle')break;
-      const wait=Math.max(0,2000-(performance.now()-startedAt));
-      if(wait) await new Promise(r=>setTimeout(r,wait));
-    }
-
-    if(token===autoRollToken){
-      autoRolling=false;
-      autoRollButton.classList.remove('active');
-      autoRollButton.textContent='AUTO ROLL';
-    }
-  }
-
-  function stopAutoRoll(){
+  function stopAuto(){
     autoRolling=false;
-    autoRollToken++;
+    autoToken++;
     if(autoRollButton){
       autoRollButton.classList.remove('active');
       autoRollButton.textContent='AUTO ROLL';
     }
   }
 
-  addPlayer&&addPlayer.addEventListener('click',()=>{
+  async function startAuto(){
+    if(autoRolling||rolling||gameSelect.value!=='livebattle')return;
+    autoRolling=true;
+    const token=++autoToken;
+    autoRollButton.classList.add('active');
+    autoRollButton.textContent='AUTO ROLL ON';
+    while(autoRolling&&token===autoToken&&gameSelect.value==='livebattle'){
+      const total=Number(rollCount.value)||10;
+      if(roll>=total){stopAuto();break;}
+      await spinBattle();
+      if(!autoRolling||token!==autoToken)break;
+      await new Promise(r=>setTimeout(r,700));
+    }
+    if(token===autoToken)stopAuto();
+  }
+
+  add&&add.addEventListener('click',function(){
     if(activePlayers<4&&!area.classList.contains('lb-locked')){
       activePlayers++;
-      syncExtraPlayers();
+      sync();
       const input=document.getElementById('lbName'+activePlayers);
-      if(input) input.focus();
+      if(input)input.focus();
     }
   });
 
-  removePlayer&&removePlayer.addEventListener('click',()=>{
+  remove&&remove.addEventListener('click',function(){
     if(activePlayers>2&&!area.classList.contains('lb-locked')){
       const old=activePlayers;
-      p[old-1].hits=0;
-      p[old-1].name='PLAYER '+old;
       const input=document.getElementById('lbName'+old);
-      if(input) input.value='';
-      const hit=document.getElementById('lbHits'+old);
-      if(hit) hit.textContent='0';
+      if(input)input.value='';
+      p[old-1].hits=0;
+      document.getElementById('lbHits'+old).textContent='0';
       activePlayers--;
       roll=0;
       document.getElementById('lbRollProgress').textContent='ROLL 0 / '+rollCount.value;
-      syncExtraPlayers();
+      sync();
+      updateNames();
     }
   });
 
   spin.addEventListener('click',spinBattle);
-  autoRollButton.addEventListener('click',()=>{
-    if(autoRolling) stopAutoRoll();
-    else startAutoRoll();
-  });
+  autoRollButton.addEventListener('click',()=>autoRolling?stopAuto():startAuto());
 
-  document.getElementById('lbWinnerClose').addEventListener('click',()=>{
+  document.getElementById('lbWinnerClose').addEventListener('click',function(){
     const overlay=document.getElementById('lbWinnerOverlay');
     overlay.classList.add('lb-closing');
     setTimeout(()=>{
       overlay.classList.remove('active','lb-closing');
       overlay.setAttribute('aria-hidden','true');
-      setModeLocked(false);
-      setBattleLocked(false);
-      resetLiveBattle();
+      reset();
     },320);
   });
 
-  gameSelect.addEventListener('change',()=>{
+  rollCount.addEventListener('change',function(){
+    if(area.classList.contains('lb-locked'))return;
+    roll=0;
+    for(let i=0;i<activePlayers;i++){
+      p[i].hits=0;
+      document.getElementById('lbHits'+(i+1)).textContent='0';
+    }
+    document.getElementById('lbRollProgress').textContent='ROLL 0 / '+rollCount.value;
+  });
+
+  gameSelect.addEventListener('change',function(){
     if(gameSelect.value==='livebattle'){
       const select=document.getElementById('numDice');
-      const saved=Math.max(1,Math.min(6,Number(modeValues.livebattle)||1));
-      select.value=String(saved);
-      resetLiveBattle();
+      const saved=(typeof modeValues!=='undefined'&&modeValues.livebattle)?Number(modeValues.livebattle):1;
+      select.value=String(Math.max(1,Math.min(6,saved||1)));
+      reset();
       renderPreview();
     }
   });
 
-  syncExtraPlayers();
+  // Initial state: controls are usable immediately. No invisible lock.
+  area.classList.remove('lb-locked');
+  sync();
+  updateNames();
   renderPreview();
 })();
 </script>
