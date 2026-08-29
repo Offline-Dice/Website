@@ -4419,13 +4419,16 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
     if(playerCount)playerCount.textContent=activePlayers+' / 4 PLAYERS';
     const locked=area.classList.contains('lb-locked');
     if(add)add.disabled=locked||activePlayers>=4;
+    const themeSelect=document.getElementById('themeSelect');
+    if(themeSelect)themeSelect.disabled=locked;
+    if(spin)spin.disabled=locked;
+    if(autoRollButton)autoRollButton.disabled=locked;
     if(remove)remove.disabled=locked||activePlayers<=2;
 
     // During an active round, don't allow settings to be changed.
     // This includes the dice count, game mode, theme, roll count,
     // player names and player colors.
     const themeSelect=document.getElementById('themeSelect');
-    if(themeSelect)themeSelect.disabled=locked;
     const diceSelect=document.getElementById('numDice');
     if(diceSelect)diceSelect.disabled=locked;
     const modeSelect=document.getElementById('colorDice');
@@ -4489,17 +4492,22 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
     if(diceSelect)diceSelect.disabled=yes;
     if(gameSelect)gameSelect.disabled=yes;
     if(rollCount)rollCount.disabled=yes;
-    if(themeSelect)themeSelect.disabled=yes;
     if(spin)spin.disabled=yes;
     if(autoRollButton)autoRollButton.disabled=yes;
+    const themeSelect2=document.getElementById('themeSelect');
+    if(themeSelect2)themeSelect2.disabled=yes;
+    if(themeSelect)themeSelect.disabled=yes;
     sync();
     if(!yes){
-      const themeSelect=document.getElementById('themeSelect');
       const diceSelect=document.getElementById('numDice');
       if(diceSelect)diceSelect.disabled=false;
       if(gameSelect)gameSelect.disabled=false;
       if(rollCount)rollCount.disabled=false;
+    } else {
+      // These controls intentionally stay usable during a round.
+      const themeSelect=document.getElementById('themeSelect');
       if(themeSelect)themeSelect.disabled=false;
+      if(spin)spin.disabled=false;
       if(autoRollButton)autoRollButton.disabled=false;
     }
   }
@@ -4555,6 +4563,21 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
     score.textContent=p.slice(0,activePlayers).map(x=>x.hits).join(' - ')+' HITS';
     overlay.classList.add('active');
     overlay.setAttribute('aria-hidden','false');
+    // Winner reached: now the round controls become usable again.
+    area.classList.remove('lb-locked');
+    const themeSelect3=document.getElementById('themeSelect');
+    if(themeSelect3)themeSelect3.disabled=false;
+    if(spin)spin.disabled=false;
+    if(autoRollButton)autoRollButton.disabled=false;
+    if(add)add.disabled=activePlayers>=4;
+    if(remove)remove.disabled=activePlayers<=2;
+    for(let i=1;i<=4;i++){
+      const input=document.getElementById('lbName'+i);
+      if(input)input.disabled=i>activePlayers;
+    }
+    document.querySelectorAll('#liveBattleArea .lb-color').forEach(b=>{
+      b.disabled=Number(b.dataset.player)>activePlayers;
+    });
   }
 
   async function spinBattle(){
@@ -4685,21 +4708,6 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
     }
     document.getElementById('lbRollProgress').textContent='ROLL 0 / '+rollCount.value;
   });
-
-  const themeSelectGuard=document.getElementById('themeSelect');
-  if(themeSelectGuard){
-    themeSelectGuard.addEventListener('change',function(){
-      if(area.classList.contains('lb-locked')){
-        this.__lbPreviousValue=this.__lbPreviousValue ?? this.value;
-        if(this.__lbPreviousValue!==this.value){
-          this.value=this.__lbPreviousValue;
-        }
-        return;
-      }
-      this.__lbPreviousValue=this.value;
-    });
-    themeSelectGuard.__lbPreviousValue=themeSelectGuard.value;
-  }
 
   gameSelect.addEventListener('change',function(){
     if(gameSelect.value==='livebattle'){
