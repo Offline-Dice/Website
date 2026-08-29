@@ -4485,27 +4485,20 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
 
   function lock(yes){
     area.classList.toggle('lb-locked',yes);
-    const themeSelect=document.getElementById('themeSelect');
     const diceSelect=document.getElementById('numDice');
+    const modeSelect=document.getElementById('colorDice');
+    const rollsSelect=document.getElementById('lbRollCount');
+    const themeSelect=document.getElementById('themeSelect');
+
     if(diceSelect)diceSelect.disabled=yes;
-    if(gameSelect)gameSelect.disabled=yes;
-    if(rollCount)rollCount.disabled=yes;
-    const lbThemeLock2=document.getElementById('themeSelect');
-    if(lbThemeLock2)lbThemeLock2.disabled=yes;
+    if(modeSelect)modeSelect.disabled=yes;
+    if(rollsSelect)rollsSelect.disabled=yes;
     if(themeSelect)themeSelect.disabled=yes;
+
+    // Roll Again and Auto Roll intentionally stay usable during the battle.
+    if(spin)spin.disabled=false;
+    if(autoRollButton)autoRollButton.disabled=false;
     sync();
-    if(!yes){
-      const diceSelect=document.getElementById('numDice');
-      if(diceSelect)diceSelect.disabled=false;
-      if(gameSelect)gameSelect.disabled=false;
-      if(rollCount)rollCount.disabled=false;
-    } else {
-      // These controls intentionally stay usable during a round.
-      const themeSelect=document.getElementById('themeSelect');
-      if(themeSelect)themeSelect.disabled=false;
-      if(spin)spin.disabled=false;
-      if(autoRollButton)autoRollButton.disabled=false;
-    }
   }
 
   function reset(){
@@ -4559,6 +4552,7 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
     score.textContent=p.slice(0,activePlayers).map(x=>x.hits).join(' - ')+' HITS';
     overlay.classList.add('active');
     overlay.setAttribute('aria-hidden','false');
+    lock(false);
     area.classList.remove('lb-locked');
     const lbThemeUnlock=document.getElementById('themeSelect');
     if(lbThemeUnlock)lbThemeUnlock.disabled=false;
@@ -4619,7 +4613,9 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
       showWinner();
       stopAuto();
     }else{
-      lock(false);
+      // Keep all battle settings locked between rolls.
+      // ROLL AGAIN and AUTO ROLL remain usable.
+      sync();
     }
   }
 
