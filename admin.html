@@ -343,6 +343,22 @@ body.secureAdminLocked>*:not(#secureAdminGate){visibility:hidden!important}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+
+<script>
+var firebaseConfig = {
+  apiKey: "AIzaSyBUT0t1I9Dkee5Ok_uYMzs4WfdwapOA5As",
+  authDomain: "kenzy-dice.firebaseapp.com",
+  projectId: "kenzy-dice",
+  databaseURL: "https://kenzy-dice-default-rtdb.europe-west1.firebasedatabase.app",
+  storageBucket: "kenzy-dice.firebasestorage.app",
+  messagingSenderId: "578956722062",
+  appId: "1:578956722062:web:5156f5737e51ef75246edf"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
 <script id="secure-admin-auth">
 (function(){
   const ADMIN_UID = "5zaM6ctegwPFRTaRabsRBhZyKmq2";
@@ -350,27 +366,11 @@ body.secureAdminLocked>*:not(#secureAdminGate){visibility:hidden!important}
   const gate=document.getElementById("secureAdminGate");
   const form=document.getElementById("secureAdminLoginForm");
   const status=document.getElementById("secureAdminAuthStatus");
-  let authReady=false;
-  const secureConfig={
-    apiKey:"AIzaSyBUT0t1I9Dkee5Ok_uYMzs4WfdwapOA5As",
-    authDomain:"kenzy-dice.firebaseapp.com",
-    projectId:"kenzy-dice",
-    databaseURL:"https://kenzy-dice-default-rtdb.europe-west1.firebasedatabase.app",
-    storageBucket:"kenzy-dice.firebasestorage.app",
-    messagingSenderId:"578956722062",
-    appId:"1:578956722062:web:5156f5737e51ef75246edf"
-  };
-  let app;
-  try{
-    app=firebase.initializeApp(secureConfig, "secureAdminAuthApp");
-  }catch(e){
-    app=firebase.app();
-  }
-  const auth=firebase.auth(app);
+  const auth=firebase.auth();
   window.secureAdminAuth=auth;
+
   auth.onAuthStateChanged(function(user){
     if(user && user.uid===ADMIN_UID){
-      authReady=true;
       gate.style.display="none";
       document.body.classList.remove("secureAdminLocked");
       return;
@@ -379,6 +379,7 @@ body.secureAdminLocked>*:not(#secureAdminGate){visibility:hidden!important}
     gate.style.display="grid";
     document.body.classList.add("secureAdminLocked");
   });
+
   form.addEventListener("submit",async function(e){
     e.preventDefault();
     status.textContent="Anmeldung...";
@@ -397,20 +398,6 @@ body.secureAdminLocked>*:not(#secureAdminGate){visibility:hidden!important}
   });
 })();
 </script>
-
-<script>
-var firebaseConfig = {
-  apiKey: "AIzaSyBUT0t1I9Dkee5Ok_uYMzs4WfdwapOA5As",
-  authDomain: "kenzy-dice.firebaseapp.com",
-  projectId: "kenzy-dice",
-  databaseURL: "https://kenzy-dice-default-rtdb.europe-west1.firebasedatabase.app",
-  storageBucket: "kenzy-dice.firebasestorage.app",
-  messagingSenderId: "578956722062",
-  appId: "1:578956722062:web:5156f5737e51ef75246edf"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
 
 
 // ============================================================
