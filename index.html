@@ -1797,8 +1797,7 @@ body.dice-roll-active #od-public-chat{
       <div class="lb-hits"><span id="lbHits2">0</span> HITS</div>
       <div class="lb-current-color" id="lbCurrentColor2">🟢 Green</div>
     </div>
-    <button type="button" id="lbAddPlayerButton" class="lb-add-player" aria-label="Add player">+</button>
-  </div>
+</div>
 
   <div class="lb-single-battle-die" id="lbDiceArea"></div>
 
@@ -1856,6 +1855,12 @@ body.dice-roll-active #od-public-chat{
         <button type="button" class="lb-color" data-player="4" data-name="Purple" data-color="#8b2be2" style="background:#8b2be2"></button>
       </div>
     </div>
+  <div class="lb-player-management">
+    <button type="button" id="lbAddPlayerButton" class="lb-management-btn">＋ ADD PLAYER</button>
+    <button type="button" id="lbRemovePlayerButton" class="lb-management-btn" disabled>− REMOVE PLAYER</button>
+    <span id="lbPlayerCount" class="lb-management-count">2 / 4 PLAYERS</span>
+  </div>
+
   <div class="lb-bottom">
     <select id="lbRollCount" aria-label="Number of rolls">
       <option value="5">5 ROLLS</option>
@@ -4154,6 +4159,13 @@ function changeMiniCounter(amount) {
 #liveBattleArea .lb-add-player:hover{transform:scale(1.06)}
 #liveBattleArea .lb-add-player:disabled{opacity:.35;cursor:not-allowed;transform:none}
 #liveBattleArea .lb-extra-setting[hidden]{display:none!important}
+
+#liveBattleArea .lb-player-management{display:flex;justify-content:center;align-items:center;gap:8px;margin:8px auto 2px;flex-wrap:wrap}
+#liveBattleArea .lb-management-btn{appearance:none;border:2px solid currentColor;background:transparent;color:inherit;border-radius:8px;min-height:34px;padding:5px 12px;font:inherit;cursor:pointer}
+#liveBattleArea .lb-management-btn:hover:not(:disabled){transform:translateY(-1px)}
+#liveBattleArea .lb-management-btn:disabled{opacity:.4;cursor:not-allowed}
+#liveBattleArea .lb-management-count{font-size:12px;opacity:.75}
+#liveBattleArea .lb-extra-player[hidden],#liveBattleArea .lb-extra-setting[hidden]{display:none!important}
 </style>
 <div id="od-intro" aria-hidden="true">
   <div class="od-intro-ring"></div>
@@ -4862,5 +4874,48 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 })();
 </script>
 
+<script>
+(function(){
+  const add=document.getElementById('lbAddPlayerButton');
+  const remove=document.getElementById('lbRemovePlayerButton');
+  const count=document.getElementById('lbPlayerCount');
+  const area=document.getElementById('liveBattleArea');
+  if(!add||!remove||!count||!area)return;
+  let players=2;
+
+  function sync(){
+    for(let i=3;i<=4;i++){
+      const card=document.getElementById('lbBattlePlayer'+i);
+      const setting=document.getElementById('lbSetting'+i);
+      if(card)card.hidden=i>players;
+      if(setting)setting.hidden=i>players;
+    }
+    count.textContent=players+' / 4 PLAYERS';
+    add.disabled=players>=4||area.classList.contains('lb-locked');
+    remove.disabled=players<=2||area.classList.contains('lb-locked');
+  }
+
+  add.onclick=function(){
+    if(players<4&&!area.classList.contains('lb-locked')){
+      players++;
+      sync();
+      const input=document.getElementById('lbName'+players);
+      if(input)input.focus();
+    }
+  };
+
+  remove.onclick=function(){
+    if(players>2&&!area.classList.contains('lb-locked')){
+      const input=document.getElementById('lbName'+players);
+      if(input)input.value='';
+      players--;
+      sync();
+    }
+  };
+
+  new MutationObserver(sync).observe(area,{attributes:true,attributeFilter:['class']});
+  sync();
+})();
+</script>
 </body>
 </html>
