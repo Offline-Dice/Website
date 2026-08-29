@@ -246,7 +246,6 @@ body.secureAdminLocked>*:not(#secureAdminGate){visibility:hidden!important}
 </nav>
 <div id="adminDashboard">
   <div class="ad-stat"><div class="ad-stat-label">Users</div><div id="adStatUsers" class="ad-stat-value">—</div><div class="ad-stat-sub">registered accounts</div></div>
-  <div class="ad-stat"><div class="ad-stat-label">Online</div><div id="adStatOnline" class="ad-stat-value">—</div><div class="ad-stat-sub"><span class="ad-live-dot"></span> currently online</div></div>
   <div class="ad-stat"><div class="ad-stat-label">VIP Rooms</div><div id="adStatVip" class="ad-stat-value">—</div><div class="ad-stat-sub">active assignments</div></div>
   <div class="ad-stat"><div class="ad-stat-label">Chat</div><div id="adStatChat" class="ad-stat-value">—</div><div class="ad-stat-sub">messages stored</div></div>
 </div>
@@ -368,7 +367,6 @@ body.secureAdminLocked>*:not(#secureAdminGate){visibility:hidden!important}
   }
   const auth=firebase.auth(app);
   window.secureAdminAuth=auth;
-  window.secureAdminApp=app;
   auth.onAuthStateChanged(function(user){
     if(user && user.uid===ADMIN_UID){
       authReady=true;
@@ -410,7 +408,8 @@ var firebaseConfig = {
   appId: "1:578956722062:web:5156f5737e51ef75246edf"
 };
 
-const db = firebase.database(window.secureAdminApp);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
 
 // ============================================================
