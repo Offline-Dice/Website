@@ -1,0 +1,1368 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Offline Dice — Admin Control Center</title>
+<style>
+body {
+ font-family: Arial, sans-serif;
+ background:#111;
+ color:white;
+ text-align:center;
+ padding:40px;
+}
+textarea {
+ width:90%;
+ max-width:500px;
+ height:120px;
+ border-radius:12px;
+ padding:12px;
+ font-size:18px;
+}
+button {
+ margin-top:15px;
+ padding:14px 35px;
+ border-radius:12px;
+ border:0;
+ font-size:18px;
+ cursor:pointer;
+}
+#status {margin-top:20px}
+</style>
+
+<style id="registered-users-admin-css">
+#registeredUsersAdmin,#vipRoomAdmin{max-width:900px;margin:30px auto;text-align:left}
+.admin-user-row,.admin-vip-row{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  background:#222;border:1px solid #333;border-radius:14px;padding:14px 16px;margin-top:10px;
+}
+.admin-user-info{min-width:0}
+.admin-user-name{font-size:18px;font-weight:800}
+.admin-user-meta{font-size:12px;opacity:.65;margin-top:4px}
+.admin-user-status{font-size:12px;font-weight:800;margin-top:6px}
+.admin-user-actions{display:flex;gap:8px;flex:none}
+.admin-user-actions button,.admin-vip-actions button{margin-top:0;padding:10px 14px;font-size:14px;font-weight:800}
+.admin-ban{background:#b30000;color:#fff}.admin-unban{background:#159447;color:#fff}
+.admin-vip-remove{background:#b30000;color:#fff}
+#registeredUsersError{display:none;margin-top:12px;padding:12px;border-radius:10px;background:#35151a;color:#ff9aa4}
+#vipRoomForm{
+  background:#222;border:1px solid #333;border-radius:14px;padding:18px;
+}
+#vipRoomForm input[type=text],#vipRoomForm input[type=file],#vipRoomForm select{
+  width:100%;box-sizing:border-box;margin:7px 0;padding:12px;border-radius:10px;
+  border:1px solid #444;background:#111;color:#fff;font-size:16px;
+}
+#vipImagePreview{
+  display:none;width:80px;height:80px;object-fit:cover;border-radius:14px;
+  border:2px solid #ffd447;margin:8px 0;
+}
+.admin-vip-row img{width:58px;height:58px;border-radius:12px;object-fit:cover;background:#111}
+.admin-vip-info{display:flex;align-items:center;gap:12px;min-width:0}
+.admin-vip-name{font-size:17px;font-weight:800}
+.admin-vip-meta{font-size:12px;opacity:.65;margin-top:4px}
+.admin-vip-actions{flex:none}
+</style>
+
+
+<style id="chat-admin-css">
+#chatAdmin{max-width:900px;margin:30px auto;text-align:left}
+#chatAdmin .chat-admin-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0}
+#chatAdmin .chat-admin-count{opacity:.7;font-size:13px}
+#chatAdmin .chat-admin-list{margin-top:15px}
+.chat-admin-msg{
+  display:flex;justify-content:space-between;gap:16px;align-items:flex-start;
+  background:#222;border:1px solid #333;border-radius:14px;padding:14px 16px;margin-top:10px
+}
+.chat-admin-content{min-width:0;flex:1}
+.chat-admin-name{font-weight:800;font-size:16px}
+.chat-admin-text{margin-top:5px;white-space:pre-wrap;word-break:break-word}
+.chat-admin-time{margin-top:6px;font-size:11px;opacity:.55}
+.chat-admin-delete{
+  margin:0!important;padding:9px 12px!important;background:#b30000!important;
+  color:#fff!important;font-weight:800!important;flex:none
+}
+#chatAdminDeleteAll{background:#b30000;color:#fff;font-weight:800}
+.chat-admin-empty{opacity:.6;padding:20px 0}
+</style>
+
+
+<style id="chat-role-admin-css">
+#chatRoleAdmin{max-width:900px;margin:25px auto;text-align:left}
+#chatRoleAdmin .role-box{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+#chatRoleAdmin input,#chatRoleAdmin select{padding:10px 12px;border-radius:9px;border:1px solid #444;background:#181818;color:#fff}
+#chatRoleAdmin button{font-weight:800}
+#chatRoleList{margin-top:14px}
+.chat-role-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;margin-top:8px;background:#222;border:1px solid #333;border-radius:12px}
+.chat-role-actions{display:flex;gap:7px;flex-wrap:wrap}
+.chat-role-badge{color:#ffd75a;font-weight:900}
+</style>
+
+
+<style id="chat-user-selector-css">
+#chatRoleName{min-width:240px;cursor:pointer}
+#chatRoleName option{background:#181818;color:#fff}
+</style>
+
+
+<style id="offline-dice-admin-redesign">
+:root{
+  --ad-bg:#090b10;--ad-panel:rgba(20,24,33,.82);--ad-panel2:rgba(255,255,255,.055);
+  --ad-border:rgba(255,255,255,.11);--ad-text:#f7f9ff;--ad-muted:rgba(255,255,255,.58);
+  --ad-blue:#2196f3;--ad-green:#20c77a;--ad-red:#ef4444;--ad-yellow:#ffd447;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0!important;padding:28px!important;min-height:100vh;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(33,150,243,.13),transparent 28%),
+    radial-gradient(circle at 90% 15%,rgba(139,92,246,.10),transparent 25%),
+    var(--ad-bg)!important;
+  color:var(--ad-text)!important;text-align:left!important;font-family:Inter,Arial,sans-serif!important;
+}
+body>h1,body>p:first-of-type{max-width:1180px;margin-left:auto;margin-right:auto}
+body>h1{
+  font-size:clamp(28px,4vw,44px)!important;margin-top:10px!important;margin-bottom:8px!important;
+  letter-spacing:-1.5px;
+}
+body>p:first-of-type{color:var(--ad-muted)}
+body>hr{max-width:1180px;border:0;border-top:1px solid var(--ad-border)!important}
+body>h2,body>section{max-width:1180px;margin-left:auto!important;margin-right:auto!important}
+body>h2{font-size:25px!important;margin-top:32px!important}
+body>section,#vipRoomForm,#chatAdmin,#chatRoleAdmin{
+  background:var(--ad-panel)!important;border:1px solid var(--ad-border)!important;
+  border-radius:22px!important;box-shadow:0 18px 60px rgba(0,0,0,.22)!important;
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+}
+body>section{padding:22px!important}
+textarea,input,select{
+  background:rgba(255,255,255,.055)!important;color:#fff!important;
+  border:1px solid rgba(255,255,255,.14)!important;
+  outline:none;transition:.18s ease;
+}
+textarea:focus,input:focus,select:focus{
+  border-color:rgba(33,150,243,.65)!important;box-shadow:0 0 0 3px rgba(33,150,243,.12)
+}
+button{
+  border:1px solid rgba(255,255,255,.12)!important;
+  border-radius:12px!important;font-weight:800!important;
+  transition:transform .16s ease,filter .16s ease,box-shadow .16s ease!important;
+}
+button:hover{transform:translateY(-1px);filter:brightness(1.06);box-shadow:0 8px 22px rgba(0,0,0,.18)}
+button:active{transform:translateY(1px) scale(.99)}
+#adminTopNav{
+  max-width:1180px;margin:0 auto 24px;display:flex;gap:8px;flex-wrap:wrap;
+  position:sticky;top:12px;z-index:1000;padding:10px;border-radius:18px;
+  background:rgba(9,11,16,.76);border:1px solid var(--ad-border);
+  backdrop-filter:blur(18px);box-shadow:0 12px 40px rgba(0,0,0,.25)
+}
+#adminTopNav a{
+  color:#fff;text-decoration:none;padding:10px 13px;border-radius:10px;
+  font-size:13px;font-weight:800;background:rgba(255,255,255,.05)
+}
+#adminTopNav a:hover{background:rgba(255,255,255,.11)}
+#adminDashboard{
+  max-width:1180px;margin:0 auto 24px;display:grid;gap:14px;
+  grid-template-columns:repeat(4,minmax(0,1fr))
+}
+.ad-stat{
+  padding:18px;border:1px solid var(--ad-border);border-radius:18px;
+  background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.025));
+}
+.ad-stat-label{font-size:12px;color:var(--ad-muted);font-weight:800;text-transform:uppercase;letter-spacing:.8px}
+.ad-stat-value{font-size:30px;font-weight:900;margin-top:7px}
+.ad-stat-sub{font-size:11px;color:var(--ad-muted);margin-top:3px}
+#adminQuickActions{
+  max-width:1180px;margin:0 auto 26px;padding:16px;border-radius:18px;
+  border:1px solid var(--ad-border);background:rgba(255,255,255,.035);
+  display:flex;gap:9px;flex-wrap:wrap;align-items:center
+}
+#adminQuickActions strong{margin-right:5px}
+#adminQuickActions button{margin:0!important;padding:10px 14px!important;font-size:13px!important}
+#adminNoticeControls{
+  max-width:1180px;margin:0 auto 25px;padding:18px;border-radius:18px;
+  border:1px solid var(--ad-border);background:rgba(255,255,255,.035)
+}
+#adminNoticeControls .ad-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+#adminNoticeControls input{padding:11px 13px;border-radius:11px}
+#adminNoticeDuration{width:130px}
+#registeredUsersAdmin{margin-top:25px!important}
+#adminUserTools{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0}
+#adminUserSearch{flex:1;min-width:220px;padding:12px 14px;border-radius:12px}
+#adminUserFilter{padding:12px 14px;border-radius:12px}
+.admin-user-row,.admin-vip-row,.chat-admin-msg,.chat-role-row{
+  background:rgba(255,255,255,.045)!important;border-color:var(--ad-border)!important;
+  border-radius:16px!important;
+}
+.admin-user-row:hover,.admin-vip-row:hover,.chat-admin-msg:hover,.chat-role-row:hover{
+  background:rgba(255,255,255,.07)!important
+}
+.ad-hidden{display:none!important}
+.ad-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ad-live-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--ad-green);box-shadow:0 0 12px rgba(32,199,122,.7)}
+@media(max-width:850px){#adminDashboard{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){
+  body{padding:14px!important}
+  #adminDashboard{grid-template-columns:1fr 1fr}
+  .ad-stat-value{font-size:24px}
+  #adminTopNav{top:6px}
+}
+</style>
+
+
+<style id="secure-admin-auth-css">
+#secureAdminGate{position:fixed;inset:0;z-index:9999999;display:grid;place-items:center;background:#090b10;padding:20px}
+#secureAdminCard{width:min(430px,94vw);padding:28px;border:1px solid rgba(255,255,255,.12);border-radius:22px;background:rgba(20,24,33,.96);box-shadow:0 20px 80px rgba(0,0,0,.45);text-align:center}
+#secureAdminCard h2{margin:0 0 8px;font-size:28px}
+#secureAdminCard p{opacity:.65;margin:0 0 20px}
+#secureAdminCard input{display:block;width:100%;box-sizing:border-box;margin:10px 0;padding:13px;border-radius:12px;background:#111;color:#fff;border:1px solid #444}
+#secureAdminCard button{width:100%;padding:13px;border-radius:12px;background:#2196f3;color:#fff;font-weight:800;border:0}
+#secureAdminAuthStatus{min-height:20px;margin-top:12px;font-size:13px;color:#ff9aa4}
+body.secureAdminLocked>*:not(#secureAdminGate){visibility:hidden!important}
+</style>
+</head>
+<body>
+<div id="secureAdminGate">
+  <div id="secureAdminCard">
+    <h2>🔐 Admin Login</h2>
+    <p>Nur der autorisierte Kenzy-Dice-Administrator kann dieses Panel öffnen.</p>
+    <form id="secureAdminLoginForm">
+      <input id="secureAdminEmail" type="email" autocomplete="username" placeholder="Admin-E-Mail" required>
+      <input id="secureAdminPassword" type="password" autocomplete="current-password" placeholder="Passwort" required>
+      <button type="submit">Anmelden</button>
+    </form>
+    <div id="secureAdminAuthStatus"></div>
+  </div>
+</div>
+
+
+<nav id="adminTopNav">
+  <a href="#adminDashboard">Dashboard</a>
+  <a href="#announcementAdminAnchor">Announcements</a>
+  <a href="#registeredUsersAdmin">Users</a>
+  <a href="#vipRoomAdmin">VIP Room</a>
+  <a href="#chatAdmin">Chat</a>
+  <a href="#chatRoleAdmin">Roles</a>
+</nav>
+<div id="adminDashboard">
+  <div class="ad-stat"><div class="ad-stat-label">Users</div><div id="adStatUsers" class="ad-stat-value">—</div><div class="ad-stat-sub">registered accounts</div></div>
+  <div class="ad-stat"><div class="ad-stat-label">Online</div><div id="adStatOnline" class="ad-stat-value">—</div><div class="ad-stat-sub"><span class="ad-live-dot"></span> currently online</div></div>
+  <div class="ad-stat"><div class="ad-stat-label">VIP Rooms</div><div id="adStatVip" class="ad-stat-value">—</div><div class="ad-stat-sub">active assignments</div></div>
+  <div class="ad-stat"><div class="ad-stat-label">Chat</div><div id="adStatChat" class="ad-stat-value">—</div><div class="ad-stat-sub">messages stored</div></div>
+</div>
+<div id="adminQuickActions">
+  <strong>⚡ Quick actions</strong>
+  <button onclick="restartForEveryone()" style="background:#ff7a00;color:#fff">🔄 Refresh everyone</button>
+  <button onclick="sendQuickAnnouncement()" style="background:#2196f3;color:#fff">📢 Quick announcement</button>
+  <button onclick="clearChatFromQuick()" style="background:#b30000;color:#fff">🗑️ Clear chat</button>
+  <button onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆️ Top</button>
+</div>
+<div id="adminNoticeControls">
+  <div class="ad-row">
+    <strong>Live announcement duration</strong>
+    <input id="adminNoticeDuration" type="number" min="1" max="120" value="5" title="seconds">
+    <span style="opacity:.6;font-size:12px">seconds</span>
+    <button onclick="saveAnnouncementDuration()">💾 Save duration</button>
+    <span id="adminDurationStatus" style="font-size:12px;opacity:.65"></span>
+  </div>
+</div>
+<div id="announcementAdminAnchor"></div>
+
+
+<h1>📢 Offline Dice Announcement Admin</h1>
+<p>Write your message:</p>
+
+<textarea id="msg" placeholder="Announcement..."></textarea><br>
+<label style="display:inline-block;margin:12px 0;font-size:18px;">
+<input type="checkbox" id="saveHistory" checked>
+ Save to Announcements Page
+</label><br>
+<button onclick="send()">SEND ANNOUNCEMENT</button>
+<div style="margin-top:30px;padding-top:25px;border-top:1px solid #333;">
+  <h2>Permanent Announcement</h2>
+  <p style="opacity:.75;">This announcement stays on the main page until you delete it.</p>
+  <textarea id="permanentMsg" placeholder="Permanent announcement..."></textarea><br>
+  <input id="permanentLinkText" type="text" placeholder="Link-Schrift, z. B. Hier klicken" style="width:90%;max-width:500px;box-sizing:border-box;border-radius:12px;padding:12px;font-size:18px;margin:8px 0;">
+  <input id="permanentLinkUrl" type="url" placeholder="Link, z. B. https://example.com" style="width:90%;max-width:500px;box-sizing:border-box;border-radius:12px;padding:12px;font-size:18px;margin:8px 0;"><br>
+  <button onclick="sendPermanent()" style="background:#fff;color:#111;font-weight:bold;">SAVE PERMANENT ANNOUNCEMENT</button>
+  <button onclick="deletePermanent()" style="background:#b30000;color:white;font-weight:bold;">DELETE PERMANENT</button>
+</div>
+
+
+<hr style="margin:30px 0">
+<h2>⚙️ Seiten-Steuerung</h2>
+<p style="opacity:.75;">Startet die Seite bei allen aktuell verbundenen Nutzern neu.</p>
+<button onclick="restartForEveryone()" style="background:#ff7a00;color:white;font-weight:bold;">
+ 🔄 NEUSTART FÜR ALLE
+</button>
+<div style="margin-top:12px;">
+  <button id="serverRestartIntroBtn" onclick="toggleServerRestartIntro()" style="background:#b30000;color:white;font-weight:bold;">
+    🔴 SERVER RESTART NOW! — AUS
+  </button>
+</div>
+
+<div style="margin-top:12px;">
+  <button id="websitePausedBtn" onclick="toggleWebsitePaused()" style="background:#b30000;color:white;font-weight:bold;">
+    🔴 THE WEBSITE IS PAUSED — AUS
+  </button>
+</div>
+
+<div id="status"></div>
+<hr style="margin:30px 0">
+<h2>Saved Announcements</h2>
+<button onclick="deleteAllHistory()" style="background:#b30000;color:white;">🗑️ Delete All</button>
+<div id="historyList" style="max-width:700px;margin:20px auto;"></div>
+
+<hr style="margin:30px 0">
+
+<hr style="margin:30px 0">
+<section id="registeredUsersAdmin">
+  <h2>👥 Angemeldete Nutzer</h2>
+  <p style="opacity:.75">Alle Nutzer aus <code>registeredUsers</code> – auch offline.</p>
+  <button class="user-refresh-btn" onclick="refreshRegisteredUsers()">🔄 Aktualisieren</button>
+  <div id="registeredUsersError"></div>
+  <div id="registeredUsersList"><p style="opacity:.65">Lade Nutzer...</p></div>
+</section>
+
+<hr style="margin:30px 0">
+<section id="vipRoomAdmin">
+  <h2>👑 VIP Room</h2>
+  <p style="opacity:.75">Wähle einen Nutzer und lade direkt ein Bild hoch. Es wird kein Bild-Link benötigt.</p>
+  <div id="vipRoomForm">
+    <select id="vipUserSelect">
+      <option value="">Nutzer auswählen...</option>
+    </select>
+    <input id="vipRoomName" type="text" maxlength="40" placeholder="VIP Room Name">
+    <input id="vipRoomImageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+    <img id="vipImagePreview" alt="VIP Vorschau">
+    <button onclick="saveVipRoom()" style="background:#8b5cf6;color:#fff;font-weight:900;">👑 VIP ROOM GEBEN</button>
+  </div>
+  <div id="vipRoomsList"></div>
+</section>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script id="secure-admin-auth">
+(function(){
+  const ADMIN_UID = "5zaM6ctegwPFRTaRabsRBhZyKmq2";
+  document.body.classList.add("secureAdminLocked");
+  const gate=document.getElementById("secureAdminGate");
+  const form=document.getElementById("secureAdminLoginForm");
+  const status=document.getElementById("secureAdminAuthStatus");
+  let authReady=false;
+  const secureConfig={
+    apiKey:"AIzaSyBUT0t1I9Dkee5Ok_uYMzs4WfdwapOA5As",
+    authDomain:"kenzy-dice.firebaseapp.com",
+    projectId:"kenzy-dice",
+    databaseURL:"https://kenzy-dice-default-rtdb.europe-west1.firebasedatabase.app",
+    storageBucket:"kenzy-dice.firebasestorage.app",
+    messagingSenderId:"578956722062",
+    appId:"1:578956722062:web:5156f5737e51ef75246edf"
+  };
+  let app;
+  try{
+    app=firebase.initializeApp(secureConfig, "secureAdminAuthApp");
+  }catch(e){
+    app=firebase.app();
+  }
+  const auth=firebase.auth(app);
+  window.secureAdminAuth=auth;
+  auth.onAuthStateChanged(function(user){
+    if(user && user.uid===ADMIN_UID){
+      authReady=true;
+      gate.style.display="none";
+      document.body.classList.remove("secureAdminLocked");
+      return;
+    }
+    if(user){ auth.signOut(); }
+    gate.style.display="grid";
+    document.body.classList.add("secureAdminLocked");
+  });
+  form.addEventListener("submit",async function(e){
+    e.preventDefault();
+    status.textContent="Anmeldung...";
+    try{
+      const cred=await auth.signInWithEmailAndPassword(
+        document.getElementById("secureAdminEmail").value.trim(),
+        document.getElementById("secureAdminPassword").value
+      );
+      if(cred.user.uid!==ADMIN_UID){
+        await auth.signOut();
+        status.textContent="❌ Kein autorisierter Admin-Account.";
+      }
+    }catch(err){
+      status.textContent="❌ Anmeldung fehlgeschlagen: " + (err && err.message ? err.message : "Unbekannter Fehler");
+    }
+  });
+})();
+</script>
+
+<script>
+var firebaseConfig = {
+  apiKey: "AIzaSyBUT0t1I9Dkee5Ok_uYMzs4WfdwapOA5As",
+  authDomain: "kenzy-dice.firebaseapp.com",
+  projectId: "kenzy-dice",
+  databaseURL: "https://kenzy-dice-default-rtdb.europe-west1.firebasedatabase.app",
+  storageBucket: "kenzy-dice.firebasestorage.app",
+  messagingSenderId: "578956722062",
+  appId: "1:578956722062:web:5156f5737e51ef75246edf"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+
+// ============================================================
+// Registered users + VIP Rooms
+// ============================================================
+const registeredUsersList = document.getElementById("registeredUsersList");
+const registeredUsersError = document.getElementById("registeredUsersError");
+const vipUserSelect = document.getElementById("vipUserSelect");
+const vipRoomsList = document.getElementById("vipRoomsList");
+
+function adminEscape(value){
+  return String(value == null ? "" : value).replace(/[&<>"']/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c];
+  });
+}
+
+function adminTime(v){
+  if(!v) return "Noch nicht";
+  const d=new Date(Number(v));
+  return Number.isNaN(d.getTime()) ? "Unbekannt" : d.toLocaleString();
+}
+
+function showRegisteredUsersError(message){
+  if(!registeredUsersError)return;
+  registeredUsersError.style.display="block";
+  registeredUsersError.textContent="❌ Firebase: " + message;
+}
+
+function renderRegisteredUsers(data){
+  if(!registeredUsersList)return;
+  registeredUsersError.style.display="none";
+  registeredUsersList.innerHTML="";
+
+  const entries=Object.entries(data||{}).map(function(pair){
+    return Object.assign({id:pair[0]}, pair[1]||{});
+  });
+
+  entries.sort(function(a,b){
+    return String(a.name||"").localeCompare(String(b.name||""),undefined,{sensitivity:"base"});
+  });
+
+  if(!entries.length){
+    registeredUsersList.innerHTML='<p style="opacity:.65">Keine Nutzer in <code>registeredUsers</code> gefunden.</p>';
+    return;
+  }
+
+  entries.forEach(function(user){
+    const row=document.createElement("div");
+    row.className="admin-user-row";
+     row.dataset.name=String(user.name||"").toLowerCase();
+     row.dataset.online=user.online===true ? "online" : "offline";
+     row.dataset.banned=user.banned ? "banned" : "normal";
+     row.dataset.vip=user.vipRoom ? "vip" : "novip";
+
+    const info=document.createElement("div");
+    info.className="admin-user-info";
+
+    const name=document.createElement("div");
+    name.className="admin-user-name";
+    name.textContent="👤 "+(user.name||"Unbekannt");
+
+    const meta=document.createElement("div");
+    meta.className="admin-user-meta";
+    meta.textContent="Registriert: "+adminTime(user.registeredAt)+" • Zuletzt: "+adminTime(user.lastSeen);
+
+    const status=document.createElement("div");
+    status.className="admin-user-status";
+    status.textContent=user.banned ? "⛔ Gebannt" : (user.online===true ? "🟢 Online" : "⚪ Offline");
+
+    info.append(name,meta,status);
+
+    const actions=document.createElement("div");
+    actions.className="admin-user-actions";
+
+    const ban=document.createElement("button");
+    ban.className=user.banned ? "admin-unban" : "admin-ban";
+    ban.textContent=user.banned ? "✅ Entbannen" : "🔨 Bannen";
+    ban.onclick=function(){
+      db.ref("registeredUsers/"+user.id+"/banned").set(!Boolean(user.banned))
+        .then(function(){refreshRegisteredUsers();})
+        .catch(function(e){showRegisteredUsersError(e.message);});
+    };
+
+    actions.appendChild(ban);
+    row.append(info,actions);
+    registeredUsersList.appendChild(row);
+  });
+
+  renderVipUserOptions(entries);
+  renderVipRooms(entries);
+}
+
+function renderVipUserOptions(entries){
+  if(!vipUserSelect)return;
+  const old=vipUserSelect.value;
+  vipUserSelect.innerHTML='<option value="">Nutzer auswählen...</option>';
+  entries.forEach(function(user){
+    const opt=document.createElement("option");
+    opt.value=user.id;
+    opt.textContent=user.name||user.id;
+    vipUserSelect.appendChild(opt);
+  });
+  if(old)vipUserSelect.value=old;
+}
+
+function renderVipRooms(entries){
+  if(!vipRoomsList)return;
+  vipRoomsList.innerHTML="";
+  let found=false;
+
+  entries.forEach(function(user){
+    const vip=user.vipRoom;
+    if(!vip)return;
+    found=true;
+
+    const row=document.createElement("div");
+    row.className="admin-vip-row";
+
+    const info=document.createElement("div");
+    info.className="admin-vip-info";
+
+    const img=document.createElement("img");
+    img.src=vip.imageData||"";
+    img.alt="";
+    img.onerror=function(){img.style.display="none";};
+
+    const text=document.createElement("div");
+    const title=document.createElement("div");
+    title.className="admin-vip-name";
+    title.textContent="👑 "+(vip.name||"VIP ROOM");
+    const meta=document.createElement("div");
+    meta.className="admin-vip-meta";
+    meta.textContent="👤 "+(user.name||user.id);
+    text.append(title,meta);
+
+    info.append(img,text);
+
+    const actions=document.createElement("div");
+    actions.className="admin-vip-actions";
+    const remove=document.createElement("button");
+    remove.className="admin-vip-remove";
+    remove.textContent="🗑️ Entfernen";
+    remove.onclick=function(){
+      db.ref("registeredUsers/"+user.id+"/vipRoom").remove()
+        .catch(function(e){showRegisteredUsersError(e.message);});
+    };
+    actions.appendChild(remove);
+
+    row.append(info,actions);
+    vipRoomsList.appendChild(row);
+  });
+
+  if(!found)vipRoomsList.innerHTML='<p style="opacity:.65">Noch kein VIP Room vergeben.</p>';
+}
+
+function refreshRegisteredUsers(){
+  db.ref("registeredUsers").once("value")
+    .then(function(snapshot){renderRegisteredUsers(snapshot.val());})
+    .catch(function(e){
+      registeredUsersList.innerHTML="";
+      showRegisteredUsersError(e.message);
+    });
+}
+
+function compressImage(file){
+  return new Promise(function(resolve,reject){
+    const reader=new FileReader();
+    reader.onerror=reject;
+    reader.onload=function(){
+      const img=new Image();
+      img.onerror=reject;
+      img.onload=function(){
+        const max=700;
+        const scale=Math.min(1,max/Math.max(img.width,img.height));
+        const canvas=document.createElement("canvas");
+        canvas.width=Math.max(1,Math.round(img.width*scale));
+        canvas.height=Math.max(1,Math.round(img.height*scale));
+        const ctx=canvas.getContext("2d");
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        resolve(canvas.toDataURL("image/jpeg",0.82));
+      };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+const vipImageFile=document.getElementById("vipRoomImageFile");
+const vipImagePreview=document.getElementById("vipImagePreview");
+
+if(vipImageFile){
+  vipImageFile.addEventListener("change",function(){
+    const file=vipImageFile.files[0];
+    if(!file){vipImagePreview.style.display="none";return;}
+    if(file.size>8*1024*1024){
+      vipImageFile.value="";
+      document.getElementById("status").textContent="❌ Bild ist zu groß (max. 8 MB).";
+      return;
+    }
+    const reader=new FileReader();
+    reader.onload=function(){
+      vipImagePreview.src=reader.result;
+      vipImagePreview.style.display="block";
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function saveVipRoom(){
+  const userId=vipUserSelect.value;
+  const name=document.getElementById("vipRoomName").value.trim();
+  const file=vipImageFile.files[0];
+
+  if(!userId){document.getElementById("status").textContent="❌ Nutzer auswählen.";return;}
+  if(!name){document.getElementById("status").textContent="❌ VIP Room Name eingeben.";return;}
+  if(!file){document.getElementById("status").textContent="❌ Bild auswählen.";return;}
+
+  try{
+    document.getElementById("status").textContent="⏳ Bild wird verarbeitet...";
+    const imageData=await compressImage(file);
+    await db.ref("registeredUsers/"+userId+"/vipRoom").set({
+      name:name,
+      imageData:imageData,
+      assignedAt:Date.now()
+    });
+    document.getElementById("status").textContent="✅ VIP Room vergeben.";
+    document.getElementById("vipRoomName").value="";
+    vipImageFile.value="";
+    vipImagePreview.style.display="none";
+  }catch(e){
+    document.getElementById("status").textContent="❌ Fehler: "+e.message;
+  }
+}
+
+db.ref("registeredUsers").on("value",function(snapshot){
+  renderRegisteredUsers(snapshot.val());
+},function(error){
+  showRegisteredUsersError(error.message);
+});
+
+refreshRegisteredUsers();
+
+
+function restartForEveryone(){
+  if(!confirm("Soll die Seite wirklich bei ALLEN aktuell verbundenen Nutzern neu geladen werden?")){
+    return;
+  }
+
+  const restartTime = Date.now();
+
+  db.ref("control/restart").set(restartTime).then(()=>{
+    document.getElementById("status").innerHTML =
+      "✅ Neustart ausgelöst – alle verbundenen Seiten laden neu.";
+  }).catch(e=>{
+    document.getElementById("status").innerHTML =
+      "❌ Neustart-Fehler: "+e.message;
+  });
+}
+
+function send(){
+ const msg=document.getElementById("msg").value.trim();
+
+ if(!msg){
+  document.getElementById("status").innerHTML="❌ Write a message first";
+  return;
+ }
+
+ const data={
+   message: msg,
+   time: Date.now()
+ };
+ db.ref("announcements/current").set(data).then(()=>{
+   if(document.getElementById("saveHistory").checked){
+     db.ref("announcements/history").push(data);
+   }
+   document.getElementById("status").innerHTML="✅ Announcement sent";
+   document.getElementById("msg").value="";
+
+   setTimeout(()=>{
+     db.ref("announcements/current").remove();
+   },5000);
+ }).catch(e=>{
+   document.getElementById("status").innerHTML="❌ Error: "+e.message;
+ });
+}
+
+
+
+function sendPermanent(){
+  const msg=document.getElementById("permanentMsg").value.trim();
+
+  if(!msg){
+    document.getElementById("status").innerHTML="❌ Write a permanent announcement first";
+    return;
+  }
+
+  const linkText = document.getElementById("permanentLinkText").value.trim();
+  const linkUrl = document.getElementById("permanentLinkUrl").value.trim();
+  if((linkText && !linkUrl) || (!linkText && linkUrl)){
+    document.getElementById("status").innerHTML="❌ Link-Schrift und Link müssen beide ausgefüllt sein";
+    return;
+  }
+  if(linkUrl && !/^https?:\/\//i.test(linkUrl)){
+    document.getElementById("status").innerHTML="❌ Der Link muss mit http:// oder https:// beginnen";
+    return;
+  }
+  const data={
+    message: msg,
+    linkText: linkText,
+    linkUrl: linkUrl,
+    time: Date.now()
+  };
+
+  db.ref("announcements/permanent").set(data).then(()=>{
+    document.getElementById("status").innerHTML="✅ Permanent announcement saved";
+    document.getElementById("permanentMsg").value="";
+    document.getElementById("permanentLinkText").value="";
+    document.getElementById("permanentLinkUrl").value="";
+  }).catch(e=>{
+    document.getElementById("status").innerHTML="❌ Error: "+e.message;
+  });
+}
+
+function deletePermanent(){
+  if(!confirm("Delete the permanent announcement from the main page?")){
+    return;
+  }
+
+  db.ref("announcements/permanent").remove().then(()=>{
+    document.getElementById("status").innerHTML="✅ Permanent announcement deleted";
+  }).catch(e=>{
+    document.getElementById("status").innerHTML="❌ Error: "+e.message;
+  });
+}
+
+const historyList=document.getElementById("historyList");
+
+function refreshHistory(){
+ db.ref("announcements/history").on("value",(snap)=>{
+   historyList.innerHTML="";
+   const data=snap.val();
+   if(!data){
+      historyList.innerHTML="<p>No saved announcements.</p>";
+      return;
+   }
+   const items=Object.entries(data).map(([k,v])=>({key:k,...v}));
+   items.sort((a,b)=>(b.time||0)-(a.time||0));
+   items.forEach(item=>{
+      const box=document.createElement("div");
+      box.style.cssText="background:#222;border-radius:10px;padding:12px;margin:10px 0;";
+      box.innerHTML="<div style='white-space:pre-wrap'></div><div style='opacity:.7;font-size:12px'></div>";
+      box.children[0].textContent=item.message||"";
+      box.children[1].textContent=new Date(item.time||0).toLocaleString();
+      const del=document.createElement("button");
+      del.textContent="🗑️ Delete";
+      del.style.background="#c62828";
+      del.style.color="white";
+      del.onclick=()=>{ if(confirm("Delete this announcement?")) db.ref("announcements/history/"+item.key).remove(); };
+      box.appendChild(del);
+      historyList.appendChild(box);
+   });
+ });
+}
+
+function deleteAllHistory(){
+ if(confirm("Delete ALL announcements?")){
+   db.ref("announcements/history").remove();
+ }
+}
+
+
+let serverRestartIntroEnabled = false;
+
+function updateServerRestartIntroButton(enabled){
+  serverRestartIntroEnabled = !!enabled;
+  const btn = document.getElementById("serverRestartIntroBtn");
+  if(!btn) return;
+
+  btn.textContent = enabled
+    ? "🟢 SERVER RESTART NOW! — AN"
+    : "🔴 SERVER RESTART NOW! — AUS";
+  btn.style.background = enabled ? "#159447" : "#b30000";
+}
+
+function toggleServerRestartIntro(){
+  const next = !serverRestartIntroEnabled;
+
+  db.ref("control/serverIntro").set(next).then(()=>{
+    updateServerRestartIntroButton(next);
+    document.getElementById("status").innerHTML =
+      next
+        ? "✅ Server-Restart-Overlay aktiviert."
+        : "✅ Server-Restart-Overlay ausgeschaltet.";
+  }).catch(e=>{
+    document.getElementById("status").innerHTML =
+      "❌ Fehler: " + e.message;
+  });
+}
+
+db.ref("control/serverIntro").on("value", snap=>{
+  updateServerRestartIntroButton(snap.val() === true);
+});
+
+let websitePausedEnabled = false;
+
+function updateWebsitePausedButton(enabled){
+  websitePausedEnabled = !!enabled;
+  const btn = document.getElementById("websitePausedBtn");
+  if(!btn) return;
+
+  btn.textContent = enabled
+    ? "🟢 THE WEBSITE IS PAUSED — AN"
+    : "🔴 THE WEBSITE IS PAUSED — AUS";
+  btn.style.background = enabled ? "#159447" : "#b30000";
+}
+
+function toggleWebsitePaused(){
+  const next = !websitePausedEnabled;
+
+  db.ref("control/websitePaused").set(next).then(()=>{
+    updateWebsitePausedButton(next);
+    document.getElementById("status").innerHTML =
+      next
+        ? "✅ Website-Paused-Overlay aktiviert."
+        : "✅ Website-Paused-Overlay ausgeschaltet.";
+  }).catch(e=>{
+    document.getElementById("status").innerHTML =
+      "❌ Fehler: " + e.message;
+  });
+}
+
+db.ref("control/websitePaused").on("value", snap=>{
+  updateWebsitePausedButton(snap.val() === true);
+});
+refreshHistory();
+
+</script>
+
+
+<hr style="margin:30px 0">
+<section id="chatAdmin">
+  <h2>💬 Community Chat</h2>
+  <p style="opacity:.75">Hier siehst du alle Nachrichten aus dem Firebase-Chat. Du kannst einzelne Nachrichten oder den kompletten Chat löschen.</p>
+  <div class="chat-admin-toolbar">
+    <button id="chatAdminDeleteAll" onclick="deleteAllChatMessages()">🗑️ Alle Nachrichten löschen</button>
+    <span id="chatAdminCount" class="chat-admin-count">0 Nachrichten</span>
+  </div>
+  <div id="chatAdminList" class="chat-admin-list">
+    <div class="chat-admin-empty">Lade Chat...</div>
+  </div>
+</section>
+
+
+<script id="chat-admin-js">
+(function(){
+  const list = document.getElementById("chatAdminList");
+  const count = document.getElementById("chatAdminCount");
+  if(!list) return;
+
+  function esc(v){
+    return String(v == null ? "" : v).replace(/[&<>"']/g,function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c];
+    });
+  }
+
+  function chatAdminTime(v){
+    if(!v) return "Unbekannt";
+    const d = new Date(Number(v));
+    return Number.isNaN(d.getTime()) ? "Unbekannt" : d.toLocaleString();
+  }
+
+  window.renderChatAdmin = function(data){
+    list.innerHTML = "";
+    const items = Object.entries(data || {}).map(([key,value]) => ({
+      key:key, ...(value || {})
+    }));
+    items.sort((a,b) => Number(b.createdAt || b.time || 0) - Number(a.createdAt || a.time || 0));
+
+    count.textContent = items.length + (items.length === 1 ? " Nachricht" : " Nachrichten");
+
+    if(!items.length){
+      list.innerHTML = '<div class="chat-admin-empty">Keine Nachrichten vorhanden.</div>';
+      return;
+    }
+
+    items.forEach(item => {
+      const row = document.createElement("div");
+      row.className = "chat-admin-msg";
+
+      const content = document.createElement("div");
+      content.className = "chat-admin-content";
+      content.innerHTML =
+        '<div class="chat-admin-name">👤 ' + esc(item.name || "Unbekannt") + '</div>' +
+        '<div class="chat-admin-text">' + esc(item.message || item.text || "") + '</div>' +
+        '<div class="chat-admin-time">' + chatAdminTime(item.createdAt || item.time) + '</div>';
+
+      const del = document.createElement("button");
+      del.className = "chat-admin-delete";
+      del.textContent = "🗑️ Löschen";
+      del.onclick = function(){
+        if(!confirm("Diese Nachricht wirklich löschen?")) return;
+        db.ref("publicChat/" + item.key).remove().catch(function(e){
+          document.getElementById("status").textContent = "❌ Chat-Fehler: " + e.message;
+        });
+      };
+
+      row.append(content, del);
+      list.appendChild(row);
+    });
+  };
+
+  window.deleteAllChatMessages = function(){
+    if(!confirm("Wirklich ALLE Chat-Nachrichten löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.")) return;
+    db.ref("publicChat").remove().then(function(){
+      document.getElementById("status").textContent = "✅ Alle Chat-Nachrichten wurden gelöscht.";
+    }).catch(function(e){
+      document.getElementById("status").textContent = "❌ Chat-Fehler: " + e.message;
+    });
+  };
+
+  db.ref("publicChat").on("value", function(snapshot){
+    renderChatAdmin(snapshot.val());
+  }, function(error){
+    list.innerHTML = '<div class="chat-admin-empty">❌ Firebase: ' + esc(error.message) + '</div>';
+  });
+})();
+</script>
+
+
+<hr style="margin:30px 0">
+<section id="chatRoleAdmin">
+  <h2>🏷️ Chat-Rollen</h2>
+  <p style="opacity:.75">Wähle einen Nutzer aus und vergib, ändere oder entferne seine Rolle.</p>
+  <div class="role-box">
+    <select id="chatRoleName">
+      <option value="">Nutzer auswählen...</option>
+    </select>
+    <select id="chatRoleSelect">
+      <option value="">Keine Rolle</option>
+      <option value="Top Streamer">Top Streamer</option>
+      <option value="Owner">Owner</option>
+      <option value="Admin">Admin</option>
+      <option value="Moderator">Moderator</option>
+      <option value="VIP">VIP</option>
+      <option value="Developer">Developer</option>
+    </select>
+    <button type="button" onclick="saveChatRole()">💾 Rolle speichern</button>
+    <button id="chatRoleRemoveBtn" type="button" onclick="removeSelectedChatRole()" style="background:#b30000;color:#fff;font-weight:800">🗑️ Rolle entfernen</button>
+  </div>
+  <div id="chatRoleList"><div style="opacity:.6">Lade Rollen...</div></div>
+</section>
+
+
+<script>
+function chatRoleKey(name){
+  return encodeURIComponent(String(name || "").trim()).replace(/\./g,"%2E");
+}
+function saveChatRole(){
+  const name = document.getElementById("chatRoleName").value.trim();
+  const role = document.getElementById("chatRoleSelect").value;
+  if(!name){ alert("Bitte einen Namen eingeben."); return; }
+  const key = chatRoleKey(name);
+  const status = document.getElementById("status");
+
+  db.ref("chatRoles/"+key).set(role || null).then(function(){
+    if(status) status.textContent = role
+      ? "✅ " + name + " ist jetzt " + role + "."
+      : "✅ Rolle von " + name + " entfernt.";
+    document.getElementById("chatRoleName").value = "";
+  }).catch(function(e){
+    if(status) status.textContent = "❌ Chat-Rollen-Fehler: " + e.message;
+  });
+}
+function renderChatRoles(data){
+  const box = document.getElementById("chatRoleList");
+  if(!box) return;
+  box.innerHTML = "";
+  const entries = Object.entries(data || {}).filter(x => x[1]);
+  if(!entries.length){
+    box.innerHTML = '<div style="opacity:.6;padding:12px 0">Noch keine Rollen vergeben.</div>';
+    return;
+  }
+  entries.forEach(([key, role]) => {
+    const name = decodeURIComponent(key);
+    const row = document.createElement("div");
+    row.className = "chat-role-row";
+    row.innerHTML =
+      '<div><strong>' + escapeHtml(name) + '</strong> <span class="chat-role-badge">• ' +
+      escapeHtml(role) + '</span></div>' +
+      '<div class="chat-role-actions">' +
+      '<button title="Rolle bearbeiten" onclick="editChatRole(' + JSON.stringify(name) + ')">Bearbeiten</button>' +
+      '<button style="background:#b30000;color:#fff" onclick="removeChatRole(' + JSON.stringify(name) + ')">Entfernen</button>' +
+      '</div>';
+    box.appendChild(row);
+  });
+}
+function escapeHtml(v){
+  return String(v).replace(/[&<>"']/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c];
+  });
+}
+function editChatRole(name){
+  const userSelect = document.getElementById("chatRoleName");
+  userSelect.value = name;
+  document.getElementById("chatRoleSelect").value =
+    (window.currentChatRoles || {})[chatRoleKey(name)] || "";
+}
+function removeChatRole(name){
+  if(!confirm("Rolle von " + name + " entfernen?")) return;
+  db.ref("chatRoles/"+chatRoleKey(name)).remove();
+}
+(function(){
+  if(typeof db === "undefined") return;
+  db.ref("chatRoles").on("value", function(snap){
+    window.currentChatRoles = snap.val() || {};
+    renderChatRoles(window.currentChatRoles);
+  });
+})();
+</script>
+
+
+<script id="chat-user-selector-js">
+(function(){
+  function fillUserSelect(data){
+    const select = document.getElementById("chatRoleName");
+    if(!select) return;
+    const previous = select.value;
+    const users = [];
+
+    Object.entries(data || {}).forEach(([uid, u]) => {
+      if(!u) return;
+      const name = typeof u === "string" ? u : (u.name || u.username || u.displayName || u.userName || "");
+      if(name) users.push({uid:uid,name:String(name)});
+    });
+
+    users.sort((a,b)=>a.name.localeCompare(b.name, undefined, {sensitivity:"base"}));
+    select.innerHTML = '<option value="">Nutzer auswählen...</option>';
+    const seen = new Set();
+    users.forEach(u=>{
+      if(seen.has(u.name)) return;
+      seen.add(u.name);
+      const opt = document.createElement("option");
+      opt.value = u.name;
+      opt.textContent = u.name;
+      select.appendChild(opt);
+    });
+    if(previous && seen.has(previous)) select.value = previous;
+  }
+
+  function loadUsers(){
+    if(typeof db === "undefined") return;
+
+    // Dieses Admin-Panel speichert die registrierten Konten unter
+    // registeredUsers/{userId}. Genau diese Quelle wird auch vom bestehenden
+    // Nutzerbereich/VIP-Room-System verwendet.
+    db.ref("registeredUsers").on("value", function(snap){
+      const data = snap.val() || {};
+      const select = document.getElementById("chatRoleName");
+      if(!select) return;
+
+      const previous = select.value;
+      const users = Object.entries(data)
+        .map(([uid,u]) => ({
+          uid: uid,
+          name: String((u && u.name) || "").trim()
+        }))
+        .filter(u => u.name);
+
+      users.sort((a,b) => a.name.localeCompare(b.name, undefined, {sensitivity:"base"}));
+
+      select.innerHTML = '<option value="">Nutzer auswählen...</option>';
+      const seen = new Set();
+
+      users.forEach(u => {
+        if(seen.has(u.uid)) return;
+        seen.add(u.uid);
+        const opt = document.createElement("option");
+        opt.value = u.name;
+        opt.textContent = u.name;
+        opt.dataset.uid = u.uid;
+        select.appendChild(opt);
+      });
+
+      if(previous) select.value = previous;
+
+      if(!users.length){
+        const opt = document.createElement("option");
+        opt.disabled = true;
+        opt.textContent = "Keine registrierten Nutzer gefunden";
+        select.appendChild(opt);
+      }
+    }, function(error){
+      const select = document.getElementById("chatRoleName");
+      if(select){
+        select.innerHTML = '<option value="">❌ Nutzer konnten nicht geladen werden</option>';
+      }
+      const status = document.getElementById("status");
+      if(status) status.textContent = "❌ Nutzer: " + error.message;
+    });
+  }
+
+  // Wait until the admin page has initialized Firebase.
+  let tries = 0;
+  const timer = setInterval(function(){
+    if(typeof db !== "undefined"){
+      clearInterval(timer);
+      loadUsers();
+    } else if(++tries > 100){
+      clearInterval(timer);
+    }
+  }, 100);
+})();
+</script>
+
+
+
+
+<script id="chat-role-admin-clean">
+(function(){
+  function roleKey(name){
+    return encodeURIComponent(String(name || "").trim()).replace(/\./g,"%2E");
+  }
+  window.chatRoleKey = roleKey;
+
+  function esc(v){
+    return String(v == null ? "" : v).replace(/[&<>"']/g,function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c];
+    });
+  }
+
+  function status(msg){
+    const el=document.getElementById("status");
+    if(el) el.textContent=msg;
+  }
+
+  window.saveChatRole = function(){
+    const user=document.getElementById("chatRoleName").value.trim();
+    const role=document.getElementById("chatRoleSelect").value;
+    if(!user){ alert("Bitte zuerst einen Nutzer auswählen."); return; }
+
+    const path="chatRoles/"+roleKey(user);
+    const action=role ? db.ref(path).set(role) : db.ref(path).remove();
+
+    action.then(function(){
+      status(role ? "✅ "+user+" → "+role : "✅ Rolle von "+user+" entfernt.");
+      if(!role) document.getElementById("chatRoleSelect").value="";
+    }).catch(function(e){
+      status("❌ Rolle konnte nicht geändert werden: "+e.message);
+      alert("Rolle konnte nicht geändert werden: "+e.message);
+    });
+  };
+
+  window.removeSelectedChatRole = function(){
+    const user=document.getElementById("chatRoleName").value.trim();
+    if(!user){ alert("Bitte zuerst einen Nutzer auswählen."); return; }
+
+    if(!confirm("Rolle von \""+user+"\" wirklich entfernen?")) return;
+
+    db.ref("chatRoles/"+roleKey(user)).remove().then(function(){
+      document.getElementById("chatRoleSelect").value="";
+      status("✅ Rolle von "+user+" wurde entfernt.");
+    }).catch(function(e){
+      status("❌ Rolle konnte nicht entfernt werden: "+e.message);
+      alert("Rolle konnte nicht entfernt werden: "+e.message);
+    });
+  };
+
+  window.removeChatRole = function(name){
+    if(!confirm("Rolle von \""+name+"\" wirklich entfernen?")) return;
+    db.ref("chatRoles/"+roleKey(name)).remove().then(function(){
+      const select=document.getElementById("chatRoleName");
+      if(select && select.value===name) document.getElementById("chatRoleSelect").value="";
+      status("✅ Rolle von "+name+" wurde entfernt.");
+    }).catch(function(e){
+      status("❌ Rolle konnte nicht entfernt werden: "+e.message);
+      alert("Rolle konnte nicht entfernt werden: "+e.message);
+    });
+  };
+
+  window.renderChatRoles = function(data){
+    window.currentChatRoles=data||{};
+    const box=document.getElementById("chatRoleList");
+    if(!box) return;
+    box.innerHTML="";
+    const entries=Object.entries(window.currentChatRoles).filter(x=>x[1]);
+
+    if(!entries.length){
+      box.innerHTML='<div style="opacity:.6;padding:12px 0">Noch keine Rollen vergeben.</div>';
+      return;
+    }
+
+    entries.forEach(function(pair){
+      const key=pair[0], role=pair[1];
+      const name=decodeURIComponent(key);
+      const row=document.createElement("div");
+      row.className="chat-role-row";
+      row.innerHTML=
+        '<div><strong>'+esc(name)+'</strong> <span class="chat-role-badge">• '+esc(role)+'</span></div>'+
+        '<div class="chat-role-actions">'+
+        '<button type="button" class="chat-role-edit">Bearbeiten</button>'+
+        '<button type="button" class="chat-role-delete" style="background:#b30000;color:#fff;font-weight:800">🗑️ Entfernen</button>'+
+        '</div>';
+
+      row.querySelector(".chat-role-edit").onclick=function(){
+        document.getElementById("chatRoleName").value=name;
+        document.getElementById("chatRoleSelect").value=role;
+      };
+      row.querySelector(".chat-role-delete").onclick=function(){
+        removeChatRole(name);
+      };
+      box.appendChild(row);
+    });
+  };
+
+  function loadUsers(){
+    const select=document.getElementById("chatRoleName");
+    if(!select || typeof db==="undefined") return;
+
+    db.ref("registeredUsers").on("value",function(snap){
+      const data=snap.val()||{};
+      const old=select.value;
+      const users=[];
+
+      Object.entries(data).forEach(function(pair){
+        const u=pair[1]||{};
+        const name=String(u.name||"").trim();
+        if(name) users.push(name);
+      });
+
+      users.sort((a,b)=>a.localeCompare(b,undefined,{sensitivity:"base"}));
+      select.innerHTML='<option value="">Nutzer auswählen...</option>';
+      [...new Set(users)].forEach(function(name){
+        const opt=document.createElement("option");
+        opt.value=name; opt.textContent=name;
+        select.appendChild(opt);
+      });
+      if(old && users.includes(old)) select.value=old;
+
+      if(!users.length){
+        const opt=document.createElement("option");
+        opt.disabled=true; opt.textContent="Keine registrierten Nutzer gefunden";
+        select.appendChild(opt);
+      }
+    });
+  }
+
+  function start(){
+    if(typeof db==="undefined") return;
+    db.ref("chatRoles").on("value",function(snap){ renderChatRoles(snap.val()||{}); });
+    loadUsers();
+  }
+
+  let tries=0;
+  const timer=setInterval(function(){
+    if(typeof db!=="undefined"){ clearInterval(timer); start(); }
+    else if(++tries>100) clearInterval(timer);
+  },100);
+})();
+</script>
+
+<script id="offline-dice-admin-enhancements">
+(function(){
+  const DURATION_KEY="offlineDiceAnnouncementDuration";
+  const durationInput=document.getElementById("adminNoticeDuration");
+  const durationStatus=document.getElementById("adminDurationStatus");
+  const saved=localStorage.getItem(DURATION_KEY);
+  if(saved && durationInput) durationInput.value=saved;
+
+  window.saveAnnouncementDuration=function(){
+    const v=Math.max(1,Math.min(120,Number(durationInput&&durationInput.value)||5));
+    if(durationInput) durationInput.value=v;
+    localStorage.setItem(DURATION_KEY,String(v));
+    if(durationStatus) durationStatus.textContent="✅ Gespeichert";
+    setTimeout(()=>{if(durationStatus)durationStatus.textContent=""},1800);
+    if(typeof db!=="undefined") db.ref("control/announcementDuration").set(v);
+  };
+
+  window.filterAdminUsers=function(){
+    const q=(document.getElementById("adminUserSearch")?.value||"").trim().toLowerCase();
+    const filter=document.getElementById("adminUserFilter")?.value||"all";
+    document.querySelectorAll("#registeredUsersList .admin-user-row").forEach(row=>{
+      const matchesName=!q || (row.dataset.name||"").includes(q);
+      let matchesFilter=true;
+      if(filter==="online") matchesFilter=row.dataset.online==="online";
+      if(filter==="offline") matchesFilter=row.dataset.online==="offline";
+      if(filter==="banned") matchesFilter=row.dataset.banned==="banned";
+      if(filter==="vip") matchesFilter=row.dataset.vip==="vip";
+      row.classList.toggle("ad-hidden",!(matchesName&&matchesFilter));
+    });
+  };
+
+  window.sendQuickAnnouncement=function(){
+    const text=prompt("Welche Nachricht soll sofort an alle Nutzer gesendet werden?");
+    if(!text || !text.trim()) return;
+    const data={message:text.trim(),time:Date.now()};
+    db.ref("announcements/current").set(data).then(()=>{
+      const seconds=Math.max(1,Math.min(120,Number(durationInput?.value)||5));
+      document.getElementById("status").textContent="✅ Quick announcement gesendet.";
+      setTimeout(()=>db.ref("announcements/current").remove(),seconds*1000);
+    }).catch(e=>document.getElementById("status").textContent="❌ "+e.message);
+  };
+
+  window.clearChatFromQuick=function(){
+    if(!confirm("Wirklich den kompletten Community Chat löschen?")) return;
+    db.ref("publicChat").remove().then(()=>{
+      document.getElementById("status").textContent="✅ Chat gelöscht.";
+    }).catch(e=>document.getElementById("status").textContent="❌ "+e.message);
+  };
+
+  window.updateAdminStats=function(users,chat){
+    const entries=Object.values(users||{});
+    const online=entries.filter(u=>u&&u.online===true).length;
+    const vip=entries.filter(u=>u&&u.vipRoom).length;
+    const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+    set("adStatUsers",entries.length);
+    set("adStatOnline",online);
+    set("adStatVip",vip);
+    set("adStatChat",Object.keys(chat||{}).length);
+  };
+
+  // Reuse the existing Firebase listeners without changing their data structure.
+  if(typeof db!=="undefined"){
+    db.ref("registeredUsers").on("value",snap=>{
+      window.updateAdminStats(snap.val()||{}, window.__adminChatData||{});
+      setTimeout(filterAdminUsers,0);
+    });
+    db.ref("publicChat").on("value",snap=>{
+      window.__adminChatData=snap.val()||{};
+      db.ref("registeredUsers").once("value").then(u=>window.updateAdminStats(u.val()||{},window.__adminChatData));
+    });
+    db.ref("control/announcementDuration").once("value").then(s=>{
+      const v=Number(s.val());
+      if(v>=1&&v<=120&&durationInput){durationInput.value=v;localStorage.setItem(DURATION_KEY,String(v));}
+    });
+  }
+})();
+</script>
+
+<script id="offline-dice-pause-message-admin">
+function saveWebsitePausedMessage(){
+  const input=document.getElementById("websitePausedMessage");
+  const text=(input?.value||"").trim();
+  db.ref("control/websitePausedMessage").set(text || "The website is paused.").then(()=>{
+    document.getElementById("status").textContent="✅ Pause-Text gespeichert.";
+  }).catch(e=>document.getElementById("status").textContent="❌ "+e.message);
+}
+if(typeof db!=="undefined"){
+  db.ref("control/websitePausedMessage").once("value").then(s=>{
+    const el=document.getElementById("websitePausedMessage");
+    if(el && s.val()) el.value=s.val();
+  });
+}
+</script>
+</body>
+</html>
