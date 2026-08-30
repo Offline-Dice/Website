@@ -1172,7 +1172,7 @@ box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
 
 <style id="od-vip-premium-design">
 /* Premium VIP mode — activated by the existing Firebase vipRoom listener. */
-body.vip-active .wrapper{position:relative;border:1px solid rgba(255,215,90,.38)!important;box-shadow:0 0 0 1px rgba(180,90,255,.12),0 0 45px rgba(255,190,40,.16),0 0 90px rgba(155,70,255,.10),inset 0 1px 0 rgba(255,255,255,.10)!important;background:linear-gradient(145deg,rgba(35,22,58,.62),rgba(9,10,20,.72))!important;backdrop-filter:blur(18px) saturate(135%)!important}
+body.vip-active .wrapper{position:relative;border:1px solid rgba(255,215,90,.38)!important;box-shadow:0 0 0 1px rgba(180,90,255,.12),0 0 45px rgba(255,190,40,.16),0 0 90px rgba(155,70,255,.10),inset 0 1px 0 rgba(255,255,255,.10)!important;background:linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.045))!important;backdrop-filter:blur(18px) saturate(135%)!important;-webkit-backdrop-filter:blur(18px) saturate(135%)!important}
 body.vip-active .wrapper::before{content:"";position:absolute;inset:-2px;border-radius:inherit;padding:1px;pointer-events:none;background:linear-gradient(120deg,rgba(255,215,80,.85),rgba(180,80,255,.75),rgba(80,220,255,.7),rgba(255,215,80,.85));background-size:300% 300%;animation:odVipBorder 6s ease infinite;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
 body.vip-active .title{background:linear-gradient(90deg,#fff2a8,#ffd34d,#d78bff,#fff2a8);background-size:250% auto;-webkit-background-clip:text;background-clip:text;color:transparent!important;text-shadow:0 0 22px rgba(255,205,70,.22);animation:odVipText 5s linear infinite}
 body.vip-active .dropdown-container select,body.vip-active button{border-color:rgba(255,211,82,.42)!important;box-shadow:0 0 18px rgba(255,190,45,.10),inset 0 1px 0 rgba(255,255,255,.12)!important}
@@ -1187,6 +1187,7 @@ body.vip-active .od-vip-image{border-color:#ffd85a;box-shadow:0 0 12px rgba(255,
 @media(prefers-reduced-motion:reduce){body.vip-active .wrapper::before,body.vip-active .title{animation:none}}
 </style>
 
+<style id="glass-chat-redesign">
 /* --- Glass Chat Redesign --- */
 #chatToggle, .chat-toggle, #chatButton, .chat-button {
   background: rgba(255,255,255,.10) !important;
