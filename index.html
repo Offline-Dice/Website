@@ -4961,5 +4961,122 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 })();
 </script>
 
+
+<style id="offline-dice-legal-css">
+#od-legal-footer{width:100%;box-sizing:border-box;padding:34px 20px 42px;margin-top:40px;text-align:center;
+font-family:inherit;color:#fff;background:rgba(8,11,18,.92);border-top:1px solid rgba(255,255,255,.10)}
+#od-legal-footer .od-legal-inner{max-width:1000px;margin:0 auto}
+#od-legal-footer .od-legal-title{font-size:15px;font-weight:700;margin-bottom:14px;letter-spacing:.2px}
+#od-legal-footer .od-legal-links{display:flex;justify-content:center;flex-wrap:wrap;gap:10px}
+#od-legal-footer button{appearance:none;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);
+color:#fff;padding:9px 14px;border-radius:9px;cursor:pointer;font:inherit;font-size:13px}
+#od-legal-footer button:hover{background:rgba(255,255,255,.10)}
+#od-legal-footer .od-legal-note{margin-top:14px;font-size:11px;opacity:.55;line-height:1.5}
+.od-legal-modal{display:none;position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.72);padding:20px;box-sizing:border-box}
+.od-legal-modal.od-open{display:flex;align-items:center;justify-content:center}
+.od-legal-box{width:min(760px,100%);max-height:min(82vh,760px);overflow:auto;background:#0d111b;color:#fff;
+border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:26px;box-sizing:border-box;text-align:left;
+box-shadow:0 20px 80px rgba(0,0,0,.45)}
+.od-legal-box h2{margin:0 42px 18px 0;font-size:24px}
+.od-legal-box h3{font-size:16px;margin:22px 0 8px}
+.od-legal-box p,.od-legal-box li{font-size:13px;line-height:1.65;opacity:.88}
+.od-legal-box ul{padding-left:20px}
+.od-legal-close{position:absolute;right:18px;top:15px;border:0;background:transparent;color:#fff;
+font-size:28px;cursor:pointer;line-height:1}
+.od-legal-box-wrap{position:relative;width:min(760px,100%)}
+.od-legal-box a{color:inherit;text-decoration:underline}
+@media(max-width:600px){#od-legal-footer{padding-bottom:32px}.od-legal-box{padding:20px}.od-legal-box h2{font-size:21px}}
+</style>
+
+<footer id="od-legal-footer">
+  <div class="od-legal-inner">
+    <div class="od-legal-title">Offline Dice</div>
+    <div class="od-legal-links">
+      <button type="button" data-od-legal="impressum">Impressum</button>
+      <button type="button" data-od-legal="datenschutz">Datenschutz</button>
+      <button type="button" data-od-legal="nutzung">Nutzungsbedingungen</button>
+      <button type="button" data-od-legal="kontakt">Kontakt</button>
+    </div>
+    <div class="od-legal-note">Kostenloses Würfelspiel · Kein Echtgeld-Einsatz · Kein Echtgeld-Gewinn</div>
+  </div>
+</footer>
+
+<div class="od-legal-modal" id="od-legal-modal" aria-hidden="true">
+  <div class="od-legal-box-wrap">
+    <div class="od-legal-box">
+      <button class="od-legal-close" type="button" aria-label="Schließen" id="od-legal-close">×</button>
+
+      <section data-od-page="impressum" hidden>
+        <h2>Impressum</h2>
+        <p><strong>Angaben gemäß den gesetzlichen Vorgaben</strong></p>
+        <p>Betreiber von Offline Dice</p>
+        <p>E-Mail: <a href="mailto:kenzytrades9@gmail.com">kenzytrades9@gmail.com</a></p>
+        <p>Offline Dice ist ein kostenloses Online-Spiel. Es werden keine Echtgeld-Einsätze angenommen und keine Echtgeldgewinne ausgezahlt.</p>
+        <p><strong>Hinweis:</strong> Für ein vollständiges Impressum müssen die gesetzlich erforderlichen Identitäts- und Anschriftangaben des tatsächlichen Diensteanbieters ergänzt werden. Eine E-Mail-Adresse allein ersetzt diese Angaben nicht.</p>
+      </section>
+
+      <section data-od-page="datenschutz" hidden>
+        <h2>Datenschutzerklärung</h2>
+        <h3>1. Verantwortlicher</h3>
+        <p>Verantwortlich für den Betrieb von Offline Dice ist der Betreiber der Website. Kontakt: <a href="mailto:kenzytrades9@gmail.com">kenzytrades9@gmail.com</a>.</p>
+        <h3>2. Nutzung der Website</h3>
+        <p>Offline Dice kann grundsätzlich ohne Benutzerkonto genutzt werden. Personenbezogene Daten werden nur verarbeitet, soweit dies für den Betrieb, die Sicherheit oder die von dir ausdrücklich genutzten Funktionen erforderlich ist.</p>
+        <h3>3. Server- und technische Daten</h3>
+        <p>Beim Aufruf einer Website können technisch notwendige Daten wie IP-Adresse, Zeitpunkt des Zugriffs, Browserinformationen und angeforderte Dateien in Server- oder Sicherheitsprotokollen verarbeitet werden. Umfang und Speicherdauer hängen vom eingesetzten Hosting ab.</p>
+        <h3>4. Externe Dienste</h3>
+        <p>Falls auf Offline Dice externe Dienste wie Werbung, Analyse, Datenbanken, Schriften oder andere eingebundene Anbieter eingesetzt werden, müssen diese Dienste und die jeweils verarbeiteten Daten hier konkret ergänzt werden.</p>
+        <h3>5. Kontakt</h3>
+        <p>Wenn du uns per E-Mail kontaktierst, werden die von dir übermittelten Angaben zur Bearbeitung deiner Anfrage verarbeitet.</p>
+        <h3>6. Deine Rechte</h3>
+        <p>Je nach den gesetzlichen Voraussetzungen können dir insbesondere Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung und Widerspruch zustehen.</p>
+        <p><strong>Wichtig:</strong> Diese Erklärung ist als Website-Grundlage gedacht und muss an die tatsächlich verwendeten Hosting-, Werbe-, Analyse- und sonstigen Dienste angepasst werden.</p>
+      </section>
+
+      <section data-od-page="nutzung" hidden>
+        <h2>Nutzungsbedingungen</h2>
+        <h3>1. Angebot</h3>
+        <p>Offline Dice stellt ein kostenloses digitales Würfelspiel zur Unterhaltung bereit.</p>
+        <h3>2. Kein Echtgeld-Glücksspiel</h3>
+        <p>Offline Dice nimmt keine Echtgeld-Einsätze an und zahlt keine Echtgeldgewinne aus. Spielstände, Ergebnisse oder virtuelle Elemente haben keinen Anspruch auf einen Geldwert, soweit auf der Website nichts ausdrücklich anderes angegeben ist.</p>
+        <h3>3. Faire Nutzung</h3>
+        <p>Die Website darf nicht missbraucht, technisch angegriffen oder für rechtswidrige Zwecke verwendet werden. Versuche, Sicherheitsmechanismen zu umgehen oder den Betrieb zu stören, sind untersagt.</p>
+        <h3>4. Verfügbarkeit</h3>
+        <p>Ein Anspruch auf eine jederzeit störungsfreie Verfügbarkeit besteht nicht. Funktionen können aus technischen oder sicherheitsbezogenen Gründen geändert, eingeschränkt oder vorübergehend deaktiviert werden.</p>
+        <h3>5. Kontakt</h3>
+        <p>Fragen oder Hinweise können an <a href="mailto:kenzytrades9@gmail.com">kenzytrades9@gmail.com</a> gesendet werden.</p>
+      </section>
+
+      <section data-od-page="kontakt" hidden>
+        <h2>Kontakt</h2>
+        <p>Bei Fragen, Hinweisen oder Problemen kannst du uns direkt per E-Mail kontaktieren:</p>
+        <p><a href="mailto:kenzytrades9@gmail.com"><strong>kenzytrades9@gmail.com</strong></a></p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script id="offline-dice-legal-js">
+(function(){
+  const modal=document.getElementById('od-legal-modal');
+  const close=document.getElementById('od-legal-close');
+  const pages=modal ? modal.querySelectorAll('[data-od-page]') : [];
+  function openPage(name){
+    pages.forEach(p=>p.hidden=p.dataset.odPage!==name);
+    modal.classList.add('od-open');
+    modal.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+  }
+  function closePage(){
+    modal.classList.remove('od-open');
+    modal.setAttribute('aria-hidden','true');
+    document.body.style.overflow='';
+  }
+  document.querySelectorAll('[data-od-legal]').forEach(b=>b.addEventListener('click',()=>openPage(b.dataset.odLegal)));
+  close.addEventListener('click',closePage);
+  modal.addEventListener('click',e=>{if(e.target===modal) closePage();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape') closePage();});
+})();
+</script>
+
 </body>
 </html>
