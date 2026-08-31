@@ -3046,7 +3046,44 @@ onValue(ref(db, "announcements/permanent"), (snap)=>{
   if(!box || !text) return;
 
   if(data && data.message){
-    text.textContent = data.message;
+    // Render the permanent announcement safely and make URLs typed
+    // directly into the message clickable.
+    text.textContent = "";
+    const message = String(data.message || "");
+    const urlRegex = /(https?:\/\/[^\s<]+)/gi;
+    let lastIndex = 0;
+    let match;
+
+    while((match = urlRegex.exec(message)) !== null){
+      if(match.index > lastIndex){
+        text.appendChild(document.createTextNode(message.slice(lastIndex, match.index)));
+      }
+
+      const url = match[0].replace(/[),.!?]+$/g, "");
+      const trailing = match[0].slice(url.length);
+
+      const autoLink = document.createElement("a");
+      autoLink.href = url;
+      autoLink.textContent = url;
+      autoLink.target = "_blank";
+      autoLink.rel = "noopener noreferrer";
+      autoLink.style.color = "#2196f3";
+      autoLink.style.textDecoration = "underline";
+      autoLink.style.fontWeight = "bold";
+      text.appendChild(autoLink);
+
+      if(trailing){
+        text.appendChild(document.createTextNode(trailing));
+      }
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    if(lastIndex < message.length){
+      text.appendChild(document.createTextNode(message.slice(lastIndex)));
+    }
+
+    // Also support the separate custom link fields.
     if(linkBox && linkAnchor && data.linkText && data.linkUrl){
       linkAnchor.textContent = data.linkText;
       linkAnchor.href = data.linkUrl;
@@ -3056,6 +3093,7 @@ onValue(ref(db, "announcements/permanent"), (snap)=>{
       linkAnchor.removeAttribute("href");
       linkBox.style.display = "none";
     }
+
     box.style.display = "block";
   }else{
     text.textContent = "";
