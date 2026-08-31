@@ -3096,6 +3096,29 @@ onValue(ref(db, "announcements/current"), (snap)=>{
 
     if(box && text){
       text.textContent = data.message;
+
+      let liveLink = document.getElementById("announcementLink");
+      if(!liveLink){
+        liveLink = document.createElement("a");
+        liveLink.id = "announcementLink";
+        liveLink.target = "_blank";
+        liveLink.rel = "noopener noreferrer";
+        liveLink.style.display = "none";
+        liveLink.style.marginLeft = "10px";
+        liveLink.style.cursor = "pointer";
+        text.insertAdjacentElement("afterend", liveLink);
+      }
+
+      if(data.linkText && data.linkUrl && /^https?:\/\//i.test(data.linkUrl)){
+        liveLink.textContent = data.linkText;
+        liveLink.href = data.linkUrl;
+        liveLink.style.display = "inline";
+      }else{
+        liveLink.textContent = "";
+        liveLink.removeAttribute("href");
+        liveLink.style.display = "none";
+      }
+
       box.style.display = "block";
       box.classList.remove("announce-anim");
       void box.offsetWidth;
