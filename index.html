@@ -4961,5 +4961,355 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 })();
 </script>
 
+
+<style id="offline-dice-legal-css">
+#od-legal-footer{
+  width:100%;
+  box-sizing:border-box;
+  margin-top:70px;
+  padding:0 24px 34px;
+  font-family:inherit;
+  color:#fff;
+}
+#od-legal-footer .od-legal-shell{
+  max-width:1120px;
+  margin:0 auto;
+  padding-top:25px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+#od-legal-footer .od-legal-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  margin-bottom:18px;
+}
+#od-legal-footer .od-legal-brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:rgba(255,255,255,.9);
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.1px;
+}
+#od-legal-footer .od-legal-mark{
+  width:27px;height:27px;
+  display:grid;
+  place-items:center;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.045);
+  font-size:12px;
+}
+#od-legal-footer .od-legal-caption{
+  margin-top:3px;
+  font-size:10px;
+  font-weight:400;
+  color:rgba(255,255,255,.35);
+}
+#od-legal-footer .od-legal-links{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap:6px;
+}
+#od-legal-footer button{
+  appearance:none;
+  border:1px solid transparent;
+  background:transparent;
+  color:rgba(255,255,255,.48);
+  padding:7px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  font:inherit;
+  font-size:11px;
+  transition:all .18s ease;
+}
+#od-legal-footer button:hover{
+  color:#fff;
+  background:rgba(255,255,255,.055);
+  border-color:rgba(255,255,255,.07);
+}
+#od-legal-footer .od-legal-bottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.045);
+  color:rgba(255,255,255,.25);
+  font-size:9px;
+}
+#od-legal-footer .od-status{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+#od-legal-footer .od-status-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:rgba(255,255,255,.45);
+}
+.od-legal-modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:999999;
+  padding:20px;
+  box-sizing:border-box;
+  align-items:center;
+  justify-content:center;
+  background:rgba(2,4,8,.76);
+  backdrop-filter:blur(14px);
+}
+.od-legal-modal.od-open{display:flex}
+.od-legal-box-wrap{
+  position:relative;
+  width:min(760px,100%);
+  max-height:85vh;
+  animation:odLegalIn .18s ease-out;
+}
+@keyframes odLegalIn{
+  from{opacity:0;transform:translateY(8px) scale(.985)}
+  to{opacity:1;transform:none}
+}
+.od-legal-box{
+  max-height:85vh;
+  overflow:auto;
+  box-sizing:border-box;
+  padding:34px 36px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:18px;
+  background:linear-gradient(180deg,#111620,#0b0f16);
+  color:#fff;
+  box-shadow:0 30px 100px rgba(0,0,0,.6);
+  text-align:left;
+}
+.od-legal-box h2{
+  margin:0 48px 24px 0;
+  font-size:24px;
+  letter-spacing:-.5px;
+}
+.od-legal-box h3{
+  margin:23px 0 7px;
+  font-size:13px;
+  color:rgba(255,255,255,.9);
+}
+.od-legal-box p,.od-legal-box li{
+  font-size:13px;
+  line-height:1.7;
+  color:rgba(255,255,255,.63);
+}
+.od-legal-box a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.od-legal-box ul{padding-left:19px}
+.od-legal-close{
+  position:absolute;
+  right:12px;
+  top:12px;
+  width:36px;height:36px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:10px;
+  background:rgba(255,255,255,.045);
+  color:rgba(255,255,255,.65);
+  font-size:23px;
+  cursor:pointer;
+  transition:all .15s ease;
+}
+.od-legal-close:hover{
+  background:rgba(255,255,255,.09);
+  color:#fff;
+  transform:rotate(2deg);
+}
+@media(max-width:700px){
+  #od-legal-footer{padding:0 14px 25px;margin-top:50px}
+  #od-legal-footer .od-legal-top{align-items:flex-start;flex-direction:column;gap:15px}
+  #od-legal-footer .od-legal-links{justify-content:flex-start}
+  #od-legal-footer .od-legal-bottom{align-items:flex-start;flex-direction:column}
+  .od-legal-box{padding:27px 21px}
+}
+</style>
+
+<style id="offline-dice-social-css">
+#od-social-card{
+  width:min(360px,calc(100% - 32px));
+  margin:42px auto 0;
+  padding:16px 18px 18px;
+  box-sizing:border-box;
+  background:#050505;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+  box-shadow:0 12px 35px rgba(0,0,0,.22);
+  font-family:inherit;
+}
+#od-social-card .od-social-title{
+  text-align:center;
+  margin:0 0 13px;
+  color:rgba(255,255,255,.72);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.2px;
+}
+#od-social-card .od-social-items{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+#od-social-card .od-social-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+#od-social-card .od-social-icon{
+  width:42px;height:42px;
+  display:grid;
+  place-items:center;
+  border-radius:11px;
+  background:#111;
+  border:1px solid rgba(255,255,255,.08);
+  color:#fff;
+}
+#od-social-card .od-social-icon svg{
+  width:21px;height:21px;display:block;fill:currentColor;
+}
+#od-social-card .od-social-link{
+  display:block;
+  width:100%;
+  box-sizing:border-box;
+  padding:7px 6px;
+  border-radius:8px;
+  text-align:center;
+  text-decoration:none;
+  color:rgba(255,255,255,.52);
+  background:rgba(255,255,255,.035);
+  font-size:10px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  transition:all .16s ease;
+}
+#od-social-card .od-social-link:hover{
+  color:#fff;
+  background:rgba(255,255,255,.075);
+}
+</style>
+
+
+<div id="od-social-card">
+  <div class="od-social-title">FOLLOW OFFLINE DICE</div>
+  <div class="od-social-items">
+    <div class="od-social-item">
+      <div class="od-social-icon" aria-label="TikTok">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.6 3c.4 2.1 1.6 3.5 3.4 3.8v3.1c-1.7-.1-3.2-.7-4.5-1.7v7.1c0 3.5-2.7 5.7-6.1 5.7-3.3 0-5.8-2.4-5.8-5.5 0-3.3 2.8-5.6 6.2-5.6.4 0 .8 0 1.2.1v3.2c-.4-.1-.8-.2-1.2-.2-1.5 0-2.8 1-2.8 2.5 0 1.4 1.1 2.4 2.5 2.4 1.7 0 2.8-1 2.8-3.1V3h4.3z"/></svg>
+      </div>
+      <a class="od-social-link" href="https://www.tiktok.com/@offlinedice?is_from_webapp=1&sender_device=pc" target="_blank" rel="noopener noreferrer">TikTok</a>
+    </div>
+    <div class="od-social-item">
+      <div class="od-social-icon" aria-label="Discord">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 5.2A16.3 16.3 0 0 0 15.5 4l-.5 1a14.2 14.2 0 0 0-5.9 0l-.5-1a16.3 16.3 0 0 0-4 1.2C2.1 8.8 1.4 12.3 1.7 15.8a16.2 16.2 0 0 0 4.9 2.5l1.2-1.7c-.7-.3-1.3-.6-1.9-1 .2.1.4.2.6.3 2.7 1.2 5.6 1.2 8.3 0 .2-.1.4-.2.6-.3-.6.4-1.2.7-1.9 1l1.2 1.7a16.2 16.2 0 0 0 4.9-2.5c.4-4.1-.7-7.6-2.1-10.6zM8.4 14.4c-.8 0-1.5-.8-1.5-1.8s.7-1.8 1.5-1.8 1.5.8 1.5 1.8-.7 1.8-1.5 1.8zm7.2 0c-.8 0-1.5-.8-1.5-1.8s.7-1.8 1.5-1.8 1.5.8 1.5 1.8-.7 1.8-1.5 1.8z"/></svg>
+      </div>
+      <a class="od-social-link" href="https://discord.com/invite/GtsH5jpSUn" target="_blank" rel="noopener noreferrer">Discord</a>
+    </div>
+  </div>
+</div>
+
+<footer id="od-legal-footer">
+  <div class="od-legal-shell">
+    <div class="od-legal-top">
+      <div>
+        <div class="od-legal-brand">
+          <span class="od-legal-mark">D</span>
+          <span>Offline Dice</span>
+        </div>
+        <div class="od-legal-caption">Legal &amp; information</div>
+      </div>
+      <nav class="od-legal-links" aria-label="Rechtliche Informationen">
+        <button type="button" data-od-legal="impressum">Impressum</button>
+        <button type="button" data-od-legal="datenschutz">Datenschutz</button>
+        <button type="button" data-od-legal="nutzung">Nutzungsbedingungen</button>
+        <button type="button" data-od-legal="kontakt">Kontakt</button>
+      </nav>
+    </div>
+    <div class="od-legal-bottom">
+      <span>© Offline Dice</span>
+      <span class="od-status"><span class="od-status-dot"></span>Kostenloses Spiel · Kein Echtgeld-Einsatz</span>
+    </div>
+  </div>
+</footer>
+
+<div class="od-legal-modal" id="od-legal-modal" aria-hidden="true">
+  <div class="od-legal-box-wrap">
+    <div class="od-legal-box">
+      <button class="od-legal-close" type="button" aria-label="Schließen" id="od-legal-close">×</button>
+      <section data-od-page="impressum" hidden>
+        <h2>Impressum</h2>
+        <p><strong>Angaben gemäß den gesetzlichen Vorgaben</strong></p>
+        <p>Betreiber von Offline Dice</p>
+        <p>E-Mail: <a href="mailto:kenzytrades9@gmail.com">kenzytrades9@gmail.com</a></p>
+        <p>Offline Dice ist ein kostenloses Online-Spiel. Es werden keine Echtgeld-Einsätze angenommen und keine Echtgeldgewinne ausgezahlt.</p>
+        <p><strong>Hinweis:</strong> Für ein vollständiges Impressum müssen die gesetzlich erforderlichen Identitäts- und Anschriftangaben des tatsächlichen Diensteanbieters ergänzt werden. Eine E-Mail-Adresse allein ersetzt diese Angaben nicht.</p>
+      </section>
+      <section data-od-page="datenschutz" hidden>
+        <h2>Datenschutzerklärung</h2>
+        <h3>1. Verantwortlicher</h3>
+        <p>Verantwortlich für den Betrieb von Offline Dice ist der Betreiber der Website. Kontakt: <a href="mailto:kenzytrades9@gmail.com">kenzytrades9@gmail.com</a>.</p>
+        <h3>2. Nutzung der Website</h3>
+        <p>Offline Dice kann grundsätzlich ohne Benutzerkonto genutzt werden. Personenbezogene Daten werden nur verarbeitet, soweit dies für den Betrieb, die Sicherheit oder die von dir ausdrücklich genutzten Funktionen erforderlich ist.</p>
+        <h3>3. Server- und technische Daten</h3>
+        <p>Beim Aufruf einer Website können technisch notwendige Daten wie IP-Adresse, Zeitpunkt des Zugriffs, Browserinformationen und angeforderte Dateien in Server- oder Sicherheitsprotokollen verarbeitet werden. Umfang und Speicherdauer hängen vom eingesetzten Hosting ab.</p>
+        <h3>4. Externe Dienste</h3>
+        <p>Falls auf Offline Dice externe Dienste wie Werbung, Analyse, Datenbanken, Schriften oder andere eingebundene Anbieter eingesetzt werden, müssen diese Dienste und die jeweils verarbeiteten Daten hier konkret ergänzt werden.</p>
+        <h3>5. Kontakt</h3>
+        <p>Wenn du uns per E-Mail kontaktierst, werden die von dir übermittelten Angaben zur Bearbeitung deiner Anfrage verarbeitet.</p>
+        <h3>6. Deine Rechte</h3>
+        <p>Je nach den gesetzlichen Voraussetzungen können dir insbesondere Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung und Widerspruch zustehen.</p>
+      </section>
+      <section data-od-page="nutzung" hidden>
+        <h2>Nutzungsbedingungen</h2>
+        <h3>1. Angebot</h3>
+        <p>Offline Dice stellt ein kostenloses digitales Würfelspiel zur Unterhaltung bereit.</p>
+        <h3>2. Kein Echtgeld-Glücksspiel</h3>
+        <p>Offline Dice nimmt keine Echtgeld-Einsätze an und zahlt keine Echtgeldgewinne aus. Spielstände, Ergebnisse oder virtuelle Elemente haben keinen Anspruch auf einen Geldwert, soweit auf der Website nichts ausdrücklich anderes angegeben ist.</p>
+        <h3>3. Faire Nutzung</h3>
+        <p>Die Website darf nicht missbraucht, technisch angegriffen oder für rechtswidrige Zwecke verwendet werden. Versuche, Sicherheitsmechanismen zu umgehen oder den Betrieb zu stören, sind untersagt.</p>
+        <h3>4. Verfügbarkeit</h3>
+        <p>Ein Anspruch auf eine jederzeit störungsfreie Verfügbarkeit besteht nicht. Funktionen können aus technischen oder sicherheitsbezogenen Gründen geändert, eingeschränkt oder vorübergehend deaktiviert werden.</p>
+        <h3>5. Kontakt</h3>
+        <p>Fragen oder Hinweise können an <a href="mailto:kenzytrades9@gmail.com">kenzytrades9@gmail.com</a> gesendet werden.</p>
+      </section>
+      <section data-od-page="kontakt" hidden>
+        <h2>Kontakt</h2>
+        <p>Bei Fragen, Hinweisen oder Problemen kannst du uns direkt per E-Mail kontaktieren:</p>
+        <p><a href="mailto:kenzytrades9@gmail.com"><strong>kenzytrades9@gmail.com</strong></a></p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script id="offline-dice-legal-js">
+(function(){
+  const modal=document.getElementById('od-legal-modal');
+  const close=document.getElementById('od-legal-close');
+  const pages=modal ? modal.querySelectorAll('[data-od-page]') : [];
+  function openPage(name){
+    pages.forEach(p=>p.hidden=p.dataset.odPage!==name);
+    modal.classList.add('od-open');
+    modal.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+  }
+  function closePage(){
+    modal.classList.remove('od-open');
+    modal.setAttribute('aria-hidden','true');
+    document.body.style.overflow='';
+  }
+  document.querySelectorAll('[data-od-legal]').forEach(b=>b.addEventListener('click',()=>openPage(b.dataset.odLegal)));
+  close.addEventListener('click',closePage);
+  modal.addEventListener('click',e=>{if(e.target===modal) closePage();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape') closePage();});
+})();
+</script>
+
 </body>
 </html>
