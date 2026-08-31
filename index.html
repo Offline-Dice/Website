@@ -4966,117 +4966,197 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 #od-legal-footer{
   width:100%;
   box-sizing:border-box;
-  margin-top:46px;
-  padding:18px 20px 24px;
-  text-align:center;
+  margin-top:70px;
+  padding:0 24px 34px;
   font-family:inherit;
-  color:rgba(255,255,255,.42);
-  border-top:1px solid rgba(255,255,255,.055);
+  color:#fff;
+}
+#od-legal-footer .od-legal-shell{
+  max-width:1120px;
+  margin:0 auto;
+  padding-top:25px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+#od-legal-footer .od-legal-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  margin-bottom:18px;
+}
+#od-legal-footer .od-legal-brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:rgba(255,255,255,.9);
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.1px;
+}
+#od-legal-footer .od-legal-mark{
+  width:27px;height:27px;
+  display:grid;
+  place-items:center;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.045);
+  font-size:12px;
+}
+#od-legal-footer .od-legal-caption{
+  margin-top:3px;
+  font-size:10px;
+  font-weight:400;
+  color:rgba(255,255,255,.35);
 }
 #od-legal-footer .od-legal-links{
   display:flex;
   align-items:center;
-  justify-content:center;
   flex-wrap:wrap;
-  gap:0;
+  justify-content:flex-end;
+  gap:6px;
 }
 #od-legal-footer button{
   appearance:none;
-  border:0;
-  background:none;
-  color:rgba(255,255,255,.42);
-  padding:3px 11px;
-  margin:0;
+  border:1px solid transparent;
+  background:transparent;
+  color:rgba(255,255,255,.48);
+  padding:7px 10px;
+  border-radius:8px;
   cursor:pointer;
   font:inherit;
   font-size:11px;
-  line-height:1.4;
-  transition:color .15s ease;
+  transition:all .18s ease;
 }
-#od-legal-footer button:hover{color:rgba(255,255,255,.85)}
-#od-legal-footer .od-sep{
-  width:1px;
-  height:11px;
-  background:rgba(255,255,255,.14);
+#od-legal-footer button:hover{
+  color:#fff;
+  background:rgba(255,255,255,.055);
+  border-color:rgba(255,255,255,.07);
 }
-#od-legal-footer .od-copy{
-  margin-top:7px;
-  font-size:10px;
-  opacity:.42;
+#od-legal-footer .od-legal-bottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.045);
+  color:rgba(255,255,255,.25);
+  font-size:9px;
+}
+#od-legal-footer .od-status{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+#od-legal-footer .od-status-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:rgba(255,255,255,.45);
 }
 .od-legal-modal{
   display:none;
   position:fixed;
   inset:0;
   z-index:999999;
+  padding:20px;
+  box-sizing:border-box;
   align-items:center;
   justify-content:center;
-  padding:16px;
-  box-sizing:border-box;
-  background:rgba(0,0,0,.62);
-  backdrop-filter:blur(5px);
+  background:rgba(2,4,8,.76);
+  backdrop-filter:blur(14px);
 }
 .od-legal-modal.od-open{display:flex}
 .od-legal-box-wrap{
   position:relative;
-  width:min(680px,100%);
-  max-height:82vh;
+  width:min(760px,100%);
+  max-height:85vh;
+  animation:odLegalIn .18s ease-out;
+}
+@keyframes odLegalIn{
+  from{opacity:0;transform:translateY(8px) scale(.985)}
+  to{opacity:1;transform:none}
 }
 .od-legal-box{
-  max-height:82vh;
+  max-height:85vh;
   overflow:auto;
   box-sizing:border-box;
-  padding:30px;
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:15px;
-  background:#0b0e15;
+  padding:34px 36px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:18px;
+  background:linear-gradient(180deg,#111620,#0b0f16);
   color:#fff;
-  box-shadow:0 25px 80px rgba(0,0,0,.5);
+  box-shadow:0 30px 100px rgba(0,0,0,.6);
   text-align:left;
 }
-.od-legal-box h2{margin:0 42px 20px 0;font-size:23px}
-.od-legal-box h3{margin:21px 0 7px;font-size:14px}
-.od-legal-box p,.od-legal-box li{font-size:13px;line-height:1.65;color:rgba(255,255,255,.66)}
+.od-legal-box h2{
+  margin:0 48px 24px 0;
+  font-size:24px;
+  letter-spacing:-.5px;
+}
+.od-legal-box h3{
+  margin:23px 0 7px;
+  font-size:13px;
+  color:rgba(255,255,255,.9);
+}
+.od-legal-box p,.od-legal-box li{
+  font-size:13px;
+  line-height:1.7;
+  color:rgba(255,255,255,.63);
+}
+.od-legal-box a{color:#fff;text-decoration:underline;text-underline-offset:3px}
 .od-legal-box ul{padding-left:19px}
-.od-legal-box a{color:#fff;text-decoration:underline}
 .od-legal-close{
   position:absolute;
-  right:10px;
-  top:9px;
-  width:34px;
-  height:34px;
-  border:0;
-  border-radius:9px;
+  right:12px;
+  top:12px;
+  width:36px;height:36px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:10px;
   background:rgba(255,255,255,.045);
   color:rgba(255,255,255,.65);
-  font-size:24px;
+  font-size:23px;
   cursor:pointer;
+  transition:all .15s ease;
 }
-.od-legal-close:hover{background:rgba(255,255,255,.08);color:#fff}
-@media(max-width:600px){
-  #od-legal-footer{padding-left:10px;padding-right:10px}
-  #od-legal-footer button{padding-left:7px;padding-right:7px}
-  .od-legal-box{padding:23px 19px}
+.od-legal-close:hover{
+  background:rgba(255,255,255,.09);
+  color:#fff;
+  transform:rotate(2deg);
+}
+@media(max-width:700px){
+  #od-legal-footer{padding:0 14px 25px;margin-top:50px}
+  #od-legal-footer .od-legal-top{align-items:flex-start;flex-direction:column;gap:15px}
+  #od-legal-footer .od-legal-links{justify-content:flex-start}
+  #od-legal-footer .od-legal-bottom{align-items:flex-start;flex-direction:column}
+  .od-legal-box{padding:27px 21px}
 }
 </style>
 <footer id="od-legal-footer">
-  <div class="od-legal-links">
-    <button type="button" data-od-legal="impressum">Impressum</button>
-    <span class="od-sep"></span>
-    <button type="button" data-od-legal="datenschutz">Datenschutz</button>
-    <span class="od-sep"></span>
-    <button type="button" data-od-legal="nutzung">Nutzungsbedingungen</button>
-    <span class="od-sep"></span>
-    <button type="button" data-od-legal="kontakt">Kontakt</button>
+  <div class="od-legal-shell">
+    <div class="od-legal-top">
+      <div>
+        <div class="od-legal-brand">
+          <span class="od-legal-mark">D</span>
+          <span>Offline Dice</span>
+        </div>
+        <div class="od-legal-caption">Legal &amp; information</div>
+      </div>
+      <nav class="od-legal-links" aria-label="Rechtliche Informationen">
+        <button type="button" data-od-legal="impressum">Impressum</button>
+        <button type="button" data-od-legal="datenschutz">Datenschutz</button>
+        <button type="button" data-od-legal="nutzung">Nutzungsbedingungen</button>
+        <button type="button" data-od-legal="kontakt">Kontakt</button>
+      </nav>
+    </div>
+    <div class="od-legal-bottom">
+      <span>© Offline Dice</span>
+      <span class="od-status"><span class="od-status-dot"></span>Kostenloses Spiel · Kein Echtgeld-Einsatz</span>
+    </div>
   </div>
-  <div class="od-copy">© Offline Dice</div>
 </footer>
 
 <div class="od-legal-modal" id="od-legal-modal" aria-hidden="true">
   <div class="od-legal-box-wrap">
     <div class="od-legal-box">
       <button class="od-legal-close" type="button" aria-label="Schließen" id="od-legal-close">×</button>
-
       <section data-od-page="impressum" hidden>
         <h2>Impressum</h2>
         <p><strong>Angaben gemäß den gesetzlichen Vorgaben</strong></p>
@@ -5085,7 +5165,6 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
         <p>Offline Dice ist ein kostenloses Online-Spiel. Es werden keine Echtgeld-Einsätze angenommen und keine Echtgeldgewinne ausgezahlt.</p>
         <p><strong>Hinweis:</strong> Für ein vollständiges Impressum müssen die gesetzlich erforderlichen Identitäts- und Anschriftangaben des tatsächlichen Diensteanbieters ergänzt werden. Eine E-Mail-Adresse allein ersetzt diese Angaben nicht.</p>
       </section>
-
       <section data-od-page="datenschutz" hidden>
         <h2>Datenschutzerklärung</h2>
         <h3>1. Verantwortlicher</h3>
@@ -5101,7 +5180,6 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
         <h3>6. Deine Rechte</h3>
         <p>Je nach den gesetzlichen Voraussetzungen können dir insbesondere Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung und Widerspruch zustehen.</p>
       </section>
-
       <section data-od-page="nutzung" hidden>
         <h2>Nutzungsbedingungen</h2>
         <h3>1. Angebot</h3>
@@ -5115,7 +5193,6 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
         <h3>5. Kontakt</h3>
         <p>Fragen oder Hinweise können an <a href="mailto:kenzytrades9@gmail.com">kenzytrades9@gmail.com</a> gesendet werden.</p>
       </section>
-
       <section data-od-page="kontakt" hidden>
         <h2>Kontakt</h2>
         <p>Bei Fragen, Hinweisen oder Problemen kannst du uns direkt per E-Mail kontaktieren:</p>
