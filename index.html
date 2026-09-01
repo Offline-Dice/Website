@@ -1684,8 +1684,97 @@ body.dice-roll-active #od-public-chat{
 #od-social-links .od-discord{background:#5865F2}
 #od-social-links svg{width:14px;height:14px;fill:#fff}
 </style>
+
+<style id="offline-dice-security-style">
+html.od-security-pending body > * { visibility: hidden !important; }
+#od-security-screen {
+  position: fixed; inset: 0; z-index: 2147483647;
+  display: flex; align-items: center; justify-content: center;
+  background: #050505; color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+}
+#od-security-box { width: min(430px, calc(100vw - 40px)); text-align:center; }
+#od-security-title { font-size: 27px; font-weight: 800; letter-spacing: 2px; }
+#od-security-sub { margin-top: 12px; opacity:.7; font-size:14px; }
+#od-security-bar { height: 5px; margin-top: 24px; background:#222; border-radius:99px; overflow:hidden; }
+#od-security-progress { width:0%; height:100%; background:#fff; transition:width .35s ease; }
+#od-security-status { margin-top:14px; font-size:13px; opacity:.75; }
+</style>
+
 </head>
 <body>
+
+<script id="offline-dice-visible-security">
+(function () {
+  document.documentElement.classList.add('od-security-pending');
+
+  const screen = document.createElement('div');
+  screen.id = 'od-security-screen';
+  screen.innerHTML = `
+    <div id="od-security-box">
+      <div id="od-security-title">OFFLINE DICE</div>
+      <div id="od-security-sub">SECURITY CHECK</div>
+      <div id="od-security-bar"><div id="od-security-progress"></div></div>
+      <div id="od-security-status">Checking website...</div>
+    </div>`;
+  document.body.appendChild(screen);
+
+  const progress = screen.querySelector('#od-security-progress');
+  const status = screen.querySelector('#od-security-status');
+
+  function fail(message) {
+    progress.style.width = '100%';
+    status.textContent = '✕ ' + message;
+    status.style.opacity = '1';
+  }
+
+  async function check() {
+    try {
+      progress.style.width = '25%';
+      status.textContent = 'Checking domain...';
+
+      if (location.protocol !== 'https:' ||
+          !['offline-dice.de', 'www.offline-dice.de'].includes(location.hostname)) {
+        throw new Error('This copy is not authorized.');
+      }
+
+      progress.style.width = '55%';
+      status.textContent = 'Verifying Offline Dice...';
+
+      const API = 'https://offline-dice-live.fischerleo56.workers.dev';
+
+      const response = await fetch(API + '/boot', {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-store',
+        credentials: 'omit'
+      });
+
+      if (!response.ok) throw new Error('Security verification failed.');
+
+      const data = await response.json();
+      if (!data || data.ok !== true || data.domain !== 'offline-dice.de') {
+        throw new Error('Security verification failed.');
+      }
+
+      progress.style.width = '85%';
+      status.textContent = 'Verified ✓';
+
+      await new Promise(r => setTimeout(r, 450));
+
+      progress.style.width = '100%';
+      document.documentElement.classList.remove('od-security-pending');
+      screen.remove();
+    } catch (e) {
+      fail(e.message || 'Access denied.');
+    }
+  }
+
+  if (document.body) check();
+  else document.addEventListener('DOMContentLoaded', check, { once: true });
+})();
+</script>
+
 
 <div id="od-ban-overlay" aria-hidden="true">
   <div class="od-ban-card">
