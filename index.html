@@ -1684,7 +1684,6 @@ body.dice-roll-active #od-public-chat{
 #od-social-links .od-discord{background:#5865F2}
 #od-social-links svg{width:14px;height:14px;fill:#fff}
 </style>
-<script id="offline-dice-server-boot">(async()=>{try{const r=await fetch("https://offline-dice-live.fischerleo56.workers.dev/boot",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});if(!r.ok)throw 0;window.__OD_SERVER_OK__=true}catch(e){document.documentElement.innerHTML='<meta charset="utf-8"><style>html,body{margin:0;min-height:100%;background:#080b12;color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center}main{text-align:center;padding:32px}</style><main><h1>Offline Dice</h1><p>This website must be opened from the official Offline Dice domain.</p></main>'}})();</script>
 </head>
 <body>
 
@@ -2020,18 +2019,36 @@ background:transparent;
         let rollColorWeights = null;
 
         async function getRandomResult(mode) {
-    const r = await fetch("https://offline-dice-live.fischerleo56.workers.dev/roll", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode,max:mode==="color"?validColors.length:validCoinflip.length})});
-    if(!r.ok) throw new Error("Offline Dice server authorization failed");
-    const data=await r.json(); const items=mode==="color"?validColors:validCoinflip;
-    const result=items[data.index%items.length]; if(mode==="color") rollColorResults.push(result); return result;
+    const items = mode === 'color' ? validColors : validCoinflip;
+
+    if (mode === 'color') {
+        // Jede Farbe wird bei jedem Roll komplett neu und unabhängig
+        // ausgewählt. Dadurch kann jede Farbe bei jedem Spin wieder
+        // erscheinen, statt dass versehentlich immer dieselbe Farbe
+        // aus einem alten Ergebnis übernommen wird.
+        let randomIndex;
+        if (window.crypto && crypto.getRandomValues) {
+            const buf = new Uint32Array(1);
+            crypto.getRandomValues(buf);
+            randomIndex = buf[0] % items.length;
+        } else {
+            randomIndex = Math.floor(Math.random() * items.length);
+        }
+        const result = items[randomIndex];
+        rollColorResults.push(result);
+        return result;
+    }
+
+    const randomIndex = await getProvablyFairRandom(items.length);
+    return items[randomIndex];
 }
 
 
         async function getRandomSegment() {
-    const possibleSegmentIndices=WHEEL_SEGMENT_OUTCOMES.map((segment,index)=>({index,name:segment.name}));
-    const r=await fetch("https://offline-dice-live.fischerleo56.workers.dev/roll",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"wheel",max:possibleSegmentIndices.length})});
-    if(!r.ok) throw new Error("Offline Dice server authorization failed"); const data=await r.json();
-    return possibleSegmentIndices[data.index%possibleSegmentIndices.length];
+    const possibleSegmentIndices = WHEEL_SEGMENT_OUTCOMES.map((segment, index) => ({ index, name: segment.name }));
+
+    const randomIndex = await getProvablyFairRandom(possibleSegmentIndices.length);
+    return possibleSegmentIndices[randomIndex];
 }
 
         document.getElementById("numDice").addEventListener("change", function () {
@@ -2517,11 +2534,22 @@ function copyVerifyCode(){
 }
 
 async function getProvablyFairRandom(max) {
-    const r=await fetch("https://offline-dice-live.fischerleo56.workers.dev/fair-roll",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({max,clientSeed:window.provablyFair.clientSeed,nonce:window.provablyFair.nextNonce()})});
-    if(!r.ok) throw new Error("Offline Dice server authorization failed"); const data=await r.json();
-    if(document.getElementById("nonceValue")) document.getElementById("nonceValue").textContent=data.nonce;
-    if(document.getElementById("serverSeedHash")) document.getElementById("serverSeedHash").textContent=data.serverSeedHash;
-    window.provablyFair.lastHash=data.hash; return data.index%max;
+    const input =
+        window.provablyFair.serverSeed +
+        ":" +
+        window.provablyFair.clientSeed +
+        ":" +
+        window.provablyFair.nonce;
+
+    const hash = await sha256(input);
+
+    const number = parseInt(hash.substring(0, 13), 16);
+window.provablyFair.lastHash = hash;
+
+    document.getElementById("nonceValue").textContent = window.provablyFair.nonce;
+
+if (document.getElementById("serverSeedHash")) {
+    document.getElementById("serverSeedHash").textContent = await sha256(window.provablyFair.serverSeed);
 }
 
     window.provablyFair.nonce++;
@@ -4574,7 +4602,7 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
 
     const matches=Array(activePlayers).fill(0);
     for(let i=0;i<n;i++){
-      const rr=await fetch("https://offline-dice-live.fischerleo56.workers.dev/roll",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"color",max:colors.length})}); if(!rr.ok) throw new Error("Offline Dice server authorization failed"); const rd=await rr.json(); const result=colors[rd.index%colors.length];
+      const result=colors[Math.floor(Math.random()*colors.length)];
       dice[i].classList.remove('lb-battle-rolling');
       dice[i].style.backgroundColor=result.color;
       for(let j=0;j<activePlayers;j++){
