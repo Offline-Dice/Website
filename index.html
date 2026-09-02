@@ -2,54 +2,6 @@
 
 <html lang="en">
 <head>
-<script id="od-runtime-1">
-(function(){
-  "use strict";
-  var H="offline-dice.de", W="www.offline-dice.de";
-  var h=(location.hostname||"").toLowerCase().replace(/\.$/,"");
-  var ok=(location.protocol==="https:"||location.protocol==="http:")&&(h===H||h===W)&&window.top===window.self;
-  if(!ok){
-    document.documentElement.innerHTML='<meta charset="utf-8"><title>Offline Dice</title><style>html,body{margin:0;min-height:100%;background:#080b12;color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center}main{text-align:center;padding:32px}h1{margin:0 0 10px}</style><main><h1>Offline Dice</h1><p>This copy is not authorized to run.</p></main>';
-    throw new Error("OD_PROTECTION_A");
-  }
-  Object.defineProperty(window,"__OD_A",{value:"production",writable:false,configurable:false});
-})();
-</script>
-<script id="od-runtime-2">
-(function(){
-  "use strict";
-  function check(){
-    var h=(location.hostname||"").toLowerCase().replace(/\.$/,"");
-    if((h!=="offline-dice.de"&&h!=="www.offline-dice.de") || location.protocol==="file:" || window.top!==window.self){
-      try{document.body.innerHTML="<div style='font-family:Arial;text-align:center;padding:60px'>Unauthorized Offline Dice copy.</div>";}catch(e){}
-      throw new Error("OD_PROTECTION_B");
-    }
-    if(!window.__OD_A) throw new Error("OD_PROTECTION_A_MISSING");
-  }
-  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",check,{once:true});
-  else check();
-  setTimeout(check,1800);
-})();
-</script>
-<script id="od-runtime-3">
-(function(){
-  "use strict";
-  var marker="__OD_A";
-  var timer=setInterval(function(){
-    try{
-      var h=(location.hostname||"").toLowerCase().replace(/\.$/,"");
-      if((h!=="offline-dice.de"&&h!=="www.offline-dice.de")||!window[marker]||window.top!==window.self){
-        clearInterval(timer);
-        document.documentElement.innerHTML='<meta charset="utf-8"><title>Offline Dice</title><main style="font-family:Arial;text-align:center;padding:60px">Unauthorized deployment.</main>';
-        throw new Error("OD_PROTECTION_C");
-      }
-    }catch(e){
-      if(e && String(e.message||"").indexOf("OD_PROTECTION_C")>=0) throw e;
-    }
-  },2500);
-})();
-</script>
-
 <!-- Offline Dice anti-copy/domain protection: this only allows the production domain. -->
 <script>
 (function () {
@@ -2066,39 +2018,6 @@ background:transparent;
         let rollColorResults = [];
         let rollColorWeights = null;
 
-        async function getRandomResult(mode) {
-    const items = mode === 'color' ? validColors : validCoinflip;
-
-    if (mode === 'color') {
-        // Jede Farbe wird bei jedem Roll komplett neu und unabhängig
-        // ausgewählt. Dadurch kann jede Farbe bei jedem Spin wieder
-        // erscheinen, statt dass versehentlich immer dieselbe Farbe
-        // aus einem alten Ergebnis übernommen wird.
-        let randomIndex;
-        if (window.crypto && crypto.getRandomValues) {
-            const buf = new Uint32Array(1);
-            crypto.getRandomValues(buf);
-            randomIndex = buf[0] % items.length;
-        } else {
-            randomIndex = Math.floor(Math.random() * items.length);
-        }
-        const result = items[randomIndex];
-        rollColorResults.push(result);
-        return result;
-    }
-
-    const randomIndex = await getProvablyFairRandom(items.length);
-    return items[randomIndex];
-}
-
-
-        async function getRandomSegment() {
-    const possibleSegmentIndices = WHEEL_SEGMENT_OUTCOMES.map((segment, index) => ({ index, name: segment.name }));
-
-    const randomIndex = await getProvablyFairRandom(possibleSegmentIndices.length);
-    return possibleSegmentIndices[randomIndex];
-}
-
         document.getElementById("numDice").addEventListener("change", function () {
             const mode = document.getElementById("colorDice").value;
 
@@ -2545,83 +2464,91 @@ document.getElementById("themeSelect").addEventListener("change",function(){
 });
 
 </script>
-<!-- Provably Fair scaffold added by ChatGPT -->
+<!-- Offline Dice server-side roll protection -->
 <script>
 window.provablyFair = {
-  serverSeed: crypto.randomUUID().replace(/-/g,""),
   clientSeed: localStorage.getItem("clientSeed") || "Kenzy",
-  nonce: 0,
-  nextNonce(){
-    this.nonce++;
-    return this.nonce;
-  }
+  nonce: Number(localStorage.getItem("offlineDiceNonce") || 0),
+  lastHash: "",
+  lastVerify: "",
+  lastColors: []
 };
-async function sha256(text) {
-    const data = new TextEncoder().encode(text);
-    const hash = await crypto.subtle.digest("SHA-256", data);
-    return Array.from(new Uint8Array(hash))
-        .map(b => b.toString(16).padStart(2, "0"))
-        .join("");
-}
-
 
 function createVerifyCode(extra){
- const id = Math.random().toString(36).substring(2,8).toUpperCase();
- const data = {
-  id:id,
-  colors: extra.colors || [],
-  nonce: extra.nonce
- };
- localStorage.setItem("KZ_"+id, JSON.stringify(data));
- if(window.saveKzCode) window.saveKzCode(id, data);
- return "KZ-" + id;
+  const id = Math.random().toString(36).substring(2,8).toUpperCase();
+  const data = { id:id, colors: extra.colors || [], nonce: extra.nonce, hash: extra.hash || "" };
+  localStorage.setItem("KZ_"+id, JSON.stringify(data));
+  if(window.saveKzCode) window.saveKzCode(id, data);
+  return "KZ-" + id;
 }
 function copyVerifyCode(){
  const el=document.getElementById("verifyCode");
  if(el) navigator.clipboard.writeText(el.value);
 }
 
-async function getProvablyFairRandom(max) {
-    const input =
-        window.provablyFair.serverSeed +
-        ":" +
-        window.provablyFair.clientSeed +
-        ":" +
-        window.provablyFair.nonce;
-
-    const hash = await sha256(input);
-
-    const number = parseInt(hash.substring(0, 13), 16);
-window.provablyFair.lastHash = hash;
-
-    document.getElementById("nonceValue").textContent = window.provablyFair.nonce;
-
-if (document.getElementById("serverSeedHash")) {
-    document.getElementById("serverSeedHash").textContent = await sha256(window.provablyFair.serverSeed);
+async function requestProtectedRolls(mode, count) {
+  const safeCount = Math.max(1, Math.min(6, Number(count) || 1));
+  const usedNonce = Number(window.provablyFair.nonce) || 0;
+  const response = await fetch("/api/roll", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "same-origin",
+    body: JSON.stringify({
+      mode,
+      count: safeCount,
+      clientSeed: String(window.provablyFair.clientSeed || "Kenzy").slice(0,128),
+      nonce: usedNonce
+    })
+  });
+  if (!response.ok) throw new Error("Offline Dice protected roll request rejected");
+  const data = await response.json();
+  if (!data || !Array.isArray(data.results) || data.results.length !== safeCount) {
+    throw new Error("Invalid protected roll response");
+  }
+  window.provablyFair.lastHash = data.serverSeedHash || "";
+  window.provablyFair.nonce = Number(data.nextNonce ?? (usedNonce + safeCount));
+  localStorage.setItem("offlineDiceNonce", String(window.provablyFair.nonce));
+  const hashEl = document.getElementById("serverSeedHash");
+  const nonceEl = document.getElementById("nonceValue");
+  const seedEl = document.getElementById("clientSeedInput");
+  if (hashEl) hashEl.textContent = window.provablyFair.lastHash;
+  if (nonceEl) nonceEl.textContent = String(data.usedNonce ?? usedNonce);
+  if (seedEl && document.activeElement !== seedEl) seedEl.value = window.provablyFair.clientSeed;
+  return data.results.map((x, i) => ({...x, usedNonce: usedNonce + i}));
 }
 
-    window.provablyFair.nonce++;
-
-    return number % max;
+async function requestProtectedRoll(mode) {
+  const results = await requestProtectedRolls(mode, 1);
+  return results[0];
 }
-(async () => {
-    const hash = await sha256(window.provablyFair.serverSeed);
 
-    document.getElementById("serverSeedHash").textContent = hash;
-    document.getElementById("clientSeedInput").value = window.provablyFair.clientSeed;
-    document.getElementById("nonceValue").textContent = window.provablyFair.nonce;
+async function getRandomResult(mode) {
+  const data = await requestProtectedRoll(mode);
+  const items = mode === 'color' ? validColors : validCoinflip;
+  const result = items[data.index];
+  if (!result) throw new Error("Invalid protected result");
+  return result;
+}
 
-    document.getElementById("clientSeedInput").addEventListener("input", function () {
-        window.provablyFair.clientSeed = this.value;
-        localStorage.setItem("clientSeed", this.value);
-    });
+async function getRandomSegment() {
+  const data = await requestProtectedRoll('coinflip');
+  if (data.index !== 0 && data.index !== 1) throw new Error("Invalid protected coin result");
+  return WHEEL_SEGMENT_OUTCOMES[data.index];
+}
+
+(function(){
+  const hashEl = document.getElementById("serverSeedHash");
+  const seedEl = document.getElementById("clientSeedInput");
+  const nonceEl = document.getElementById("nonceValue");
+  if (seedEl) seedEl.value = window.provablyFair.clientSeed;
+  if (nonceEl) nonceEl.textContent = String(window.provablyFair.nonce);
+  if (seedEl) seedEl.addEventListener("input", function(){
+    window.provablyFair.clientSeed = this.value;
+    localStorage.setItem("clientSeed", this.value);
+  });
+  if (hashEl) hashEl.textContent = "Server protected";
 })();
-localStorage.setItem("clientSeed", window.provablyFair.clientSeed);
-console.log("Provably Fair scaffold loaded", window.provablyFair);
 </script>
-
-
-
 
 <style id="offline-dice-chat-css">
 /* --- Adaptive glass chat --- */
@@ -4649,8 +4576,10 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
     await new Promise(r=>setTimeout(r,1000));
 
     const matches=Array(activePlayers).fill(0);
+    const protectedResults = await requestProtectedRolls('color', n);
     for(let i=0;i<n;i++){
-      const result=colors[Math.floor(Math.random()*colors.length)];
+      const result=colors[protectedResults[i].index];
+      if(!result) throw new Error('Invalid protected battle result');
       dice[i].classList.remove('lb-battle-rolling');
       dice[i].style.backgroundColor=result.color;
       for(let j=0;j<activePlayers;j++){
@@ -5026,17 +4955,5 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 <a class="od-discord" href="https://discord.com/invite/GtsH5jpSUn" target="_blank" rel="noopener noreferrer" aria-label="Discord">
 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 4.2A16.2 16.2 0 0 0 15.5 3l-.5 1.1a14.7 14.7 0 0 0-6 0L8.5 3a16.2 16.2 0 0 0-4 1.2C2 7.8 1.3 11.4 1.7 15a16.5 16.5 0 0 0 5 2.5l1.2-1.7c-.7-.3-1.4-.6-2-1 .2-.2.4-.3.6-.5 3.9 1.8 8.1 1.8 12 0 .2.2.4.3.6.5-.6.4-1.3.7-2 1l1.2 1.7a16.5 16.5 0 0 0 5-2.5c.5-4.2-.8-7.8-3.8-10.8zM8.8 13.5c-1.2 0-2.1-1.1-2.1-2.4s1-2.4 2.1-2.4 2.1 1.1 2.1 2.4-.9 2.4-2.1 2.4zm6.4 0c-1.2 0-2.1-1.1-2.1-2.4s1-2.4 2.1-2.4 2.1 1.1 2.1 2.4-.9 2.4-2.1 2.4z"/></svg></a>
 </div>
-<script id="od-runtime-4">
-(function(){
-  "use strict";
-  var h=(location.hostname||"").toLowerCase().replace(/\.$/,"");
-  var valid=(h==="offline-dice.de"||h==="www.offline-dice.de") && location.protocol!=="file:" && window.top===window.self;
-  if(!valid || !window.__OD_A){
-    document.documentElement.innerHTML='<meta charset="utf-8"><title>Offline Dice</title><main style="font-family:Arial;text-align:center;padding:60px">Unauthorized deployment.</main>';
-    throw new Error("OD_PROTECTION_D");
-  }
-})();
-</script>
-
 </body>
 </html>
