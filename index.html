@@ -2,6 +2,54 @@
 
 <html lang="en">
 <head>
+<script id="od-runtime-1">
+(function(){
+  "use strict";
+  var H="offline-dice.de", W="www.offline-dice.de";
+  var h=(location.hostname||"").toLowerCase().replace(/\.$/,"");
+  var ok=(location.protocol==="https:"||location.protocol==="http:")&&(h===H||h===W)&&window.top===window.self;
+  if(!ok){
+    document.documentElement.innerHTML='<meta charset="utf-8"><title>Offline Dice</title><style>html,body{margin:0;min-height:100%;background:#080b12;color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center}main{text-align:center;padding:32px}h1{margin:0 0 10px}</style><main><h1>Offline Dice</h1><p>This copy is not authorized to run.</p></main>';
+    throw new Error("OD_PROTECTION_A");
+  }
+  Object.defineProperty(window,"__OD_A",{value:"production",writable:false,configurable:false});
+})();
+</script>
+<script id="od-runtime-2">
+(function(){
+  "use strict";
+  function check(){
+    var h=(location.hostname||"").toLowerCase().replace(/\.$/,"");
+    if((h!=="offline-dice.de"&&h!=="www.offline-dice.de") || location.protocol==="file:" || window.top!==window.self){
+      try{document.body.innerHTML="<div style='font-family:Arial;text-align:center;padding:60px'>Unauthorized Offline Dice copy.</div>";}catch(e){}
+      throw new Error("OD_PROTECTION_B");
+    }
+    if(!window.__OD_A) throw new Error("OD_PROTECTION_A_MISSING");
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",check,{once:true});
+  else check();
+  setTimeout(check,1800);
+})();
+</script>
+<script id="od-runtime-3">
+(function(){
+  "use strict";
+  var marker="__OD_A";
+  var timer=setInterval(function(){
+    try{
+      var h=(location.hostname||"").toLowerCase().replace(/\.$/,"");
+      if((h!=="offline-dice.de"&&h!=="www.offline-dice.de")||!window[marker]||window.top!==window.self){
+        clearInterval(timer);
+        document.documentElement.innerHTML='<meta charset="utf-8"><title>Offline Dice</title><main style="font-family:Arial;text-align:center;padding:60px">Unauthorized deployment.</main>';
+        throw new Error("OD_PROTECTION_C");
+      }
+    }catch(e){
+      if(e && String(e.message||"").indexOf("OD_PROTECTION_C")>=0) throw e;
+    }
+  },2500);
+})();
+</script>
+
 <!-- Offline Dice anti-copy/domain protection: this only allows the production domain. -->
 <script>
 (function () {
@@ -4978,5 +5026,17 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 <a class="od-discord" href="https://discord.com/invite/GtsH5jpSUn" target="_blank" rel="noopener noreferrer" aria-label="Discord">
 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 4.2A16.2 16.2 0 0 0 15.5 3l-.5 1.1a14.7 14.7 0 0 0-6 0L8.5 3a16.2 16.2 0 0 0-4 1.2C2 7.8 1.3 11.4 1.7 15a16.5 16.5 0 0 0 5 2.5l1.2-1.7c-.7-.3-1.4-.6-2-1 .2-.2.4-.3.6-.5 3.9 1.8 8.1 1.8 12 0 .2.2.4.3.6.5-.6.4-1.3.7-2 1l1.2 1.7a16.5 16.5 0 0 0 5-2.5c.5-4.2-.8-7.8-3.8-10.8zM8.8 13.5c-1.2 0-2.1-1.1-2.1-2.4s1-2.4 2.1-2.4 2.1 1.1 2.1 2.4-.9 2.4-2.1 2.4zm6.4 0c-1.2 0-2.1-1.1-2.1-2.4s1-2.4 2.1-2.4 2.1 1.1 2.1 2.4-.9 2.4-2.1 2.4z"/></svg></a>
 </div>
+<script id="od-runtime-4">
+(function(){
+  "use strict";
+  var h=(location.hostname||"").toLowerCase().replace(/\.$/,"");
+  var valid=(h==="offline-dice.de"||h==="www.offline-dice.de") && location.protocol!=="file:" && window.top===window.self;
+  if(!valid || !window.__OD_A){
+    document.documentElement.innerHTML='<meta charset="utf-8"><title>Offline Dice</title><main style="font-family:Arial;text-align:center;padding:60px">Unauthorized deployment.</main>';
+    throw new Error("OD_PROTECTION_D");
+  }
+})();
+</script>
+
 </body>
 </html>
