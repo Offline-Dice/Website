@@ -2066,23 +2066,78 @@ background:transparent;
         let rollColorResults = [];
         let rollColorWeights = null;
 
-        async function getRandomResult(mode) {
+        const DICE_WORKER_URL = "https://offline-dice-api.fischerleo56.workers.dev";
+
+async function getWorkerColorResults(count) {
+    const uid = String(localStorage.getItem("offlineDiceFirebaseUserId") || "");
+    const clientSeed = String(
+        window.provablyFair?.clientSeed ||
+        localStorage.getItem("clientSeed") ||
+        "Kenzy"
+    ).slice(0, 128);
+
+    const nonce = Number.isSafeInteger(window.provablyFair?.nonce)
+        ? window.provablyFair.nonce
+        : 0;
+
+    const headers = {
+        "Content-Type": "application/json"
+    };
+    if (/^[A-Za-z0-9_-]{1,128}$/.test(uid)) {
+        headers["X-Session"] = uid;
+    }
+
+    const response = await fetch(DICE_WORKER_URL, {
+        method: "POST",
+        headers,
+        cache: "no-store",
+        body: JSON.stringify({
+            mode: "color",
+            count: Math.max(1, Math.min(6, Number(count) || 1)),
+            clientSeed,
+            nonce
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error("Dice Worker request failed (" + response.status + ")");
+    }
+
+    const data = await response.json();
+    if (!data || !Array.isArray(data.results)) {
+        throw new Error("Invalid Dice Worker response");
+    }
+
+    const colors = data.results.map(item => {
+        const index = Number(item?.index);
+        if (!Number.isInteger(index) || index < 0 || index >= validColors.length) {
+            throw new Error("Invalid color index from Dice Worker");
+        }
+        return validColors[index];
+    });
+
+    if (window.provablyFair) {
+        if (Number.isSafeInteger(data.nextNonce)) {
+            window.provablyFair.nonce = data.nextNonce;
+        } else {
+            window.provablyFair.nonce = nonce + colors.length;
+        }
+        if (data.serverSeedHash) {
+            window.provablyFair.lastHash = String(data.serverSeedHash);
+        }
+        const nonceEl = document.getElementById("nonceValue");
+        if (nonceEl) nonceEl.textContent = window.provablyFair.nonce;
+    }
+
+    return colors;
+}
+
+async function getRandomResult(mode) {
     const items = mode === 'color' ? validColors : validCoinflip;
 
     if (mode === 'color') {
-        // Jede Farbe wird bei jedem Roll komplett neu und unabhängig
-        // ausgewählt. Dadurch kann jede Farbe bei jedem Spin wieder
-        // erscheinen, statt dass versehentlich immer dieselbe Farbe
-        // aus einem alten Ergebnis übernommen wird.
-        let randomIndex;
-        if (window.crypto && crypto.getRandomValues) {
-            const buf = new Uint32Array(1);
-            crypto.getRandomValues(buf);
-            randomIndex = buf[0] % items.length;
-        } else {
-            randomIndex = Math.floor(Math.random() * items.length);
-        }
-        const result = items[randomIndex];
+        const results = await getWorkerColorResults(1);
+        const result = results[0];
         rollColorResults.push(result);
         return result;
     }
@@ -2213,27 +2268,17 @@ background:transparent;
             // Genau ein zufälliger Spruch pro Roll – er bleibt während des gesamten Rolls gleich.
 
             // Farben parallel im Hintergrund bestimmen, aber erst nach dem Sound zeigen.
-            const colorPromises = blocks.map((_, i) =>
-                getRandomResult('color').then(color => {
+            const colorPromise = getWorkerColorResults(numDice).then(colors => {
+                colors.forEach((color, i) => {
                     verifyColors[i] = color;
                     rollColorResults[i] = color;
-                })
-            );
+                });
+            });
 
-            await Promise.all([Promise.all(colorPromises), soundDone]);
+            await Promise.all([colorPromise, soundDone]);
 
-            // Mildly reduce rolls with four or more different colors by
-            // occasionally repeating one of the already rolled colors.
-            if (verifyColors.length >= 4) {
-                const uniqueColors = [...new Set(verifyColors)];
-                if (uniqueColors.length >= 4 && Math.random() < 0.35) {
-                    const replaceIndex = Math.floor(Math.random() * verifyColors.length);
-                    let duplicateColor = verifyColors.find((c, i) => i !== replaceIndex && verifyColors.indexOf(c) !== i);
-                    if (!duplicateColor) duplicateColor = verifyColors[(replaceIndex + 1) % verifyColors.length];
-                    verifyColors[replaceIndex] = duplicateColor;
-                    rollColorResults[replaceIndex] = duplicateColor;
-                }
-            }
+            // The Cloudflare Worker result is authoritative.
+            // Do not modify the returned colors on the client.
 
             // Ergebnis sauber anzeigen. Danach verschwindet der Fokusmodus
             // und die komplette normale Seite kommt wieder zurück.
@@ -4681,8 +4726,25 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
     await new Promise(r=>setTimeout(r,1000));
 
     const matches=Array(activePlayers).fill(0);
+    let workerResults;
+    try {
+      workerResults = await getWorkerColorResults(n);
+    } catch (workerError) {
+      console.error('Offline Dice Worker roll failed:', workerError);
+      dice.forEach(d => {
+        d.classList.remove('lb-battle-rolling');
+        d.style.backgroundColor = '#e0e0e0';
+      });
+      rolling=false;
+      sync();
+      return;
+    }
+
     for(let i=0;i<n;i++){
-      const result=colors[Math.floor(Math.random()*colors.length)];
+      const resultName = workerResults[i];
+      const result = colors.find(c => c.name.toLowerCase() === String(resultName).toLowerCase());
+      if(!result) throw new Error('Unknown color from Dice Worker: ' + resultName);
+
       dice[i].classList.remove('lb-battle-rolling');
       dice[i].style.backgroundColor=result.color;
       for(let j=0;j<activePlayers;j++){
