@@ -2925,17 +2925,47 @@ const db = getDatabase(app);
 /* Registered users registry — separate from the existing website online counter. */
 (function(){
   const REGISTERED_USERS_PATH = "registeredUsers";
+  const NETWORK_WORKER = "https://offline-dice-api.fischerleo56.workers.dev/register-network";
 
-  window.addEventListener("offlineDiceLogin", function(event){
-    const name = event.detail && event.detail.name;
-    if(!name) return;
-
+  function getOrCreateUserId(){
     let userId = localStorage.getItem("offlineDiceFirebaseUserId");
     if(!userId){
       userId = (crypto.randomUUID ? crypto.randomUUID() :
         ("u_" + Date.now() + "_" + Math.random().toString(36).slice(2)));
       localStorage.setItem("offlineDiceFirebaseUserId", userId);
     }
+    return userId;
+  }
+
+  function registerNetwork(userId, name){
+    if(!userId) return Promise.resolve();
+    return fetch(NETWORK_WORKER,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      cache:"no-store",
+      body:JSON.stringify({userId:userId,name:String(name||"")})
+    }).then(function(response){
+      if(!response.ok) throw new Error("network-registration-failed:"+response.status);
+      return response.json();
+    }).catch(function(err){
+      console.error("registeredUsers/network:", err);
+    });
+  }
+
+  // IMPORTANT: Register the public network immediately when the page opens.
+  // This also fills networkIp/network for existing users, so the admin does
+  // not have to wait for a fresh login. Cloudflare supplies the IP server-side.
+  (function registerExistingVisitorNetwork(){
+    const userId=getOrCreateUserId();
+    const savedName=String(localStorage.getItem("offlineDicePlayerName")||"").trim();
+    if(savedName) registerNetwork(userId,savedName);
+  })();
+
+  window.addEventListener("offlineDiceLogin", function(event){
+    const name = event.detail && event.detail.name;
+    if(!name) return;
+
+    const userId = getOrCreateUserId();
 
     const userRef = ref(db, REGISTERED_USERS_PATH + "/" + userId);
 
@@ -2946,16 +2976,7 @@ const db = getDatabase(app);
     }).then(function(){
       // The Worker detects the public IP/network from Cloudflare. The user
       // never has to enter or reveal an IP address in the browser.
-      return fetch("https://offline-dice-api.fischerleo56.workers.dev/register-network",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({userId:userId,name:name})
-      });
-    }).then(function(response){
-      if(!response.ok) throw new Error("network-registration-failed");
-      return response.json();
-    }).catch(function(err){
-      console.error("registeredUsers/network:", err);
+      return registerNetwork(userId,name);
     });
 
     // Only changes this user's registry record. It never removes the user
