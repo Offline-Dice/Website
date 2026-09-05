@@ -1562,28 +1562,50 @@ body.dice-roll-active #od-public-chat{
 <script id="offline-dice-ip-ban-gate">
 (function(){
   const API="https://offline-dice-api.fischerleo56.workers.dev";
-  async function checkIpBan(){
-    try{
-      const r=await fetch(API+"/ip-ban-check",{method:"GET",cache:"no-store"});
-      if(!r.ok)return;
-      const data=await r.json();
-      if(data && data.banned===true){
-        document.documentElement.innerHTML=`
-          <head><meta charset="UTF-8"><title>Offline Dice – Gebannt</title>
-          <style>
-            html,body{margin:0;min-height:100%;background:#080808;color:#fff;font-family:Arial,sans-serif}
-            body{display:flex;align-items:center;justify-content:center;text-align:center}
-            .ban{max-width:650px;padding:42px;border:1px solid #3a3a3a;border-radius:20px;background:#111;box-shadow:0 20px 80px rgba(0,0,0,.45)}
-            h1{margin:0 0 14px;font-size:32px}.reason{opacity:.7;margin-top:14px}
-          </style></head>
-          <body><div class="ban">
-            <h1>⛔ Du bist gebannt</h1>
-            <div>Deine IP-Adresse wurde von Offline Dice gesperrt.</div>
-            ${data.reason?`<div class="reason">Grund: ${String(data.reason).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}</div>`:""}
-          </div></body>`;
-      }
-    }catch(e){}
+
+  function showBan(reason){
+    document.documentElement.innerHTML=`
+      <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>Offline Dice – Gebannt</title>
+      <style>
+        html,body{margin:0;min-height:100%;background:#080808;color:#fff;font-family:Arial,sans-serif}
+        body{display:flex;align-items:center;justify-content:center;text-align:center}
+        .ban{max-width:650px;padding:42px;border:1px solid #3a3a3a;border-radius:20px;background:#111;box-shadow:0 20px 80px rgba(0,0,0,.45)}
+        h1{margin:0 0 14px;font-size:32px}.reason{opacity:.7;margin-top:14px}
+      </style></head>
+      <body><div class="ban">
+        <h1>⛔ Du bist gebannt</h1>
+        <div>Deine öffentliche IP-Adresse wurde von Offline Dice gesperrt.</div>
+        ${reason?`<div class="reason">Grund: ${String(reason).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}</div>`:""}
+      </div></body>`;
   }
+
+  async function checkIpBan(){
+    for(let attempt=0; attempt<3; attempt++){
+      try{
+        const r=await fetch(API+"/ip-ban-check?ts="+Date.now(),{
+          method:"GET",
+          cache:"no-store",
+          credentials:"omit",
+          headers:{"Cache-Control":"no-cache","Pragma":"no-cache"}
+        });
+
+        if(!r.ok) throw new Error("ban-check-"+r.status);
+
+        const data=await r.json();
+
+        if(data && data.banned===true){
+          showBan(data.reason||"");
+        }
+        return;
+      }catch(e){
+        if(attempt<2){
+          await new Promise(resolve=>setTimeout(resolve,500));
+        }
+      }
+    }
+  }
+
   checkIpBan();
 })();
 </script>
