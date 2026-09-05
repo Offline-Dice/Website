@@ -2397,9 +2397,19 @@ async function requestProtectedRolls(mode, count) {
   }
   const safeCount = Math.max(1, Math.min(6, Number(count) || 1));
   const usedNonce = Number(window.provablyFair.nonce) || 0;
+  const sessionId = String(localStorage.getItem("offlineDiceFirebaseUserId") || "").trim();
+
+  const requestHeaders = {
+    "Content-Type": "application/json"
+  };
+
+  if (sessionId) {
+    requestHeaders["X-Session"] = sessionId;
+  }
+
   const response = await fetch("https://offline-dice-api.fischerleo56.workers.dev/", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: requestHeaders,
     credentials: "same-origin",
     body: JSON.stringify({
       mode,
