@@ -445,27 +445,44 @@ async function banUserNetwork(userId, action){
   const user=snap.val()||{};
   const ip=String(user.networkIp||"").trim();
   const network=String(user.network||"").trim();
-  if(!ip){
-    throw new Error("Für diesen User wurde noch kein Netzwerk erkannt. Der User muss Offline Dice mindestens einmal öffnen/anmelden.");
-  }
-  const key=encodeURIComponent(ip).replace(/\./g,"%2E");
-  if(action==="ban"){
+
+  // Entbannen muss auch dann funktionieren, wenn bei dem User kein
+  // Netzwerk gespeichert wurde. Der Account-Ban wird immer entfernt.
+  if(action==="unban"){
     const updates={};
-    updates["registeredUsers/"+userId+"/banned"]=true;
-    updates["ipBans/"+key]={
-      ip:ip,
-      network:network,
-      userId:userId,
-      userName:String(user.name||"").slice(0,64),
-      reason:"User-Ban: "+String(user.name||userId).slice(0,64),
-      bannedAt:Date.now()
-    };
+    updates["registeredUsers/"+userId+"/banned"]=false;
+
+    // Entferne den Netzwerk-Ban nur, wenn er tatsächlich von diesem User
+    // stammt. So wird nicht versehentlich ein anderer Netzwerk-Ban gelöscht.
+    if(ip){
+      const key=encodeURIComponent(ip).replace(/\./g,"%2E");
+      const banSnap=await db.ref("ipBans/"+key).once("value");
+      const banData=banSnap.val();
+      if(banData && String(banData.userId||"")===String(userId)){
+        updates["ipBans/"+key]=null;
+      }
+    }
+
     await db.ref().update(updates);
     return;
   }
+
+  // Beim Bannen muss ein öffentliches Netzwerk bekannt sein.
+  if(!ip){
+    throw new Error("Für diesen User wurde noch kein Netzwerk erkannt. Der User muss Offline Dice mindestens einmal öffnen/anmelden.");
+  }
+
+  const key=encodeURIComponent(ip).replace(/\./g,"%2E");
   const updates={};
-  updates["registeredUsers/"+userId+"/banned"]=false;
-  updates["ipBans/"+key]=null;
+  updates["registeredUsers/"+userId+"/banned"]=true;
+  updates["ipBans/"+key]={
+    ip:ip,
+    network:network,
+    userId:userId,
+    userName:String(user.name||"").slice(0,64),
+    reason:"User-Ban: "+String(user.name||userId).slice(0,64),
+    bannedAt:Date.now()
+  };
   await db.ref().update(updates);
 }
 
