@@ -1365,5 +1365,125 @@ if(typeof db!=="undefined"){
   });
 }
 </script>
+
+<hr style="margin:30px 0">
+<section id="offlineDiceIpBanAdmin">
+  <h2>🌐 IP-Bans</h2>
+  <p style="opacity:.75">IP-Bans sperren die öffentliche IP-Adresse eines Besuchers. Die bestehenden Konto-Bans bleiben unverändert.</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+    <input id="ipBanAddress" type="text" placeholder="IP-Adresse, z. B. 203.0.113.10" style="min-width:260px">
+    <input id="ipBanReason" type="text" maxlength="200" placeholder="Grund (optional)" style="min-width:260px">
+    <button id="ipBanButton" type="button" style="background:#b30000;color:#fff;font-weight:900">🔨 IP BANNEN</button>
+    <button id="ipBanRefresh" type="button">🔄 Aktualisieren</button>
+  </div>
+  <div id="ipBanMyIp" style="margin-top:12px;opacity:.7"></div>
+  <div id="ipBanStatus" style="margin-top:10px"></div>
+  <div id="ipBanList" style="margin-top:18px"></div>
+</section>
+
+<script id="offline-dice-ip-ban-admin">
+(function(){
+  const $=id=>document.getElementById(id);
+  const status=$("ipBanStatus");
+  const list=$("ipBanList");
+
+  function esc(v){
+    return String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+  }
+  function setStatus(t){ if(status) status.textContent=t; }
+  function ipKey(ip){ return encodeURIComponent(String(ip).trim()).replace(/\./g,'%2E'); }
+  function validIp(ip){
+    ip=String(ip||'').trim();
+    const v4=/^(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)$/;
+    return v4.test(ip) || (/^[0-9A-Fa-f:]{2,45}$/.test(ip) && ip.includes(':'));
+  }
+
+  async function requireRealAdmin(){
+    const user=window.secureAdminAuth && window.secureAdminAuth.currentUser;
+    if(!user) throw new Error("Nicht als Admin angemeldet.");
+    if(String(user.uid)!=="5zaM6ctegwPFRTaRabsRBhZyKmq2") throw new Error("Keine Admin-Berechtigung.");
+    return user;
+  }
+
+  async function loadIpBans(){
+    if(!list) return;
+    try{
+      await requireRealAdmin();
+      const snap=await db.ref("ipBans").once("value");
+      const raw=snap.val()||{};
+      const bans=Object.entries(raw).map(([key,value])=>({
+        ip:String(value?.ip||decodeURIComponent(key)),
+        reason:String(value?.reason||''),
+        bannedAt:Number(value?.bannedAt||0)
+      })).sort((a,b)=>b.bannedAt-a.bannedAt);
+      if(!bans.length){
+        list.innerHTML='<div style="opacity:.65">Keine IP-Bans vorhanden.</div>';
+        return;
+      }
+      list.innerHTML=bans.map(b=>`
+        <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#181818;border:1px solid #333;border-radius:12px;padding:12px;margin:8px 0">
+          <div>
+            <strong>🌐 ${esc(b.ip)}</strong>
+            ${b.reason?`<div style="opacity:.7;margin-top:4px">${esc(b.reason)}</div>`:""}
+            ${b.bannedAt?`<div style="opacity:.5;font-size:12px;margin-top:4px">${esc(new Date(b.bannedAt).toLocaleString())}</div>`:""}
+          </div>
+          <button type="button" data-ip="${esc(b.ip)}" style="background:#159447;color:#fff;font-weight:900">✅ ENTBANNEN</button>
+        </div>`).join("");
+
+      list.querySelectorAll("button[data-ip]").forEach(btn=>{
+        btn.onclick=async()=>{
+          const ip=btn.getAttribute("data-ip");
+          if(!confirm("IP wirklich entbannen?\n\n"+ip)) return;
+          try{
+            await requireRealAdmin();
+            setStatus("⏳ Entbanne...");
+            await db.ref("ipBans/"+ipKey(ip)).remove();
+            setStatus("✅ IP entbannt.");
+            loadIpBans();
+          }catch(e){ setStatus("❌ "+e.message); }
+        };
+      });
+    }catch(e){ setStatus("❌ IP-Bans konnten nicht geladen werden: "+e.message); }
+  }
+
+  $("ipBanButton")?.addEventListener("click",async()=>{
+    const ip=($("ipBanAddress")?.value||"").trim();
+    const reason=($("ipBanReason")?.value||"").trim();
+    if(!validIp(ip)){ setStatus("❌ Ungültige IP-Adresse."); return; }
+    try{
+      await requireRealAdmin();
+      setStatus("⏳ Banne IP...");
+      await db.ref("ipBans/"+ipKey(ip)).set({
+        ip,
+        reason:reason.slice(0,200),
+        bannedAt:Date.now()
+      });
+      setStatus("✅ IP wurde gebannt.");
+      $("ipBanAddress").value="";
+      $("ipBanReason").value="";
+      loadIpBans();
+    }catch(e){ setStatus("❌ "+e.message); }
+  });
+
+  $("ipBanRefresh")?.addEventListener("click",loadIpBans);
+
+  fetch("https://offline-dice-api.fischerleo56.workers.dev/ip-ban-check",{cache:"no-store"})
+    .then(r=>r.json()).then(data=>{
+      if(data && data.ip && $("ipBanMyIp")) $("ipBanMyIp").textContent="Deine aktuelle öffentliche IP: "+data.ip;
+    }).catch(()=>{});
+
+  let tries=0;
+  const timer=setInterval(()=>{
+    if(window.secureAdminAuth?.currentUser){
+      clearInterval(timer);
+      loadIpBans();
+    }else if(++tries>120){
+      clearInterval(timer);
+      setStatus("❌ Admin-Anmeldung nicht gefunden.");
+    }
+  },500);
+})();
+</script>
+
 </body>
 </html>
