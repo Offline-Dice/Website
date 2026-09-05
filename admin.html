@@ -1402,6 +1402,34 @@ if(typeof db!=="undefined"){
     const v4=/^(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)$/;
     return v4.test(ip) || (/^[0-9A-Fa-f:]{2,45}$/.test(ip) && ip.includes(':'));
   }
+  function ipNetworkKey(ip){
+    const value=String(ip||'').trim();
+
+    if(value.includes('.')) return 'v4:'+value;
+
+    if(value.includes(':')){
+      const parts=value.split('::');
+      let left=parts[0]?parts[0].split(':'):[];
+      let right=parts.length>1 && parts[1]?parts[1].split(':'):[];
+
+      if(parts.length===2){
+        const missing=8-left.length-right.length;
+        left=left.concat(
+          new Array(Math.max(0,missing)).fill('0'),
+          right
+        );
+      }
+
+      while(left.length<8) left.push('0');
+
+      return 'v6:'+left.slice(0,4).map(x=>
+        String(x||'0').padStart(4,'0').toLowerCase()
+      ).join(':')+'::/64';
+    }
+
+    return '';
+  }
+
 
   async function requireRealAdmin(){
     const user=window.secureAdminAuth && window.secureAdminAuth.currentUser;
@@ -1460,6 +1488,7 @@ if(typeof db!=="undefined"){
       setStatus("⏳ Banne IP...");
       await db.ref("ipBans/"+ipKey(ip)).set({
         ip,
+        network:ipNetworkKey(ip),
         reason:reason.slice(0,200),
         bannedAt:Date.now()
       });
