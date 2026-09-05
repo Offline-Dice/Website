@@ -446,28 +446,34 @@ async function banUserNetwork(userId, action){
   const ip=String(user.networkIp||"").trim();
   const network=String(user.network||"").trim();
 
-  // Entbannen muss auch dann funktionieren, wenn bei dem User kein
-  // Netzwerk gespeichert wurde. Der Account-Ban wird immer entfernt.
   if(action==="unban"){
+    // Account-Ban immer entfernen.
     const updates={};
     updates["registeredUsers/"+userId+"/banned"]=false;
 
-    // Entferne den Netzwerk-Ban nur, wenn er tatsächlich von diesem User
-    // stammt. So wird nicht versehentlich ein anderer Netzwerk-Ban gelöscht.
-    if(ip){
-      const key=encodeURIComponent(ip).replace(/\./g,"%2E");
-      const banSnap=await db.ref("ipBans/"+key).once("value");
-      const banData=banSnap.val();
-      if(banData && String(banData.userId||"")===String(userId)){
+    // Alle passenden Netzwerk-Bans entfernen. Das ist absichtlich nicht nur
+    // der aktuelle IP-Key, weil der User inzwischen eine andere öffentliche
+    // IP haben kann oder ein älterer Ban noch keinen userId-Eintrag hatte.
+    const bansSnap=await db.ref("ipBans").once("value");
+    const bans=bansSnap.val()||{};
+    Object.keys(bans).forEach(function(key){
+      const ban=bans[key];
+      if(!ban) return;
+      const banUserId=String(ban.userId||"").trim();
+      const banIp=String(ban.ip||"").trim();
+      const banNetwork=String(ban.network||"").trim();
+      const matchesUser=banUserId && banUserId===String(userId);
+      const matchesIp=ip && banIp===ip;
+      const matchesNetwork=network && banNetwork===network;
+      if(matchesUser || matchesIp || matchesNetwork){
         updates["ipBans/"+key]=null;
       }
-    }
+    });
 
     await db.ref().update(updates);
     return;
   }
 
-  // Beim Bannen muss ein öffentliches Netzwerk bekannt sein.
   if(!ip){
     throw new Error("Für diesen User wurde noch kein Netzwerk erkannt. Der User muss Offline Dice mindestens einmal öffnen/anmelden.");
   }
@@ -1462,7 +1468,7 @@ if(typeof db!=="undefined"){
     try{
       setStatus("⏳ Wird verarbeitet...");
       await banUserNetwork(id,action);
-      setStatus(action==="ban"?"✅ User + WLAN/Netzwerk gebannt.":"✅ User + WLAN/Netzwerk entbannt.");
+      setStatus(action==="ban"?"✅ User + WLAN/Netzwerk gebannt.":"✅ User + WLAN/Netzwerk vollständig entbannt.");
       load();
       refreshRegisteredUsers();
     }catch(e){setStatus("❌ "+e.message);}
