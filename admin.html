@@ -490,7 +490,15 @@ function renderRegisteredUsers(data){
     ban.className=user.banned ? "admin-unban" : "admin-ban";
     ban.textContent=user.banned ? "✅ Entbannen" : "🔨 Bannen";
     ban.onclick=function(){
-      db.ref("registeredUsers/"+user.id+"/banned").set(!Boolean(user.banned))
+      (async function(){
+        const banned=!Boolean(user.banned);
+        const key=String(user.name||"").trim().replace(/\s+/g," ").toLowerCase().replace(/[.#$\[\]\/]/g,"_");
+        const updates={};
+        updates["registeredUsers/"+user.id+"/banned"]=banned;
+        if(key) updates["userBansByName/"+key]={banned:true,name:String(user.name||"").trim(),userId:user.id,bannedAt:Date.now()};
+        if(!banned && key) updates["userBansByName/"+key]=null;
+        await db.ref().update(updates);
+      })()
         .then(function(){refreshRegisteredUsers();})
         .catch(function(e){showRegisteredUsersError(e.message);});
     };
