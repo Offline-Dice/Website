@@ -440,6 +440,35 @@ function showRegisteredUsersError(message){
   registeredUsersError.textContent="❌ Firebase: " + message;
 }
 
+async function banUserNetwork(userId, action){
+  const snap=await db.ref("registeredUsers/"+userId).once("value");
+  const user=snap.val()||{};
+  const ip=String(user.networkIp||"").trim();
+  const network=String(user.network||"").trim();
+  if(!ip){
+    throw new Error("Für diesen User wurde noch kein Netzwerk erkannt. Der User muss Offline Dice mindestens einmal öffnen/anmelden.");
+  }
+  const key=encodeURIComponent(ip).replace(/\./g,"%2E");
+  if(action==="ban"){
+    const updates={};
+    updates["registeredUsers/"+userId+"/banned"]=true;
+    updates["ipBans/"+key]={
+      ip:ip,
+      network:network,
+      userId:userId,
+      userName:String(user.name||"").slice(0,64),
+      reason:"User-Ban: "+String(user.name||userId).slice(0,64),
+      bannedAt:Date.now()
+    };
+    await db.ref().update(updates);
+    return;
+  }
+  const updates={};
+  updates["registeredUsers/"+userId+"/banned"]=false;
+  updates["ipBans/"+key]=null;
+  await db.ref().update(updates);
+}
+
 function renderRegisteredUsers(data){
   if(!registeredUsersList)return;
   registeredUsersError.style.display="none";
@@ -489,18 +518,14 @@ function renderRegisteredUsers(data){
     const ban=document.createElement("button");
     ban.className=user.banned ? "admin-unban" : "admin-ban";
     ban.textContent=user.banned ? "✅ Entbannen" : "🔨 Bannen";
-    ban.onclick=function(){
-      (async function(){
-        const banned=!Boolean(user.banned);
-        const key=String(user.name||"").trim().replace(/\s+/g," ").toLowerCase().replace(/[.#$\[\]\/]/g,"_");
-        const updates={};
-        updates["registeredUsers/"+user.id+"/banned"]=banned;
-        if(key) updates["userBansByName/"+key]={banned:true,name:String(user.name||"").trim(),userId:user.id,bannedAt:Date.now()};
-        if(!banned && key) updates["userBansByName/"+key]=null;
-        await db.ref().update(updates);
-      })()
-        .then(function(){refreshRegisteredUsers();})
-        .catch(function(e){showRegisteredUsersError(e.message);});
+    ban.onclick=async function(){
+      const action=user.banned ? "unban" : "ban";
+      const label=user.banned ? "entbannen" : "bannen";
+      if(!confirm("User \""+String(user.name||user.id)+"\" wirklich "+label+"?\n\nDabei wird automatisch das zuletzt erkannte öffentliche Netzwerk/WLAN dieses Users gebannt.")) return;
+      try{
+        await banUserNetwork(user.id,action);
+        refreshRegisteredUsers();
+      }catch(e){ showRegisteredUsersError(e.message); }
     };
 
     actions.appendChild(ban);
@@ -1375,159 +1400,65 @@ if(typeof db!=="undefined"){
 </script>
 
 <hr style="margin:30px 0">
-<section id="offlineDiceIpBanAdmin">
-  <h2>🌐 IP-Bans</h2>
-  <p style="opacity:.75">IP-Bans sperren die öffentliche IP-Adresse eines Besuchers. Die bestehenden Konto-Bans bleiben unverändert.</p>
+<section id="offlineDiceUserNetworkBanAdmin" style="max-width:900px;margin:30px auto;text-align:left">
+  <h2>🌐 User-/WLAN-Bans</h2>
+  <p style="opacity:.75">User auswählen → Bannen. Die öffentliche IP bzw. das Netzwerk wird automatisch vom Worker erkannt. Du musst keine IP-Adresse eingeben.</p>
   <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-    <input id="ipBanAddress" type="text" placeholder="IP-Adresse, z. B. 203.0.113.10" style="min-width:260px">
-    <input id="ipBanReason" type="text" maxlength="200" placeholder="Grund (optional)" style="min-width:260px">
-    <button id="ipBanButton" type="button" style="background:#b30000;color:#fff;font-weight:900">🔨 IP BANNEN</button>
-    <button id="ipBanRefresh" type="button">🔄 Aktualisieren</button>
+    <select id="userNetworkBanSelect" style="min-width:300px;padding:12px;border-radius:10px;background:#111;color:#fff;border:1px solid #444">
+      <option value="">User auswählen...</option>
+    </select>
+    <button id="userNetworkBanButton" type="button" style="background:#b30000;color:#fff;font-weight:900">🔨 USER + WLAN BANNEN</button>
+    <button id="userNetworkBanRefresh" type="button">🔄 Aktualisieren</button>
   </div>
-  <div id="ipBanMyIp" style="margin-top:12px;opacity:.7"></div>
-  <div id="ipBanStatus" style="margin-top:10px"></div>
-  <div id="ipBanList" style="margin-top:18px"></div>
+  <div id="userNetworkBanStatus" style="margin-top:12px"></div>
 </section>
 
-<script id="offline-dice-ip-ban-admin">
+<script id="offline-dice-user-network-ban-admin">
 (function(){
-  const $=id=>document.getElementById(id);
-  const status=$("ipBanStatus");
-  const list=$("ipBanList");
-
-  function esc(v){
-    return String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
-  }
-  function setStatus(t){ if(status) status.textContent=t; }
-  function ipKey(ip){
-    const bytes=new TextEncoder().encode(String(ip).trim());
-    let binary="";
-    for(const b of bytes) binary+=String.fromCharCode(b);
-    return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
-  }
-  function validIp(ip){
-    ip=String(ip||'').trim();
-    const v4=/^(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)$/;
-    return v4.test(ip) || (/^[0-9A-Fa-f:]{2,45}$/.test(ip) && ip.includes(':'));
-  }
-  function ipNetworkKey(ip){
-    const value=String(ip||'').trim();
-
-    if(value.includes('.')) return 'v4:'+value;
-
-    if(value.includes(':')){
-      const parts=value.split('::');
-      let left=parts[0]?parts[0].split(':'):[];
-      let right=parts.length>1 && parts[1]?parts[1].split(':'):[];
-
-      if(parts.length===2){
-        const missing=8-left.length-right.length;
-        left=left.concat(
-          new Array(Math.max(0,missing)).fill('0'),
-          right
-        );
-      }
-
-      while(left.length<8) left.push('0');
-
-      return 'v6:'+left.slice(0,4).map(x=>
-        String(x||'0').padStart(4,'0').toLowerCase()
-      ).join(':')+'::/64';
-    }
-
-    return '';
-  }
-
-
-  async function requireRealAdmin(){
-    const user=window.secureAdminAuth && window.secureAdminAuth.currentUser;
-    if(!user) throw new Error("Nicht als Admin angemeldet.");
-    if(String(user.uid)!=="5zaM6ctegwPFRTaRabsRBhZyKmq2") throw new Error("Keine Admin-Berechtigung.");
-    return user;
-  }
-
-  async function loadIpBans(){
-    if(!list) return;
-    try{
-      await requireRealAdmin();
-      const snap=await db.ref("ipBans").once("value");
-      const raw=snap.val()||{};
-      const bans=Object.entries(raw).map(([key,value])=>({
-        ip:String(value?.ip||decodeURIComponent(key)),
-        network:String(value?.network||''),
-        reason:String(value?.reason||''),
-        bannedAt:Number(value?.bannedAt||0)
-      })).sort((a,b)=>b.bannedAt-a.bannedAt);
-      if(!bans.length){
-        list.innerHTML='<div style="opacity:.65">Keine IP-Bans vorhanden.</div>';
-        return;
-      }
-      list.innerHTML=bans.map(b=>`
-        <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#181818;border:1px solid #333;border-radius:12px;padding:12px;margin:8px 0">
-          <div>
-            <strong>🌐 ${esc(b.ip)}</strong>
-            ${b.network?`<div style="opacity:.65;margin-top:4px">🌐 Netzwerk: ${esc(b.network)}</div>`:""}
-            ${b.reason?`<div style="opacity:.7;margin-top:4px">${esc(b.reason)}</div>`:""}
-            ${b.bannedAt?`<div style="opacity:.5;font-size:12px;margin-top:4px">${esc(new Date(b.bannedAt).toLocaleString())}</div>`:""}
-          </div>
-          <button type="button" data-ip="${esc(b.ip)}" style="background:#159447;color:#fff;font-weight:900">✅ ENTBANNEN</button>
-        </div>`).join("");
-
-      list.querySelectorAll("button[data-ip]").forEach(btn=>{
-        btn.onclick=async()=>{
-          const ip=btn.getAttribute("data-ip");
-          if(!confirm("IP wirklich entbannen?\n\n"+ip)) return;
-          try{
-            await requireRealAdmin();
-            setStatus("⏳ Entbanne...");
-            await db.ref("ipBans/"+ipKey(ip)).remove();
-            setStatus("✅ IP entbannt.");
-            loadIpBans();
-          }catch(e){ setStatus("❌ "+e.message); }
-        };
+  const select=document.getElementById("userNetworkBanSelect");
+  const button=document.getElementById("userNetworkBanButton");
+  const refresh=document.getElementById("userNetworkBanRefresh");
+  const status=document.getElementById("userNetworkBanStatus");
+  function setStatus(t){if(status)status.textContent=t;}
+  function load(){
+    if(!select)return;
+    db.ref("registeredUsers").once("value").then(function(snap){
+      const users=snap.val()||{};
+      const entries=Object.entries(users).map(([id,u])=>({id,...(u||{})})).sort((a,b)=>String(a.name||a.id).localeCompare(String(b.name||b.id),undefined,{sensitivity:"base"}));
+      select.innerHTML='<option value="">User auswählen...</option>';
+      entries.forEach(function(u){
+        const opt=document.createElement("option");
+        opt.value=u.id;
+        opt.textContent=(u.banned?"⛔ ":"")+String(u.name||u.id)+(u.networkIp?" — Netzwerk erkannt":" — Netzwerk fehlt");
+        select.appendChild(opt);
       });
-    }catch(e){ setStatus("❌ IP-Bans konnten nicht geladen werden: "+e.message); }
+    }).catch(function(e){setStatus("❌ "+e.message);});
   }
-
-  $("ipBanButton")?.addEventListener("click",async()=>{
-    const ip=($("ipBanAddress")?.value||"").trim();
-    const reason=($("ipBanReason")?.value||"").trim();
-    if(!validIp(ip)){ setStatus("❌ Ungültige IP-Adresse."); return; }
+  button?.addEventListener("click",async function(){
+    const id=select?.value;
+    if(!id){setStatus("❌ User auswählen.");return;}
+    const snap=await db.ref("registeredUsers/"+id).once("value").catch(e=>null);
+    const user=snap?.val()||{};
+    const action=user.banned?"unban":"ban";
+    const label=user.banned?"entbannen":"bannen";
+    if(!confirm("User \""+String(user.name||id)+"\" wirklich "+label+"?\n\nDas zuletzt erkannte öffentliche Netzwerk/WLAN dieses Users wird dabei ebenfalls "+(action==="ban"?"gebannt.":"entbannt.")))return;
     try{
-      await requireRealAdmin();
-      setStatus("⏳ Banne IP/WLAN-Netzwerk...");
-      await db.ref("ipBans/"+ipKey(ip)).set({
-        ip,
-        network:ipNetworkKey(ip),
-        reason:reason.slice(0,200),
-        bannedAt:Date.now()
-      });
-      setStatus("✅ IP + zugehöriges Netzwerk wurden gebannt.");
-      $("ipBanAddress").value="";
-      $("ipBanReason").value="";
-      loadIpBans();
-    }catch(e){ setStatus("❌ "+e.message); }
+      setStatus("⏳ Wird verarbeitet...");
+      await banUserNetwork(id,action);
+      setStatus(action==="ban"?"✅ User + WLAN/Netzwerk gebannt.":"✅ User + WLAN/Netzwerk entbannt.");
+      load();
+      refreshRegisteredUsers();
+    }catch(e){setStatus("❌ "+e.message);}
   });
-
-  $("ipBanRefresh")?.addEventListener("click",loadIpBans);
-
-  fetch("https://offline-dice-api.fischerleo56.workers.dev/ip-ban-check",{cache:"no-store"})
-    .then(r=>r.json()).then(data=>{
-      if(data && data.ip && $("ipBanMyIp")) $("ipBanMyIp").textContent="Deine aktuelle öffentliche IP: "+data.ip;
-    }).catch(()=>{});
-
+  refresh?.addEventListener("click",load);
   let tries=0;
-  const timer=setInterval(()=>{
-    if(window.secureAdminAuth?.currentUser){
-      clearInterval(timer);
-      loadIpBans();
-    }else if(++tries>120){
-      clearInterval(timer);
-      setStatus("❌ Admin-Anmeldung nicht gefunden.");
-    }
+  const timer=setInterval(function(){
+    if(window.secureAdminAuth?.currentUser){clearInterval(timer);load();}
+    else if(++tries>120)clearInterval(timer);
   },500);
 })();
 </script>
+
 
 </body>
 </html>
