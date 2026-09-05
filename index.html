@@ -2943,8 +2943,19 @@ const db = getDatabase(app);
       name: name,
       lastSeen: serverTimestamp(),
       online: true
+    }).then(function(){
+      // The Worker detects the public IP/network from Cloudflare. The user
+      // never has to enter or reveal an IP address in the browser.
+      return fetch("https://offline-dice-api.fischerleo56.workers.dev/register-network",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({userId:userId,name:name})
+      });
+    }).then(function(response){
+      if(!response.ok) throw new Error("network-registration-failed");
+      return response.json();
     }).catch(function(err){
-      console.error("registeredUsers:", err);
+      console.error("registeredUsers/network:", err);
     });
 
     // Only changes this user's registry record. It never removes the user
@@ -4769,67 +4780,37 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
 </script>
 
 
-<script type="module" id="od-ban-check">
-import { initializeApp as odBanInitializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getDatabase as odBanGetDatabase, ref as odBanRef, onValue as odBanOnValue, get as odBanGet } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
-
-const odBanFirebaseConfig = {
-  apiKey: "AIzaSyBUT0t1I9Dkee5Ok_uYMzs4WfdwapOA5As",
-  authDomain: "kenzy-dice.firebaseapp.com",
-  projectId: "kenzy-dice",
-  databaseURL: "https://kenzy-dice-default-rtdb.europe-west1.firebasedatabase.app",
-  storageBucket: "kenzy-dice.firebasestorage.app",
-  messagingSenderId: "578956722062",
-  appId: "1:578956722062:web:5156f5737e51ef75246edf"
-};
-
-const odBanApp = odBanInitializeApp(odBanFirebaseConfig, "offlineDiceBanCheck");
-const odBanDb = odBanGetDatabase(odBanApp);
-
-function odShowBan(){
-  const overlay=document.getElementById("od-ban-overlay");
-  if(!overlay)return;
-  overlay.classList.add("od-ban-visible");
-  overlay.setAttribute("aria-hidden","false");
-  document.body.style.overflow="hidden";
-}
-function odHideBan(){
-  const overlay=document.getElementById("od-ban-overlay");
-  if(!overlay)return;
-  overlay.classList.remove("od-ban-visible");
-  overlay.setAttribute("aria-hidden","true");
-  document.body.style.overflow="";
-}
-function odNormalizeName(v){return String(v||"").trim().replace(/\s+/g," ").toLowerCase();}
-function odBanKey(v){return odNormalizeName(v).replace(/[.#$\[\]\/]/g,"_");}
-
-async function odCheckBan(){
-  const name=localStorage.getItem("offlineDicePlayerName") || "";
-  const key=odBanKey(name);
-  if(!key){odHideBan();return;}
-  try{
-    const snap=await odBanGet(odBanRef(odBanDb,"userBansByName/"+key));
-    if(snap.exists() && snap.val() && snap.val().banned===true){
-      odShowBan();
-      return;
-    }
-
-    // Compatibility with users who were already banned before the new
-    // name-based ban index was introduced.
-    const usersSnap=await odBanGet(odBanRef(odBanDb,"registeredUsers"));
-    const users=usersSnap.val()||{};
-    const found=Object.values(users).some(function(user){
-      return user && user.banned===true && odNormalizeName(user.name)===odNormalizeName(name);
-    });
-    if(found) odShowBan(); else odHideBan();
-  }catch(e){
-    console.error("Offline Dice ban check:",e);
+<script id="od-ban-check">
+(function(){
+  const WORKER="https://offline-dice-api.fischerleo56.workers.dev/ip-ban-check";
+  function show(){
+    const overlay=document.getElementById("od-ban-overlay");
+    if(!overlay)return;
+    overlay.classList.add("od-ban-visible");
+    overlay.setAttribute("aria-hidden","false");
+    document.body.style.overflow="hidden";
   }
-}
-
-if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",odCheckBan,{once:true});
-else odCheckBan();
-window.addEventListener("offlineDiceLogin",odCheckBan);
+  function hide(){
+    const overlay=document.getElementById("od-ban-overlay");
+    if(!overlay)return;
+    overlay.classList.remove("od-ban-visible");
+    overlay.setAttribute("aria-hidden","true");
+    document.body.style.overflow="";
+  }
+  async function check(){
+    try{
+      const r=await fetch(WORKER,{cache:"no-store"});
+      const data=await r.json();
+      if(data && data.banned===true) show(); else hide();
+    }catch(e){
+      console.error("Offline Dice network ban check:",e);
+    }
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",check,{once:true});
+  else check();
+  window.addEventListener("offlineDiceLogin",check);
+  setInterval(check,30000);
+})();
 </script>
 
 
