@@ -1446,6 +1446,7 @@ if(typeof db!=="undefined"){
       const raw=snap.val()||{};
       const bans=Object.entries(raw).map(([key,value])=>({
         ip:String(value?.ip||decodeURIComponent(key)),
+        network:String(value?.network||''),
         reason:String(value?.reason||''),
         bannedAt:Number(value?.bannedAt||0)
       })).sort((a,b)=>b.bannedAt-a.bannedAt);
@@ -1457,6 +1458,7 @@ if(typeof db!=="undefined"){
         <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#181818;border:1px solid #333;border-radius:12px;padding:12px;margin:8px 0">
           <div>
             <strong>🌐 ${esc(b.ip)}</strong>
+            ${b.network?`<div style="opacity:.65;margin-top:4px">🌐 Netzwerk: ${esc(b.network)}</div>`:""}
             ${b.reason?`<div style="opacity:.7;margin-top:4px">${esc(b.reason)}</div>`:""}
             ${b.bannedAt?`<div style="opacity:.5;font-size:12px;margin-top:4px">${esc(new Date(b.bannedAt).toLocaleString())}</div>`:""}
           </div>
@@ -1485,14 +1487,14 @@ if(typeof db!=="undefined"){
     if(!validIp(ip)){ setStatus("❌ Ungültige IP-Adresse."); return; }
     try{
       await requireRealAdmin();
-      setStatus("⏳ Banne IP...");
+      setStatus("⏳ Banne IP/WLAN-Netzwerk...");
       await db.ref("ipBans/"+ipKey(ip)).set({
         ip,
         network:ipNetworkKey(ip),
         reason:reason.slice(0,200),
         bannedAt:Date.now()
       });
-      setStatus("✅ IP wurde gebannt.");
+      setStatus("✅ IP + zugehöriges Netzwerk wurden gebannt.");
       $("ipBanAddress").value="";
       $("ipBanReason").value="";
       loadIpBans();
