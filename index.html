@@ -238,7 +238,137 @@ flex-wrap:wrap;
             100% { transform: scale(1); }
         }
 
-        /* Dice presentation CSS is served by the Cloudflare Worker. */
+        .dice-result {
+            margin: 20px auto;
+            padding: 10px;
+            width: 90%;
+            max-width: 650px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            min-height: 90px;
+            position: relative;
+        }
+
+        .dice-rolling-status {
+            width: 100%;
+            text-align: center;
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 2px;
+            line-height: 1;
+            margin: 0 0 2px;
+            color: #fff;
+            text-shadow: 0 2px 8px rgba(0,0,0,.45);
+        }
+
+        .color-block {
+            width: 90px;
+            height: 90px;
+            border-radius: 25px;
+            border: 10px solid var(--white);
+            position: relative;
+            background-color: #e0e0e0;
+            box-shadow: 6px 6px 12px rgba(0,0,0,0.3), -4px -4px 10px var(--shadow-light);
+            transition: background-color 0.3s ease-in-out, transform 0.1s;
+            animation: none;
+            transform-style: preserve-3d;
+        }
+
+        /* Während des Rolls wird die Seite wie im Referenzvideo auf den Hintergrund reduziert.
+           Die Würfel kommen clean ins Zentrum und bleiben ruhig – keine Wackel-Animation. */
+        /* Sofortiger Fokusmodus: kein kurzes Aufblitzen der normalen Seite beim Roll-Again-Klick. */
+        body.dice-focus-mode {
+            overflow: hidden !important;
+        }
+
+        body.dice-focus-mode > * {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
+        body.dice-focus-mode > #diceResultArea {
+            display: flex !important;
+            visibility: visible !important;
+        }
+
+        body.dice-focus-mode #diceResultArea,
+        body.dice-focus-mode #diceResultArea * {
+            visibility: visible !important;
+        }
+
+        /* The Roll Again button must never flash or remain clickable during the focused roll. */
+        body.dice-focus-mode #rollButton {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        body.dice-roll-active #rollButton {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        body.dice-focus-mode {
+            cursor: default !important;
+        }
+
+        body.dice-focus-mode #diceResultArea {
+            position: fixed !important;
+            left: 50% !important;
+            top: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            z-index: 999999 !important;
+            width: min(92vw, 650px) !important;
+            max-width: 650px !important;
+            min-height: 120px !important;
+            margin: 0 !important;
+            padding: 10px !important;
+            display: flex !important;
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+            align-items: center !important;
+            gap: 15px !important;
+        }
+
+        .rolling-dice {
+            animation: dice-roll-shake .16s ease-in-out infinite !important;
+        }
+        .dice-clean-exit {
+            animation: dice-clean-exit .10s ease-out forwards !important;
+        }
+
+        @keyframes dice-clean-exit {
+            0%   { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(.985); }
+        }
+
+        @keyframes dice-roll-shake {
+            0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+            20%  { transform: translate(-4px, 2px) rotate(-1.5deg) scale(1.01); }
+            40%  { transform: translate(4px, -2px) rotate(1.5deg) scale(1.01); }
+            60%  { transform: translate(-3px, -1px) rotate(-1deg) scale(1.005); }
+            80%  { transform: translate(3px, 1px) rotate(1deg) scale(1.005); }
+            100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+        }
+
+        .dot {
+            width: 18px;
+            height: 18px;
+            background-color: var(--white);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px var(--white);
+        }
+
         .wheel-wrapper {
             display: flex;
             flex-direction: column;
@@ -1602,7 +1732,6 @@ body.dice-roll-active #od-public-chat{
 #od-social-links .od-discord{background:#5865F2}
 #od-social-links svg{width:14px;height:14px;fill:#fff}
 </style>
-    <link rel="stylesheet" href="https://offline-dice-api.fischerleo56.workers.dev/dice-style">
 </head>
 <body>
 
