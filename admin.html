@@ -441,55 +441,57 @@ function showRegisteredUsersError(message){
 }
 
 async function banUserNetwork(userId, action){
-  const snap=await db.ref("registeredUsers/"+userId).once("value");
+  if(!window.secureAdminAuth || !window.secureAdminAuth.currentUser || window.secureAdminAuth.currentUser.uid!=="5zaM6ctegwPFRTaRabsRBhZyKmq2"){
+    throw new Error("Admin-Sitzung nicht aktiv. Bitte Admin neu anmelden.");
+  }
+
+  const userRef=db.ref("registeredUsers/"+userId);
+  const snap=await userRef.once("value");
   const user=snap.val()||{};
   const ip=String(user.networkIp||"").trim();
   const network=String(user.network||"").trim();
 
-  if(action==="unban"){
-    // Account-Ban immer entfernen.
-    const updates={};
-    updates["registeredUsers/"+userId+"/banned"]=false;
+  if(action==="ban"){
+    // Der User-Ban funktioniert auch dann, wenn noch kein Netzwerk erkannt wurde.
+    await userRef.child("banned").set(true);
 
-    // Alle passenden Netzwerk-Bans entfernen. Das ist absichtlich nicht nur
-    // der aktuelle IP-Key, weil der User inzwischen eine andere öffentliche
-    // IP haben kann oder ein älterer Ban noch keinen userId-Eintrag hatte.
-    const bansSnap=await db.ref("ipBans").once("value");
-    const bans=bansSnap.val()||{};
-    Object.keys(bans).forEach(function(key){
-      const ban=bans[key];
-      if(!ban) return;
-      const banUserId=String(ban.userId||"").trim();
-      const banIp=String(ban.ip||"").trim();
-      const banNetwork=String(ban.network||"").trim();
-      const matchesUser=banUserId && banUserId===String(userId);
-      const matchesIp=ip && banIp===ip;
-      const matchesNetwork=network && banNetwork===network;
-      if(matchesUser || matchesIp || matchesNetwork){
-        updates["ipBans/"+key]=null;
-      }
-    });
-
-    await db.ref().update(updates);
+    // Netzwerk-Ban zusätzlich setzen, sobald eine IP vorhanden ist.
+    if(ip){
+      const key=encodeURIComponent(ip).replace(/\./g,"%2E");
+      await db.ref("ipBans/"+key).set({
+        ip:ip,
+        network:network,
+        userId:userId,
+        userName:String(user.name||"").slice(0,64),
+        reason:"User-Ban: "+String(user.name||userId).slice(0,64),
+        bannedAt:Date.now()
+      });
+    }
     return;
   }
 
-  if(!ip){
-    throw new Error("Für diesen User wurde noch kein Netzwerk erkannt. Der User muss Offline Dice mindestens einmal öffnen/anmelden.");
-  }
+  // Entbannen: Account-Ban immer entfernen.
+  await userRef.child("banned").set(false);
 
-  const key=encodeURIComponent(ip).replace(/\./g,"%2E");
+  // Alle passenden Netzwerk-Bans entfernen, auch ältere Einträge.
+  const bansSnap=await db.ref("ipBans").once("value");
+  const bans=bansSnap.val()||{};
   const updates={};
-  updates["registeredUsers/"+userId+"/banned"]=true;
-  updates["ipBans/"+key]={
-    ip:ip,
-    network:network,
-    userId:userId,
-    userName:String(user.name||"").slice(0,64),
-    reason:"User-Ban: "+String(user.name||userId).slice(0,64),
-    bannedAt:Date.now()
-  };
-  await db.ref().update(updates);
+  const userName=String(user.name||"").trim();
+  Object.keys(bans).forEach(function(key){
+    const ban=bans[key];
+    if(!ban)return;
+    const banUserId=String(ban.userId||"").trim();
+    const banIp=String(ban.ip||"").trim();
+    const banNetwork=String(ban.network||"").trim();
+    const banName=String(ban.userName||"").trim();
+    const matchesUser=banUserId===String(userId);
+    const matchesIp=!!ip && banIp===ip;
+    const matchesNetwork=!!network && banNetwork===network;
+    const matchesName=!!userName && banName===userName;
+    if(matchesUser||matchesIp||matchesNetwork||matchesName)updates["ipBans/"+key]=null;
+  });
+  if(Object.keys(updates).length)await db.ref().update(updates);
 }
 
 function renderRegisteredUsers(data){
@@ -1471,7 +1473,10 @@ if(typeof db!=="undefined"){
       setStatus(action==="ban"?"✅ User + WLAN/Netzwerk gebannt.":"✅ User + WLAN/Netzwerk vollständig entbannt.");
       load();
       refreshRegisteredUsers();
-    }catch(e){setStatus("❌ "+e.message);}
+    }catch(e){
+      console.error("Offline Dice User/WLAN Ban:",e);
+      setStatus("❌ "+(e && e.message ? e.message : String(e)));
+    }
   });
   refresh?.addEventListener("click",load);
   let tries=0;
