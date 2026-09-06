@@ -832,7 +832,8 @@ box-shadow:4px 4px 8px rgba(0,0,0,.25)
 #liveBattleArea #lbAutoRollButton.active{background:#16a34a}
 #liveBattleArea #lbAutoRollButton:disabled{opacity:.55;cursor:not-allowed}
 #liveBattleArea .lb-die.lb-battle-rolling{
-animation:dice-roll-shake .16s ease-in-out infinite !important
+animation:dice-roll-shake .16s ease-in-out infinite !important;
+will-change:transform
 }
 #liveBattleArea .lb-die.lb-battle-exit{
 animation:dice-clean-exit .10s ease-out forwards !important
@@ -2029,6 +2030,14 @@ async function getWorkerColorResults(count) {
         }
         return validColors[index];
     });
+
+    // A Battle roll must receive exactly the requested number of dice.
+    // Do this check BEFORE advancing the nonce, so an incomplete response
+    // never partially consumes the roll sequence.
+    const requestedCount = Math.max(1, Math.min(6, Number(count) || 1));
+    if (colors.length !== requestedCount) {
+        throw new Error("Incomplete Dice Worker batch: expected " + requestedCount + ", got " + colors.length);
+    }
 
     if (window.provablyFair) {
         if (Number.isSafeInteger(data.nextNonce)) {
@@ -4616,17 +4625,14 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
     lock(true);
     updateNames();
 
-    const total=Math.max(1,Number(rollCount.value)||10);
+    const total=Number(rollCount.value)||10;
     const n=Math.max(1,Math.min(6,Number(document.getElementById('numDice').value)||1));
-
     if(roll===0){
       for(let i=0;i<activePlayers;i++){
         p[i].hits=0;
-        const h=document.getElementById('lbHits'+(i+1));
-        if(h)h.textContent='0';
+        document.getElementById('lbHits'+(i+1)).textContent='0';
       }
     }
-
     roll++;
     document.getElementById('lbRollProgress').textContent='ROLL '+roll+' / '+total;
 
@@ -4639,39 +4645,27 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
       box.appendChild(d);
       dice.push(d);
     }
+    try{if(typeof playDiceRollSound==='function')playDiceRollSound();}catch(e){}
 
-    /* Start the Worker request immediately instead of waiting for the animation. */
-    const workerPromise=(async()=>{
-      for(let attempt=0;attempt<3;attempt++){
-        try{
-          const result=await getWorkerColorResults(n);
-          if(Array.isArray(result)&&result.length===n)return result;
-          throw new Error('Dice Worker returned '+(Array.isArray(result)?result.length:0)+' of '+n+' results');
-        }catch(err){
-          if(attempt===2)throw err;
-          await new Promise(r=>setTimeout(r,120));
-        }
-      }
-    })();
-
-    let soundPromise=Promise.resolve();
-    try{if(typeof playDiceRollSound==='function')soundPromise=Promise.resolve(playDiceRollSound());}catch(e){}
-
+    // Start the Worker request immediately. The animation runs while the
+    // request is in flight instead of waiting for it afterwards.
     let workerResults;
-    try{
-      /* Keep the roll animation short and smooth. */
-      await Promise.all([
-        workerPromise.then(r=>{workerResults=r;}),
-        soundPromise,
-        new Promise(r=>setTimeout(r,420))
-      ]);
-    }catch(error){
-      console.error('Offline Dice Worker battle roll failed:',error);
+    try {
+      const workerPromise=getWorkerColorResults(n);
+      await new Promise(r=>setTimeout(r,520));
+      workerResults=await workerPromise;
+
+      if(!Array.isArray(workerResults)||workerResults.length!==n){
+        throw new Error('Dice Worker returned an incomplete Battle batch');
+      }
+    } catch (workerError) {
+      console.error('Offline Dice Worker roll failed:', workerError);
       dice.forEach(d=>{
         d.classList.remove('lb-battle-rolling','lb-battle-exit');
         d.style.backgroundColor='#e0e0e0';
       });
       roll=Math.max(0,roll-1);
+      document.getElementById('lbRollProgress').textContent='ROLL '+roll+' / '+total;
       rolling=false;
       lock(false);
       sync();
@@ -4680,29 +4674,27 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
 
     const matches=Array(activePlayers).fill(0);
 
-    /* Paint every die only after the complete batch has arrived. */
+    // Paint all dice only after the complete batch is available.
     for(let i=0;i<n;i++){
       const resultName=workerResults[i];
       const result=colors.find(c=>c.name.toLowerCase()===String(resultName).toLowerCase());
-      if(!result){
-        console.error('Unknown color from Dice Worker:',resultName);
-        continue;
-      }
-      dice[i].classList.remove('lb-battle-rolling','lb-battle-exit');
+      if(!result)throw new Error('Unknown color from Dice Worker: '+resultName);
+
+      dice[i].classList.remove('lb-battle-rolling');
       dice[i].style.backgroundColor=result.color;
-      const dot=dice[i].querySelector('.dot');
-      if(dot)dot.style.backgroundColor='#FFFFFF';
       for(let j=0;j<activePlayers;j++){
         if(result.color.toLowerCase()===p[j].color.toLowerCase())matches[j]++;
       }
+      dice[i].classList.add('lb-battle-exit');
+      setTimeout(()=>dice[i].classList.remove('lb-battle-exit'),120);
     }
 
     for(let j=0;j<activePlayers;j++){
       p[j].hits+=matches[j];
-      const h=document.getElementById('lbHits'+(j+1));
-      if(h)h.textContent=p[j].hits;
+      document.getElementById('lbHits'+(j+1)).textContent=p[j].hits;
     }
 
+    await new Promise(r=>setTimeout(r,180));
     rolling=false;
     if(roll>=total){
       document.getElementById('lbRollProgress').textContent='FINISHED · '+total+' ROLLS';
