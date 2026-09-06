@@ -4611,77 +4611,120 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
   }
 
   async function spinBattle(){
-    if(rolling||gameSelect.value!=='livebattle')return;
-    rolling=true;
+    if(rolling || gameSelect.value!=='livebattle') return;
+
+    rolling = true;
     lock(true);
     updateNames();
 
-    const total=Number(rollCount.value)||10;
-    const n=Math.max(1,Math.min(6,Number(document.getElementById('numDice').value)||1));
-    if(roll===0){
+    const total = Math.max(1, Number(rollCount.value) || 10);
+    const n = Math.max(1, Math.min(6, Number(document.getElementById('numDice').value) || 1));
+
+    if(roll === 0){
       for(let i=0;i<activePlayers;i++){
-        p[i].hits=0;
-        document.getElementById('lbHits'+(i+1)).textContent='0';
+        p[i].hits = 0;
+        const hitEl = document.getElementById('lbHits'+(i+1));
+        if(hitEl) hitEl.textContent = '0';
       }
     }
-    roll++;
-    document.getElementById('lbRollProgress').textContent='ROLL '+roll+' / '+total;
 
-    const box=document.getElementById('lbDiceArea');
-    box.innerHTML='';
-    const dice=[];
+    roll++;
+    const progress = document.getElementById('lbRollProgress');
+    if(progress) progress.textContent = 'ROLL '+roll+' / '+total;
+
+    const box = document.getElementById('lbDiceArea');
+    if(!box){
+      rolling = false;
+      lock(false);
+      return;
+    }
+
+    /* Keep the original Battle dice DOM/style intact. */
+    box.innerHTML = '';
+    const dice = [];
     for(let i=0;i<n;i++){
-      const d=createDie('#e0e0e0');
+      const d = createDie('#e0e0e0');
       d.classList.add('lb-battle-rolling');
       box.appendChild(d);
       dice.push(d);
     }
-    try{if(typeof playDiceRollSound==='function')playDiceRollSound();}catch(e){}
-    await new Promise(r=>setTimeout(r,1000));
 
-    const matches=Array(activePlayers).fill(0);
-    let workerResults;
-    try {
-      workerResults = await getWorkerColorResults(n);
-    } catch (workerError) {
-      console.error('Offline Dice Worker roll failed:', workerError);
-      dice.forEach(d => {
-        d.classList.remove('lb-battle-rolling');
-        d.style.backgroundColor = '#e0e0e0';
-      });
-      rolling=false;
-      sync();
-      return;
-    }
+    try{
+      if(typeof playDiceRollSound === 'function') playDiceRollSound();
+    }catch(e){}
 
-    for(let i=0;i<n;i++){
-      const resultName = workerResults[i];
-      const result = colors.find(c => c.name.toLowerCase() === String(resultName).toLowerCase());
-      if(!result) throw new Error('Unknown color from Dice Worker: ' + resultName);
+    try{
+      await new Promise(r => setTimeout(r, 1000));
 
-      dice[i].classList.remove('lb-battle-rolling');
-      dice[i].style.backgroundColor=result.color;
-      for(let j=0;j<activePlayers;j++){
-        if(result.color.toLowerCase()===p[j].color.toLowerCase())matches[j]++;
+      /* The Cloudflare Dice Worker remains the only source of the result. */
+      const workerResults = await getWorkerColorResults(n);
+
+      if(!Array.isArray(workerResults) || workerResults.length < n){
+        throw new Error('Dice Worker returned too few results');
       }
-      setTimeout(()=>dice[i].classList.remove('lb-battle-exit'),120);
-      dice[i].classList.add('lb-battle-exit');
-    }
-    for(let j=0;j<activePlayers;j++){
-      p[j].hits+=matches[j];
-      document.getElementById('lbHits'+(j+1)).textContent=p[j].hits;
-    }
 
-    await new Promise(r=>setTimeout(r,180));
-    rolling=false;
-    if(roll>=total){
-      document.getElementById('lbRollProgress').textContent='FINISHED · '+total+' ROLLS';
-      roll=0;
-      showWinner();
-      stopAuto();
-    }else{
-      // Keep all battle settings locked between rolls.
-      // ROLL AGAIN and AUTO ROLL remain usable.
+      const matches = Array(activePlayers).fill(0);
+
+      for(let i=0;i<n;i++){
+        const resultName = String(workerResults[i] || '').trim().toLowerCase();
+        const result = colors.find(c => c.name.toLowerCase() === resultName);
+
+        if(!result){
+          throw new Error('Unknown color from Dice Worker: ' + workerResults[i]);
+        }
+
+        dice[i].classList.remove('lb-battle-rolling');
+        dice[i].style.backgroundColor = result.color;
+
+        const dot = dice[i].querySelector('.dot');
+        if(dot) dot.style.backgroundColor = '#FFFFFF';
+
+        for(let j=0;j<activePlayers;j++){
+          if(result.color.toLowerCase() === p[j].color.toLowerCase()){
+            matches[j]++;
+          }
+        }
+
+        dice[i].classList.add('lb-battle-exit');
+        setTimeout(() => {
+          if(dice[i]) dice[i].classList.remove('lb-battle-exit');
+        }, 120);
+      }
+
+      for(let j=0;j<activePlayers;j++){
+        p[j].hits += matches[j];
+        const hitEl = document.getElementById('lbHits'+(j+1));
+        if(hitEl) hitEl.textContent = p[j].hits;
+      }
+
+      await new Promise(r => setTimeout(r, 180));
+
+      rolling = false;
+
+      if(roll >= total){
+        if(progress) progress.textContent = 'FINISHED · '+total+' ROLLS';
+        roll = 0;
+        showWinner();
+        stopAuto();
+      }else{
+        sync();
+      }
+
+    }catch(error){
+      console.error('Offline Dice Battle roll failed:', error);
+
+      /* Never leave Battle permanently locked after a failed request. */
+      dice.forEach(d => {
+        d.classList.remove('lb-battle-rolling', 'lb-battle-exit');
+      });
+
+      rolling = false;
+      lock(false);
+
+      /* The failed roll is not counted as a completed roll. */
+      roll = Math.max(0, roll - 1);
+      if(progress) progress.textContent = 'ROLL '+roll+' / '+total;
+
       sync();
     }
   }
