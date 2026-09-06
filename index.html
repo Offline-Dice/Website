@@ -2001,49 +2001,26 @@ async function getWorkerColorResults(count) {
         headers["X-Session"] = uid;
     }
 
-    const requestedCount = Math.max(1, Math.min(6, Number(count) || 1));
-    let data = null;
-    let lastError = null;
+    const response = await fetch(DICE_WORKER_URL, {
+        method: "POST",
+        headers,
+        cache: "no-store",
+        body: JSON.stringify({
+            mode: "color",
+            count: Math.max(1, Math.min(6, Number(count) || 1)),
+            clientSeed,
+            nonce
+        })
+    });
 
-    // A Battle roll must receive exactly the requested number of dice.
-    // Retry short/invalid Worker responses instead of partially painting the dice.
-    for (let attempt = 0; attempt < 3; attempt++) {
-        try {
-            const response = await fetch(DICE_WORKER_URL, {
-                method: "POST",
-                headers,
-                cache: "no-store",
-                body: JSON.stringify({
-                    mode: "color",
-                    count: requestedCount,
-                    clientSeed,
-                    nonce
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error("Dice Worker request failed (" + response.status + ")");
-            }
-
-            const candidate = await response.json();
-            if (!candidate || !Array.isArray(candidate.results)) {
-                throw new Error("Invalid Dice Worker response");
-            }
-            if (candidate.results.length !== requestedCount) {
-                throw new Error("Dice Worker returned " + candidate.results.length + " of " + requestedCount + " results");
-            }
-
-            data = candidate;
-            break;
-        } catch (err) {
-            lastError = err;
-            if (attempt < 2) {
-                await new Promise(resolve => setTimeout(resolve, 150 * (attempt + 1)));
-            }
-        }
+    if (!response.ok) {
+        throw new Error("Dice Worker request failed (" + response.status + ")");
     }
 
-    if (!data) throw (lastError || new Error("Invalid Dice Worker response"));
+    const data = await response.json();
+    if (!data || !Array.isArray(data.results)) {
+        throw new Error("Invalid Dice Worker response");
+    }
 
     const colors = data.results.map(item => {
         const index = Number(item?.index);
@@ -4634,77 +4611,148 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
   }
 
   async function spinBattle(){
-    if(rolling||gameSelect.value!=='livebattle')return;
-    rolling=true;
+    if(rolling || gameSelect.value!=='livebattle') return;
+
+    rolling = true;
     lock(true);
     updateNames();
 
-    const total=Number(rollCount.value)||10;
-    const n=Math.max(1,Math.min(6,Number(document.getElementById('numDice').value)||1));
-    if(roll===0){
+    const total = Math.max(1, Number(rollCount.value) || 10);
+    const n = Math.max(1, Math.min(6, Number(document.getElementById('numDice').value) || 1));
+
+    if(roll === 0){
       for(let i=0;i<activePlayers;i++){
-        p[i].hits=0;
-        document.getElementById('lbHits'+(i+1)).textContent='0';
+        p[i].hits = 0;
+        const h = document.getElementById('lbHits'+(i+1));
+        if(h) h.textContent = '0';
       }
     }
-    roll++;
-    document.getElementById('lbRollProgress').textContent='ROLL '+roll+' / '+total;
 
-    const box=document.getElementById('lbDiceArea');
-    box.innerHTML='';
-    const dice=[];
+    roll++;
+    const progress = document.getElementById('lbRollProgress');
+    if(progress) progress.textContent = 'ROLL '+roll+' / '+total;
+
+    const box = document.getElementById('lbDiceArea');
+    if(!box){
+      rolling = false;
+      lock(false);
+      return;
+    }
+
+    /* Create ALL requested dice first. Never remove or replace individual dice. */
+    box.innerHTML = '';
+    const dice = [];
     for(let i=0;i<n;i++){
-      const d=createDie('#e0e0e0');
+      const d = createDie('#e0e0e0');
       d.classList.add('lb-battle-rolling');
       box.appendChild(d);
       dice.push(d);
     }
-    try{if(typeof playDiceRollSound==='function')playDiceRollSound();}catch(e){}
-    await new Promise(r=>setTimeout(r,1000));
 
-    const matches=Array(activePlayers).fill(0);
-    let workerResults;
-    try {
-      workerResults = await getWorkerColorResults(n);
-    } catch (workerError) {
-      console.error('Offline Dice Worker roll failed:', workerError);
+    try{
+      if(typeof playDiceRollSound === 'function') playDiceRollSound();
+    }catch(e){}
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    /*
+      Important:
+      The Worker endpoint can occasionally return an incomplete batch.
+      Battle therefore requests ONE result per die, sequentially.
+      This also prevents multiple requests from using the same nonce.
+    */
+    const workerResults = [];
+
+    try{
+      for(let i=0;i<n;i++){
+        let result = null;
+        let lastError = null;
+
+        for(let attempt=0; attempt<5 && !result; attempt++){
+          try{
+            const one = await getWorkerColorResults(1);
+
+            if(!Array.isArray(one) || one.length !== 1 || !one[0]){
+              throw new Error('Dice Worker returned an invalid single-die result');
+            }
+
+            result = String(one[0]).trim();
+          }catch(err){
+            lastError = err;
+            if(attempt < 4){
+              await new Promise(resolve => setTimeout(resolve, 250 * (attempt + 1)));
+            }
+          }
+        }
+
+        if(!result){
+          throw lastError || new Error('Could not get dice result '+(i+1));
+        }
+
+        workerResults.push(result);
+      }
+    }catch(error){
+      console.error('Offline Dice Battle roll failed:', error);
+
+      /* Keep the full requested number of dice visible and unlock the battle. */
       dice.forEach(d => {
-        d.classList.remove('lb-battle-rolling');
+        d.classList.remove('lb-battle-rolling', 'lb-battle-exit');
         d.style.backgroundColor = '#e0e0e0';
       });
-      rolling=false;
+
+      roll = Math.max(0, roll - 1);
+      if(progress) progress.textContent = 'ROLL '+roll+' / '+total;
+
+      rolling = false;
+      lock(false);
       sync();
       return;
     }
 
+    const matches = Array(activePlayers).fill(0);
+
+    /* Only after EVERY result exists, paint EVERY die. */
     for(let i=0;i<n;i++){
       const resultName = workerResults[i];
-      const result = colors.find(c => c.name.toLowerCase() === String(resultName).toLowerCase());
-      if(!result) throw new Error('Unknown color from Dice Worker: ' + resultName);
+      const result = colors.find(c =>
+        c.name.toLowerCase() === String(resultName).toLowerCase()
+      );
 
-      dice[i].classList.remove('lb-battle-rolling');
-      dice[i].style.backgroundColor=result.color;
-      for(let j=0;j<activePlayers;j++){
-        if(result.color.toLowerCase()===p[j].color.toLowerCase())matches[j]++;
+      if(!result){
+        console.error('Unknown color from Dice Worker:', resultName);
+        continue;
       }
-      setTimeout(()=>dice[i].classList.remove('lb-battle-exit'),120);
-      dice[i].classList.add('lb-battle-exit');
-    }
-    for(let j=0;j<activePlayers;j++){
-      p[j].hits+=matches[j];
-      document.getElementById('lbHits'+(j+1)).textContent=p[j].hits;
+
+      const d = dice[i];
+      d.classList.remove('lb-battle-rolling', 'lb-battle-exit');
+      d.style.backgroundColor = result.color;
+
+      const dot = d.querySelector('.dot');
+      if(dot) dot.style.backgroundColor = '#FFFFFF';
+
+      for(let j=0;j<activePlayers;j++){
+        if(result.color.toLowerCase() === p[j].color.toLowerCase()){
+          matches[j]++;
+        }
+      }
     }
 
-    await new Promise(r=>setTimeout(r,180));
-    rolling=false;
-    if(roll>=total){
-      document.getElementById('lbRollProgress').textContent='FINISHED · '+total+' ROLLS';
-      roll=0;
+    for(let j=0;j<activePlayers;j++){
+      p[j].hits += matches[j];
+      const h = document.getElementById('lbHits'+(j+1));
+      if(h) h.textContent = p[j].hits;
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 180));
+
+    rolling = false;
+
+    if(roll >= total){
+      if(progress) progress.textContent = 'FINISHED · '+total+' ROLLS';
+      roll = 0;
       showWinner();
       stopAuto();
     }else{
-      // Keep all battle settings locked between rolls.
-      // ROLL AGAIN and AUTO ROLL remain usable.
       sync();
     }
   }
