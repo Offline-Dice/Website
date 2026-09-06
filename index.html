@@ -2022,11 +2022,6 @@ async function getWorkerColorResults(count) {
         throw new Error("Invalid Dice Worker response");
     }
 
-    const requestedCount = Math.max(1, Math.min(6, Number(count) || 1));
-    if (data.results.length !== requestedCount) {
-        throw new Error("Incomplete Dice Worker response: expected " + requestedCount + ", got " + data.results.length);
-    }
-
     const colors = data.results.map(item => {
         const index = Number(item?.index);
         if (!Number.isInteger(index) || index < 0 || index >= validColors.length) {
@@ -4642,48 +4637,29 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
       dice.push(d);
     }
     try{if(typeof playDiceRollSound==='function')playDiceRollSound();}catch(e){}
+    await new Promise(r=>setTimeout(r,1000));
 
     const matches=Array(activePlayers).fill(0);
     let workerResults;
     try {
       workerResults = await getWorkerColorResults(n);
-      if(!Array.isArray(workerResults) || workerResults.length !== n) {
-        throw new Error('Dice Worker returned an incomplete roll');
-      }
     } catch (workerError) {
       console.error('Offline Dice Worker roll failed:', workerError);
       dice.forEach(d => {
-        d.classList.remove('lb-battle-rolling','lb-battle-exit');
+        d.classList.remove('lb-battle-rolling');
         d.style.backgroundColor = '#e0e0e0';
       });
-      roll--;
-      document.getElementById('lbRollProgress').textContent='ROLL '+roll+' / '+total;
       rolling=false;
       sync();
       return;
     }
 
-    const resolvedColors=[];
     for(let i=0;i<n;i++){
       const resultName = workerResults[i];
-      const result = colors.find(c => c.name.toLowerCase() === String(resultName).toLowerCase());
-      if(!result){
-        console.error('Unknown color from Dice Worker:', resultName);
-        dice.forEach(d => {
-          d.classList.remove('lb-battle-rolling','lb-battle-exit');
-          d.style.backgroundColor = '#e0e0e0';
-        });
-        roll--;
-        document.getElementById('lbRollProgress').textContent='ROLL '+roll+' / '+total;
-        rolling=false;
-        sync();
-        return;
-      }
-      resolvedColors.push(result);
-    }
+      const lookupName = String(resultName).toLowerCase() === 'gold' ? 'yellow' : String(resultName).toLowerCase();
+      const result = colors.find(c => c.name.toLowerCase() === lookupName);
+      if(!result) throw new Error('Unknown color from Dice Worker: ' + resultName);
 
-    for(let i=0;i<n;i++){
-      const result = resolvedColors[i];
       dice[i].classList.remove('lb-battle-rolling');
       dice[i].style.backgroundColor=result.color;
       for(let j=0;j<activePlayers;j++){
