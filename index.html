@@ -466,27 +466,31 @@ width:52px;height:52px;border-radius:50%;object-fit:cover;
 }
 .stream-btn:hover{background:#3a3a3a;}
 
-/* Top Streamer LIVE indicator — overlays the existing card without changing its layout */
+/* Top Streamer LIVE indicator — keeps the original card layout */
 .stream-btn{position:relative;}
 .top-streamer-live-badge{
   display:none;
   position:absolute;
-  right:8px;
-  top:50%;
-  transform:translateY(-50%);
-  z-index:2;
-  padding:5px 7px;
+  left:18px;
+  bottom:7px;
+  z-index:5;
+  padding:3px 7px 4px;
   border-radius:7px;
-  background:#e53935;
+  background:#ff304f;
   color:#fff;
+  border:2px solid #fff;
   font-size:10px;
   font-weight:900;
   line-height:1;
-  letter-spacing:.4px;
+  letter-spacing:.1px;
   white-space:nowrap;
   pointer-events:none;
+  box-shadow:0 1px 5px rgba(0,0,0,.45);
 }
 .top-streamer-card-live .top-streamer-live-badge{display:inline-flex;}
+.top-streamer-card-live img{
+  box-shadow:0 0 0 3px #ff304f, 0 0 0 5px rgba(255,48,79,.28);
+}
 
 
 
