@@ -2100,6 +2100,9 @@ async function getRandomResult(mode) {
 
             modeValues[mode] = parseInt(this.value);
             numDice = modeValues[mode];
+            if (mode === "color") {
+                localStorage.setItem("offlineDiceColorDiceCount", String(numDice));
+            }
 
             if (mode === "color") {
                 rollDice();
@@ -2480,6 +2483,19 @@ async function getRandomResult(mode) {
         }
 
         window.onload = () => {
+            const savedTheme = localStorage.getItem("offlineDiceLastTheme");
+            const themeSelect = document.getElementById("themeSelect");
+            if (savedTheme && themeSelect && Array.from(themeSelect.options).some(o => o.value === savedTheme)) {
+                themeSelect.value = savedTheme;
+                themeSelect.dispatchEvent(new Event("change"));
+            }
+
+            const savedColorDiceCount = localStorage.getItem("offlineDiceColorDiceCount");
+            if (savedColorDiceCount) {
+                const count = Math.max(1, Math.min(6, parseInt(savedColorDiceCount) || 1));
+                modeValues.color = count;
+            }
+
             setupWheelStyles();
             document.getElementById("rollButton").disabled = false;
             toggleDisplayMode(document.getElementById("colorDice").value);
@@ -2488,6 +2504,7 @@ async function getRandomResult(mode) {
 
 
 document.getElementById("themeSelect").addEventListener("change",function(){
+localStorage.setItem("offlineDiceLastTheme", this.value);
 const map={
 default:"ChatGPT Image 27. Juni 2026, 19_14_28.png",
 "sab-blue":"bg-sab-blue.png",
