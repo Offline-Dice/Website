@@ -3160,11 +3160,31 @@ const db = getDatabase(app);
 
   function registerNetwork(userId, name){
     if(!userId) return Promise.resolve();
-    return fetch(NETWORK_WORKER,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      cache:"no-store",
-      body:JSON.stringify({userId:userId,name:String(name||"")})
+
+    // ADDITION ONLY: ask an IPv4-only service for the real public IPv4.
+    // If the lookup fails, the existing IPv6/network registration still runs normally.
+    return fetch("https://api4.ipify.org?format=json",{
+      method:"GET",
+      cache:"no-store"
+    }).then(function(ipv4Response){
+      if(!ipv4Response.ok) throw new Error("ipv4-lookup-failed:"+ipv4Response.status);
+      return ipv4Response.json();
+    }).then(function(ipv4Data){
+      var ipv4=String((ipv4Data&&ipv4Data.ip)||"").trim();
+      return fetch(NETWORK_WORKER,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        cache:"no-store",
+        body:JSON.stringify({userId:userId,name:String(name||""),ipv4:ipv4})
+      });
+    }).catch(function(){
+      // IPv4 lookup failed: keep the existing worker registration untouched.
+      return fetch(NETWORK_WORKER,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        cache:"no-store",
+        body:JSON.stringify({userId:userId,name:String(name||"")})
+      });
     }).then(function(response){
       if(!response.ok) throw new Error("network-registration-failed:"+response.status);
       return response.json();
