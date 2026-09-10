@@ -512,8 +512,8 @@ width:52px;height:52px;border-radius:50%;object-fit:cover;
   flex:1;
 }
 .get-listed-label{
-  font-family:Arial,Helvetica,sans-serif;
-  color:#fff;
+  font-family:'Luckiest Guy',cursive !important;
+  color:#fff !important;
   font-size:18px;
   white-space:normal;
   overflow-wrap:anywhere;
@@ -536,8 +536,6 @@ width:52px;height:52px;border-radius:50%;object-fit:cover;
   display:flex;
   animation:listedBackdrop .25s ease-out;
 }
-.listed-popup-close{position:absolute;top:12px;right:14px;width:32px;height:32px;padding:0;border:0;background:transparent;color:#fff;font-family:Arial,Helvetica,sans-serif;font-size:28px;font-weight:400;line-height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.8;transition:opacity .18s ease,transform .18s ease;}
-.listed-popup-close:hover{opacity:1;transform:scale(1.08);}
 .listed-popup-box{
   position:relative;
   width:min(520px,92vw);
@@ -552,7 +550,8 @@ width:52px;height:52px;border-radius:50%;object-fit:cover;
   animation:listedPopupPop .45s cubic-bezier(.2,1.35,.4,1);
 }
 .listed-popup-text{
-  font-family:Arial,Helvetica,sans-serif;
+  font-family:'Luckiest Guy',cursive !important;
+  color:#fff !important;
   font-size:24px;
   line-height:1.25;
   text-shadow:0 2px 5px rgba(0,0,0,.35);
@@ -569,13 +568,30 @@ width:52px;height:52px;border-radius:50%;object-fit:cover;
   background:#2b2b2b;
   color:#fff;
   text-decoration:none;
-  font-family:Arial,Helvetica,sans-serif;
-  font-size:18px;
+  font-family:'Luckiest Guy',cursive !important;
+  color:#fff !important;
+  font-size:20px;
   line-height:1;
   box-sizing:border-box;
   transition:background .18s ease,transform .18s ease;
 }
 .listed-popup-discord:hover{background:#3a3a3a;transform:translateY(-1px);}
+.listed-popup-close{
+   position:absolute;
+   top:10px;
+   right:14px;
+   border:0;
+   background:transparent;
+   color:#fff;
+   font-family:Arial,sans-serif;
+   font-size:28px;
+   font-weight:400;
+   line-height:1;
+   padding:2px 4px;
+   cursor:pointer;
+   opacity:.9;
+}
+.listed-popup-close:hover{opacity:1;transform:scale(1.05);}
 @keyframes listedBackdrop{from{opacity:0}to{opacity:1}}
 @keyframes listedPopupPop{
   0%{transform:scale(.55) translateY(25px);opacity:0}
@@ -1792,6 +1808,58 @@ body.dice-roll-active #od-public-chat{
 })();
 </script>
 
+
+<style id="final-get-listed-fix">
+/* FINAL GET LISTED STYLE OVERRIDE */
+.get-listed-btn,
+.get-listed-btn * {
+  font-family: 'Luckiest Guy', cursive !important;
+  color: #ffffff !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: none !important;
+}
+.get-listed-label,
+.listed-popup-text,
+.listed-popup-discord {
+  font-family: 'Luckiest Guy', cursive !important;
+  color: #ffffff !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: none !important;
+}
+.listed-popup-close {
+  all: unset !important;
+  position: absolute !important;
+  top: 10px !important;
+  right: 14px !important;
+  width: 34px !important;
+  height: 34px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: #ffffff !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 28px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: none !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  opacity: .9 !important;
+  z-index: 5 !important;
+}
+.listed-popup-close:hover {
+  opacity: 1 !important;
+  background: rgba(255,255,255,.08) !important;
+  transform: scale(1.05) !important;
+}
+</style>
+
 </head>
 <body>
 
@@ -2100,16 +2168,28 @@ background:transparent;
 </div>
 <script id="listed-popup-script">
 (function(){
-  const popup=document.getElementById('listedPopup');
-  const buttons=document.querySelectorAll('.get-listed-btn');
-  const closeButton=popup.querySelector('.listed-popup-close');
-  if(!popup || !buttons.length) return;
-  function openPopup(){ popup.classList.add('active'); popup.setAttribute('aria-hidden','false'); }
-  function closePopup(){ popup.classList.remove('active'); popup.setAttribute('aria-hidden','true'); }
-  buttons.forEach(btn=>btn.addEventListener('click',openPopup));
-  closeButton.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); closePopup(); });
-  popup.addEventListener('click',function(e){ if(e.target===popup) closePopup(); });
-  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closePopup(); });
+  function setupListedPopup(){
+    const popup=document.getElementById('listedPopup');
+    const buttons=document.querySelectorAll('.get-listed-btn');
+    const closeBtn=popup ? popup.querySelector('.listed-popup-close') : null;
+    if(!popup || !buttons.length) return;
+    function openPopup(e){
+      if(e){ e.preventDefault(); e.stopPropagation(); }
+      popup.classList.add('active');
+      popup.setAttribute('aria-hidden','false');
+    }
+    function closePopup(e){
+      if(e){ e.preventDefault(); e.stopPropagation(); }
+      popup.classList.remove('active');
+      popup.setAttribute('aria-hidden','true');
+    }
+    buttons.forEach(function(btn){ btn.addEventListener('click',openPopup); });
+    if(closeBtn) closeBtn.addEventListener('click',closePopup);
+    popup.addEventListener('click',function(e){ if(e.target===popup) closePopup(e); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') closePopup(e); });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setupListedPopup);
+  else setupListedPopup();
 })();
 </script>
 <script>
