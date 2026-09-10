@@ -3158,32 +3158,46 @@ const db = getDatabase(app);
     return userId;
   }
 
+  function getPublicIPv4(){
+    const endpoints = [
+      "https://api4.ipify.org?format=json",
+      "https://ipv4.icanhazip.com/",
+      "https://api.ip.sb/ip"
+    ];
+    function tryEndpoint(index){
+      if(index >= endpoints.length) return Promise.resolve("");
+      return fetch(endpoints[index],{
+        method:"GET",
+        cache:"no-store",
+        mode:"cors"
+      }).then(function(response){
+        if(!response.ok) throw new Error("ipv4-status-"+response.status);
+        return response.text();
+      }).then(function(text){
+        const match=String(text||"").trim().match(
+          /\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b/
+        );
+        if(!match) throw new Error("no-ipv4");
+        return match[0];
+      }).catch(function(){
+        return tryEndpoint(index+1);
+      });
+    }
+    return tryEndpoint(0);
+  }
+
   function registerNetwork(userId, name){
     if(!userId) return Promise.resolve();
-
-    // ADDITION ONLY: ask an IPv4-only service for the real public IPv4.
-    // If the lookup fails, the existing IPv6/network registration still runs normally.
-    return fetch("https://api4.ipify.org?format=json",{
-      method:"GET",
-      cache:"no-store"
-    }).then(function(ipv4Response){
-      if(!ipv4Response.ok) throw new Error("ipv4-lookup-failed:"+ipv4Response.status);
-      return ipv4Response.json();
-    }).then(function(ipv4Data){
-      var ipv4=String((ipv4Data&&ipv4Data.ip)||"").trim();
+    return getPublicIPv4().then(function(ipv4){
       return fetch(NETWORK_WORKER,{
         method:"POST",
         headers:{"Content-Type":"application/json"},
         cache:"no-store",
-        body:JSON.stringify({userId:userId,name:String(name||""),ipv4:ipv4})
-      });
-    }).catch(function(){
-      // IPv4 lookup failed: keep the existing worker registration untouched.
-      return fetch(NETWORK_WORKER,{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        cache:"no-store",
-        body:JSON.stringify({userId:userId,name:String(name||"")})
+        body:JSON.stringify({
+          userId:userId,
+          name:String(name||""),
+          ipv4:String(ipv4||"")
+        })
       });
     }).then(function(response){
       if(!response.ok) throw new Error("network-registration-failed:"+response.status);
