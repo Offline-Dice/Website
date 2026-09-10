@@ -513,6 +513,7 @@ width:52px;height:52px;border-radius:50%;object-fit:cover;
 }
 .get-listed-label{
   font-family:'Luckiest Guy',cursive;
+  color:#fff;
   font-size:18px;
   white-space:normal;
   overflow-wrap:anywhere;
@@ -535,7 +536,10 @@ width:52px;height:52px;border-radius:50%;object-fit:cover;
   display:flex;
   animation:listedBackdrop .25s ease-out;
 }
+.listed-popup-close{position:absolute;top:10px;right:12px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:#fff;font-size:25px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .18s ease,transform .18s ease;}
+.listed-popup-close:hover{background:rgba(255,255,255,.18);transform:scale(1.06);}
 .listed-popup-box{
+  position:relative;
   width:min(520px,92vw);
   padding:30px 28px 26px;
   box-sizing:border-box;
@@ -2089,6 +2093,7 @@ background:transparent;
 </div>
 <div id="listedPopup" aria-hidden="true">
   <div class="listed-popup-box" role="dialog" aria-modal="true" aria-label="Get Listed Here">
+    <button type="button" class="listed-popup-close" aria-label="Close">×</button>
     <div class="listed-popup-text">If you want to be a top streamer or a VIP, join our Discord and open a ticket.</div>
     <a class="listed-popup-discord" href="https://discord.com/invite/GtsH5jpSUn" target="_blank" rel="noopener noreferrer">Join our Dc</a>
   </div>
@@ -2097,6 +2102,7 @@ background:transparent;
 (function(){
   const popup=document.getElementById('listedPopup');
   const buttons=document.querySelectorAll('.get-listed-btn');
+  const closeButton=popup.querySelector('.listed-popup-close');
   if(!popup || !buttons.length) return;
   function openPopup(){ popup.classList.add('active'); popup.setAttribute('aria-hidden','false'); }
   function closePopup(){ popup.classList.remove('active'); popup.setAttribute('aria-hidden','true'); }
