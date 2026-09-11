@@ -220,6 +220,30 @@ button:active{transform:translateY(1px) scale(.99)}
 #secureAdminAuthStatus{min-height:20px;margin-top:12px;font-size:13px;color:#ff9aa4}
 body.secureAdminLocked>*:not(#secureAdminGate){visibility:hidden!important}
 </style>
+
+<style id="chat-blocked-words-admin-css">
+#chatBlockedWordsAdmin{max-width:900px;margin:25px auto;text-align:left}
+#chatBlockedWordsAdmin .blocked-words-box{
+  display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start
+}
+#chatBlockedWordsInput{
+  flex:1;min-width:280px;min-height:110px;resize:vertical;
+  padding:12px;border-radius:12px;box-sizing:border-box;
+}
+#chatBlockedWordsSave{
+  margin-top:0!important;padding:12px 16px!important;background:#b30000;color:#fff;font-weight:900
+}
+#chatBlockedWordsList{margin-top:14px}
+.chat-blocked-word-row{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:10px 14px;margin-top:8px;background:rgba(255,255,255,.045);
+  border:1px solid var(--ad-border);border-radius:12px
+}
+.chat-blocked-word-delete{
+  margin:0!important;padding:8px 11px!important;background:#b30000;color:#fff;font-weight:800
+}
+#chatBlockedWordsStatus{margin-top:10px;font-size:13px;opacity:.75}
+</style>
 </head>
 <body>
 <div id="secureAdminGate">
@@ -242,6 +266,7 @@ body.secureAdminLocked>*:not(#secureAdminGate){visibility:hidden!important}
   <a href="#registeredUsersAdmin">Users</a>
   <a href="#vipRoomAdmin">VIP Room</a>
   <a href="#chatAdmin">Chat</a>
+  <a href="#chatBlockedWordsAdmin">Gesperrte Wörter</a>
   <a href="#chatRoleAdmin">Roles</a>
 </nav>
 <div id="adminDashboard">
@@ -998,6 +1023,119 @@ refreshHistory();
 })();
 </script>
 
+
+<hr style="margin:30px 0">
+<section id="chatBlockedWordsAdmin">
+  <h2>🚫 Gesperrte Chat-Wörter</h2>
+  <p style="opacity:.75">
+    Ein Wort oder eine Wortgruppe pro Zeile. Groß-/Kleinschreibung wird ignoriert.
+    Gesperrte Nachrichten werden auf Offline Dice nicht gesendet.
+  </p>
+  <div class="blocked-words-box">
+    <textarea id="chatBlockedWordsInput" placeholder="z. B.
+werbung
+discord.gg/
+schimpfwort"></textarea>
+    <button id="chatBlockedWordsSave" type="button">💾 Wörter speichern</button>
+  </div>
+  <div id="chatBlockedWordsStatus"></div>
+  <div id="chatBlockedWordsList"></div>
+</section>
+
+<script id="chat-blocked-words-admin-js">
+(function(){
+  const input=document.getElementById("chatBlockedWordsInput");
+  const save=document.getElementById("chatBlockedWordsSave");
+  const list=document.getElementById("chatBlockedWordsList");
+  const status=document.getElementById("chatBlockedWordsStatus");
+  const path="chatBlockedWords";
+
+  function normalize(v){
+    return String(v||"").trim().replace(/\s+/g," ").toLocaleLowerCase("de-DE");
+  }
+
+  function escapeHtml(v){
+    return String(v==null?"":v).replace(/[&<>"']/g,function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c];
+    });
+  }
+
+  function setStatus(t){
+    if(status) status.textContent=t;
+  }
+
+  function render(data){
+    if(!list)return;
+    list.innerHTML="";
+    const words=Object.entries(data||{})
+      .map(function(pair){return {key:pair[0],word:normalize(pair[1])};})
+      .filter(function(x){return x.word;})
+      .sort(function(a,b){return a.word.localeCompare(b.word,"de",{sensitivity:"base"});});
+
+    if(!words.length){
+      list.innerHTML='<div style="opacity:.6;padding:12px 0">Noch keine Wörter gesperrt.</div>';
+      return;
+    }
+
+    words.forEach(function(item){
+      const row=document.createElement("div");
+      row.className="chat-blocked-word-row";
+      row.innerHTML='<div>🚫 <strong>'+escapeHtml(item.word)+'</strong></div>';
+      const del=document.createElement("button");
+      del.className="chat-blocked-word-delete";
+      del.type="button";
+      del.textContent="🗑️ Entfernen";
+      del.onclick=function(){
+        if(!confirm('"' + item.word + '" wirklich entsperren?')) return;
+        db.ref(path+"/"+item.key).remove()
+          .then(function(){setStatus("✅ Wort entfernt.");})
+          .catch(function(e){setStatus("❌ Fehler: "+e.message);});
+      };
+      row.appendChild(del);
+      list.appendChild(row);
+    });
+  }
+
+  if(save){
+    save.addEventListener("click",function(){
+      const words=[...new Set(
+        String(input.value||"").split(/\r?\n/)
+          .map(normalize).filter(Boolean)
+      )];
+
+      if(!words.length){
+        setStatus("❌ Bitte mindestens ein Wort eingeben.");
+        return;
+      }
+
+      const updates={};
+      words.forEach(function(word){
+        const key=encodeURIComponent(word).replace(/\./g,"%2E");
+        updates[key]=word;
+      });
+
+      save.disabled=true;
+      setStatus("⏳ Speichere...");
+      db.ref(path).update(updates)
+        .then(function(){
+          input.value="";
+          setStatus("✅ Gesperrte Wörter gespeichert.");
+        })
+        .catch(function(e){
+          setStatus("❌ Fehler: "+e.message);
+        })
+        .finally(function(){
+          save.disabled=false;
+        });
+    });
+  }
+
+  if(typeof db!=="undefined"){
+    db.ref(path).on("value",function(snap){render(snap.val()||{});},
+      function(e){setStatus("❌ Firebase: "+e.message);});
+  }
+})();
+</script>
 
 <hr style="margin:30px 0">
 <section id="chatRoleAdmin">
