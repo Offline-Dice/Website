@@ -656,39 +656,69 @@ width:52px;height:52px;border-radius:50%;object-fit:cover;
    .announcements-link{
   position:fixed !important;
   right:185px !important;
-  bottom:9px !important;
+  bottom:7px !important;
   z-index:2147483646 !important;
-  display:block !important;
-  width:120px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:126px !important;
+  min-height:42px;
   margin:0 !important;
-  padding:6px 8px;
+  padding:4px 8px 5px;
   box-sizing:border-box;
   text-align:center;
-  background:rgba(20,20,20,.72);
+  background:rgba(255,255,255,.12);
   color:#fff;
   font-family:'Luckiest Guy',cursive;
   font-size:13px;
-  letter-spacing:.2px;
-  border:1px solid rgba(255,255,255,.28);
-  border-radius:7px;
+  line-height:1.05;
+  letter-spacing:.1px;
+  border:1px solid rgba(255,255,255,.55);
+  border-radius:8px;
   text-decoration:none;
-  box-shadow:0 3px 9px rgba(0,0,0,.28);
+  box-shadow:0 3px 10px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.2);
   -webkit-text-stroke:0;
-  text-shadow:0 1px 2px rgba(0,0,0,.3);
-  backdrop-filter:blur(5px);
-  -webkit-backdrop-filter:blur(5px);
+  text-shadow:0 1px 2px rgba(0,0,0,.55);
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
   overflow:hidden;
   transition:transform .15s ease,background .15s ease;
 }
-.announcements-link::before{
-  content:"";
-  display:none;
-}
 .announcements-link:hover{
   transform:translateY(-1px);
-  background:rgba(35,35,35,.82);
-  box-shadow:0 4px 11px rgba(0,0,0,.32);
+  background:rgba(255,255,255,.17);
 }
+.announcements-link:active{
+  transform:translateY(0);
+}
+
+@media(max-width:600px){
+  .announcements-link{
+    right:165px !important;
+    bottom:6px !important;
+    width:112px !important;
+    min-height:38px;
+    font-size:12px;
+    padding:3px 6px 4px;
+  }
+}
+
+.announcements-link:hover::before{left:135%;}
+.announcements-link:active{
+  transform:translateY(0);
+}
+
+@media(max-width:600px){
+  .announcements-link{
+    right:165px !important;
+    bottom:6px !important;
+    width:112px !important;
+    font-size:12px;
+    padding:5px 6px;
+  }
+}
+
 .announcements-link:hover::before{display:none;}
 .announcements-link:active{
   transform:translateY(0);
