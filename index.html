@@ -873,17 +873,23 @@ width:52px;height:52px;border-radius:50%;object-fit:cover;
 <style id="last20RollsStyle">
 .last20-rolls{
   width:90%;
-  max-width:780px;
-  margin:14px auto 20px;
-  padding:18px;
+  max-width:700px;
+  margin:20px auto;
+  padding:20px 20px;
   box-sizing:border-box;
   color:#fff;
-  background:rgba(18,18,18,.72);
-  border:1px solid rgba(255,255,255,.28);
-  border-radius:16px;
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  background-color:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:25px;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  justify-content:center;
+  position:relative;
+  z-index:2;
 }
 .last20-title{
   text-align:center;
@@ -2254,15 +2260,6 @@ background:transparent;
 </div>
 </div>
 
-<div id="last20Rolls" class="last20-rolls">
-  <div class="last20-title">LAST 20 ROLLS</div>
-  <div class="last20-label">STATS</div>
-  <div id="last20Stats" class="last20-stats"></div>
-  <div id="last20Streak" class="last20-streak" style="display:none;"></div>
-  <div id="last20Current"></div>
-  <div class="last20-label" style="margin-top:16px;">PREVIOUS ROLLS</div>
-  <div id="last20Previous"></div>
-</div>
 <div class="side-box">
 <div class="side-content">
 <div class="top-streamer-title">Top Streamer</div>
@@ -2296,6 +2293,16 @@ background:transparent;
 </div>
 </div>
 </div>
+<div id="last20Rolls" class="last20-rolls">
+  <div class="last20-title">LAST 20 ROLLS</div>
+  <div class="last20-label">STATS</div>
+  <div id="last20Stats" class="last20-stats"></div>
+  <div id="last20Streak" class="last20-streak" style="display:none;"></div>
+  <div id="last20Current"></div>
+  <div class="last20-label" style="margin-top:16px;">PREVIOUS ROLLS</div>
+  <div id="last20Previous"></div>
+</div>
+
 <div id="listedPopup" aria-hidden="true">
   <div class="listed-popup-box" role="dialog" aria-modal="true" aria-label="Get Listed Here">
     <button type="button" class="listed-popup-close" aria-label="Close">×</button>
@@ -3943,16 +3950,7 @@ window.addEventListener("load", initAntiBan);
 
 
 <a class="announcements-link" href="Announcements.html">📢 Announcements</a>
-<div class="last5panel"><div class="last5title">LAST 5 SPINS</div><div id="last5"></div></div><script>window.__hist=[];function __render(){const c=document.getElementById('last5');if(!c)return;c.innerHTML='';__hist.forEach((s,i)=>{const r=document.createElement('div');r.className='last5row';const n=document.createElement('span');n.style.cssText='color:#fff;font-family:Luckiest Guy,cursive;font-size:18px;min-width:18px;text-align:center';n.textContent=(i+1)+'.';r.appendChild(n);s.forEach(col=>{const d=document.createElement('div');d.className='last5cell';d.style.background=col;r.appendChild(d)});c.appendChild(r);});}function addSpinHistory(cols){__hist.unshift(cols.slice());__hist=__hist.slice(0,5);__render();}</script>
-<script>
-document.addEventListener('DOMContentLoaded',()=>{
- const p=document.querySelector('.last5panel');
- const b=document.getElementById('last5Toggle');
- if(!p||!b) return;
- p.classList.remove('show');
- b.onclick=()=>{p.classList.toggle('show');};
-});
-</script>
+
 
 
 
