@@ -750,23 +750,6 @@ width:52px;height:52px;border-radius:50%;object-fit:cover;
    }
  }
 
-#last5Toggle{
-position:fixed;
-left:15px;
-bottom:15px;
-width:auto;
-padding:8px 14px;
-font-size:14px;
-font-family:'Luckiest Guy',cursive;
-background:linear-gradient(#49a9ff,#0d57c8);
-color:#fff;
-border:2px solid #7cc8ff;
-border-radius:10px;
-cursor:pointer;
-z-index:10001;
-box-shadow:0 4px 10px rgba(0,0,0,.3);
-}
-
 
 /* Clean upward coin flip animation — only used by Coinflip */
 .coin {
@@ -885,9 +868,78 @@ box-shadow:0 4px 10px rgba(0,0,0,.3);
 .stream-btn span{font-family:'Luckiest Guy',cursive;font-size:18px;white-space:normal;overflow-wrap:anywhere;flex:1;line-height:1.1;font-weight:normal;}
 </style>
 
-<style>
-.last5panel{position:fixed;left:15px;bottom:68px;top:auto;width:220px;background:linear-gradient(180deg,#47b3ff,#0066cc);backdrop-filter:blur(10px);border:3px solid #7cc8ff;border-radius:18px;padding:12px;z-index:9999;opacity:0;visibility:hidden;transform:translateY(14px) scale(.96);transform-origin:bottom left;transition:opacity .22s ease,transform .22s ease,visibility .22s ease}.last5panel.show{opacity:1;visibility:visible;transform:translateY(0) scale(1)}.last5title{text-align:center;color:#fff;font-family:Luckiest Guy,cursive;font-size:22px;margin-bottom:10px}.last5row{display:flex;gap:6px;justify-content:center;margin:8px 0}.last5cell{width:22px;height:22px;border-radius:7px;border:2px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,.4)}</style>
 
+
+<style id="last20RollsStyle">
+.last20-rolls{
+  width:90%;
+  max-width:780px;
+  margin:14px auto 20px;
+  padding:18px;
+  box-sizing:border-box;
+  color:#fff;
+  background:rgba(18,18,18,.72);
+  border:1px solid rgba(255,255,255,.28);
+  border-radius:16px;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+}
+.last20-title{
+  text-align:center;
+  color:#fff;
+  font-family:'Luckiest Guy',cursive;
+  font-size:24px;
+  letter-spacing:.5px;
+  margin:0 0 16px;
+}
+.last20-label{
+  color:#aaa;
+  font-family:'Luckiest Guy',cursive;
+  font-size:13px;
+  letter-spacing:1px;
+  margin:0 0 8px;
+}
+.last20-stats{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  padding-bottom:16px;
+  border-bottom:1px dashed rgba(255,255,255,.18);
+}
+.last20-stat{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:7px 11px;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:10px;
+  background:rgba(255,255,255,.035);
+  font-weight:700;
+  font-size:14px;
+}
+.last20-dot{width:14px;height:14px;border-radius:4px;border:2px solid #fff;box-sizing:border-box;display:inline-block}
+.last20-streak{margin-top:14px;padding:7px 11px;border:1px solid rgba(255,255,255,.22);border-radius:10px;display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:14px}
+.last20-roll{
+  margin-top:12px;
+  padding:10px 12px;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:13px;
+  background:rgba(0,0,0,.16);
+}
+.last20-roll.current{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.45)}
+.last20-roll-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.last20-roll-name{color:#aaa;font-size:13px;font-weight:700}
+.last20-roll-id{color:#aaa;font-size:12px;text-align:right;white-space:nowrap}
+.last20-dice{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.last20-die{width:26px;height:26px;border-radius:7px;border:2px solid #fff;box-sizing:border-box;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+@media(max-width:600px){
+  .last20-rolls{width:94%;padding:13px}
+  .last20-title{font-size:21px}
+  .last20-roll-head{align-items:flex-start;flex-direction:column;gap:3px}
+  .last20-roll-id{text-align:left}
+}
+</style>
 <style id="miniCounterStyle">
 .mini-counter{
   width:100%;
@@ -1950,8 +2002,6 @@ body.dice-roll-active #od-public-chat{
   </div>
 </div>
 
-<button id="last5Toggle">LAST 5 SPINS</button>
-
 <div id="announcementBox" style="display:none;"><div id="announcementTitle">📢 Announcement</div><div id="announcementText"></div></div>
 <h1 class="hidden-h1">ROLL COLOR DICE 🎲 — Online Color Dice and Wheel Game</h1>
 <p class="intro">
@@ -2038,6 +2088,16 @@ body.dice-roll-active #od-public-chat{
 </select>
 </div>
 <div class="dice-result" id="diceResultArea"></div>
+
+<div id="last20Rolls" class="last20-rolls">
+  <div class="last20-title">LAST 20 ROLLS</div>
+  <div class="last20-label">STATS</div>
+  <div id="last20Stats" class="last20-stats"></div>
+  <div id="last20Streak" class="last20-streak" style="display:none;"></div>
+  <div id="last20Current"></div>
+  <div class="last20-label" style="margin-top:16px;">PREVIOUS ROLLS</div>
+  <div id="last20Previous"></div>
+</div>
 
 <div id="lbWinnerOverlay" aria-hidden="true">
   <div class="lb-winner-box">
@@ -2562,7 +2622,8 @@ async function getRandomResult(mode) {
                 colors: window.provablyFair.lastColors
             });
 
-            setTimeout(() => addSpinHistory(verifyColors), 5000);
+            const historyVerifyCode = window.provablyFair.lastVerify;
+             setTimeout(() => addSpinHistory(verifyColors, historyVerifyCode), 5000);
             const vc = document.getElementById("verifyCodeDisplay");
             if (vc) vc.textContent = window.provablyFair.lastVerify;
         }
@@ -5502,5 +5563,91 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 })();
 </script>
 
+
+<script>
+(function(){
+  const history=[];
+  const colorMap={
+    red:'#ef4444', orange:'#f59e0b', gold:'#facc15', green:'#3baa35', blue:'#3b5bea', purple:'#9c27b0'
+  };
+  const labels={red:'Red',orange:'Orange',gold:'Yellow',green:'Green',blue:'Blue',purple:'Purple'};
+
+  function die(color){
+    const d=document.createElement('span');
+    d.className='last20-die';
+    d.style.background=colorMap[color] || color;
+    return d;
+  }
+
+  function makeRoll(item,index,current){
+    const box=document.createElement('div');
+    box.className='last20-roll'+(current?' current':'');
+    const head=document.createElement('div');
+    head.className='last20-roll-head';
+    const name=document.createElement('div');
+    name.className='last20-roll-name';
+    name.textContent=current?'THIS ROLL':String(index+2);
+    const id=document.createElement('div');
+    id.className='last20-roll-id';
+    id.textContent=item.code || 'Verify code unavailable';
+    head.append(name,id);
+    const dice=document.createElement('div');
+    dice.className='last20-dice';
+    (item.colors||[]).forEach(c=>dice.appendChild(die(String(c).toLowerCase())));
+    box.append(head,dice);
+    return box;
+  }
+
+  function render(){
+    const stats=document.getElementById('last20Stats');
+    const streak=document.getElementById('last20Streak');
+    const current=document.getElementById('last20Current');
+    const previous=document.getElementById('last20Previous');
+    if(!stats||!streak||!current||!previous)return;
+    stats.innerHTML='';
+    current.innerHTML='';
+    previous.innerHTML='';
+
+    const counts={red:0,orange:0,gold:0,green:0,blue:0,purple:0};
+    let longestColor=null,longest=0,runColor=null,run=0;
+    const flat=[];
+    history.forEach(item=>(item.colors||[]).forEach(c=>flat.push(String(c).toLowerCase())));
+    flat.forEach(c=>{
+      if(counts[c]!==undefined)counts[c]++;
+      if(c===runColor)run++;else{runColor=c;run=1;}
+      if(run>longest){longest=run;longestColor=c;}
+    });
+    Object.keys(counts).forEach(c=>{
+      const stat=document.createElement('div');
+      stat.className='last20-stat';
+      const dot=document.createElement('span');
+      dot.className='last20-dot';
+      dot.style.background=colorMap[c];
+      stat.append(dot,document.createTextNode('× '+counts[c]));
+      stats.appendChild(stat);
+    });
+    if(longest){
+      streak.style.display='inline-flex';
+      streak.innerHTML='';
+      const dot=document.createElement('span');
+      dot.className='last20-dot';
+      dot.style.background=colorMap[longestColor] || longestColor;
+      streak.append(dot,document.createTextNode(' '+(labels[longestColor]||longestColor)+' × '+longest));
+    }else streak.style.display='none';
+
+    if(history.length){
+      current.appendChild(makeRoll(history[0],0,true));
+      history.slice(1).forEach((item,i)=>previous.appendChild(makeRoll(item,i,false)));
+    }
+  }
+
+  window.addSpinHistory=function(colors,code){
+    history.unshift({colors:Array.isArray(colors)?colors.slice():[],code:code||''});
+    if(history.length>20)history.length=20;
+    render();
+  };
+  render();
+})();
+</script>
 </body>
 </html>
