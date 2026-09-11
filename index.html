@@ -10,7 +10,16 @@
   var h=(location.hostname||"").toLowerCase().replace(/\.$/,"");
   var ok=(location.protocol==="https:"||location.protocol==="http:")&&(h===H||h===W)&&window.top===window.self;
   if(!ok){
-    document.documentElement.innerHTML='<meta charset="utf-8"><title>Offline Dice</title><style>html,body{margin:0;min-height:100%;background:#080b12;color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center}main{text-align:center;padding:32px}h1{margin:0 0 10px}</style><main><h1>Offline Dice</h1><p>This copy is not authorized to run.</p></main>';
+    document.documentElement.innerHTML='<meta charset="utf-8"><title>Offline Dice</title><style>html,body{margin:0;min-height:100%;background:#080b12;color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center}main{text-align:center;padding:32px}h1{margin:0 0 10px}
+@media (max-width:600px){
+    .announcements-link{
+        right:145px !important;
+        min-width:102px;
+        padding:5px 8px;
+        font-size:13px;
+    }
+}
+</style><main><h1>Offline Dice</h1><p>This copy is not authorized to run.</p></main>';
     throw new Error("OD_PROTECTION_A");
   }
   Object.defineProperty(window,"__OD_A",{value:"production",writable:false,configurable:false});
@@ -654,30 +663,41 @@ width:52px;height:52px;border-radius:50%;object-fit:cover;
 
 
    .announcements-link{
- position:fixed;
- right:150px;
- bottom:15px;
- z-index:2147483646;
- display:block;
- width:150px;
- margin:0;
- padding:7px 10px;
- box-sizing:border-box;
- text-align:center;
- background:linear-gradient(135deg,#fff08a 0%,#ffd21c 48%,#ffb900 100%);
- color:#fff;
- font-family:'Luckiest Guy',cursive;
- font-size:17px;
- letter-spacing:.3px;
- border:2px solid rgba(255,255,255,.95);
- border-radius:10px;
- text-decoration:none;
- box-shadow:0 7px 18px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.7);
- -webkit-text-stroke:1px #b87900;
- text-shadow:0 2px 3px rgba(100,60,0,.25);
- overflow:hidden;
- transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;
- }
+    position:fixed !important;
+    right:155px !important;
+    bottom:15px !important;
+    z-index:2147483646 !important;
+    display:flex !important;
+    align-items:center;
+    justify-content:center;
+    width:auto !important;
+    min-width:112px;
+    max-width:none !important;
+    margin:0 !important;
+    padding:6px 10px;
+    box-sizing:border-box;
+    background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.28);
+    border-radius:8px;
+    color:#fff;
+    font-family:'Luckiest Guy',cursive;
+    font-size:14px;
+    line-height:1;
+    text-align:center;
+    text-decoration:none;
+    box-shadow:0 3px 10px rgba(0,0,0,.22);
+    -webkit-text-stroke:0;
+    text-shadow:0 1px 2px rgba(0,0,0,.3);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    transition:transform .18s ease, background .18s ease, box-shadow .18s ease;
+}
+.announcements-link:hover{
+    transform:translateY(-1px);
+    background:rgba(255,255,255,.16);
+    box-shadow:0 5px 12px rgba(0,0,0,.25);
+}
+
  .announcements-link::before{
  content:"";
  position:absolute;
