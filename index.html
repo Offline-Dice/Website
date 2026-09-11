@@ -925,7 +925,6 @@ width:52px;height:52px;border-radius:50%;object-fit:cover;
   font-size:14px;
 }
 .last20-dot{width:14px;height:14px;border-radius:4px;border:2px solid #fff;box-sizing:border-box;display:inline-block}
-.last20-streak{margin-top:14px;padding:7px 11px;border:1px solid rgba(255,255,255,.22);border-radius:10px;display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:14px}
 .last20-roll{
   margin-top:12px;
   padding:10px 12px;
@@ -2297,7 +2296,6 @@ background:transparent;
   <div class="last20-title">LAST 20 ROLLS</div>
   <div class="last20-label">STATS</div>
   <div id="last20Stats" class="last20-stats"></div>
-  <div id="last20Streak" class="last20-streak" style="display:none;"></div>
   <div id="last20Current"></div>
   <div class="last20-label" style="margin-top:16px;">PREVIOUS ROLLS</div>
   <div id="last20Previous"></div>
@@ -5568,7 +5566,6 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
   const colorMap={
     red:'#ef4444', orange:'#f59e0b', gold:'#facc15', green:'#3baa35', blue:'#3b5bea', purple:'#9c27b0'
   };
-  const labels={red:'Red',orange:'Orange',gold:'Yellow',green:'Green',blue:'Blue',purple:'Purple'};
 
   function die(color){
     const d=document.createElement('span');
@@ -5598,23 +5595,18 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 
   function render(){
     const stats=document.getElementById('last20Stats');
-    const streak=document.getElementById('last20Streak');
     const current=document.getElementById('last20Current');
     const previous=document.getElementById('last20Previous');
-    if(!stats||!streak||!current||!previous)return;
+    if(!stats||!current||!previous)return;
     stats.innerHTML='';
     current.innerHTML='';
     previous.innerHTML='';
 
     const counts={red:0,orange:0,gold:0,green:0,blue:0,purple:0};
-    let longestColor=null,longest=0,runColor=null,run=0;
-    const flat=[];
-    history.forEach(item=>(item.colors||[]).forEach(c=>flat.push(String(c).toLowerCase())));
-    flat.forEach(c=>{
+    history.forEach(item=>(item.colors||[]).forEach(c=>{
+      c=String(c).toLowerCase();
       if(counts[c]!==undefined)counts[c]++;
-      if(c===runColor)run++;else{runColor=c;run=1;}
-      if(run>longest){longest=run;longestColor=c;}
-    });
+    }));
     Object.keys(counts).forEach(c=>{
       const stat=document.createElement('div');
       stat.className='last20-stat';
@@ -5624,15 +5616,6 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
       stat.append(dot,document.createTextNode('× '+counts[c]));
       stats.appendChild(stat);
     });
-    if(longest){
-      streak.style.display='inline-flex';
-      streak.innerHTML='';
-      const dot=document.createElement('span');
-      dot.className='last20-dot';
-      dot.style.background=colorMap[longestColor] || longestColor;
-      streak.append(dot,document.createTextNode(' '+(labels[longestColor]||longestColor)+' × '+longest));
-    }else streak.style.display='none';
-
     if(history.length){
       current.appendChild(makeRoll(history[0],0,true));
       history.slice(1).forEach((item,i)=>previous.appendChild(makeRoll(item,i,false)));
