@@ -2994,6 +2994,8 @@ const odChatConfig = {
 const odChatApp = getApps().length ? getApps()[0] : initializeApp(odChatConfig);
 const odChatDb = getDatabase(odChatApp);
 const OD_CHAT_PATH = "publicChat";
+const OD_BLOCKED_WORDS_PATH = "chatBlockedWords";
+let odBlockedWords = [];
 
 const chat = document.getElementById("od-public-chat");
 const messagesEl = document.getElementById("od-chat-messages");
@@ -3003,6 +3005,33 @@ const input = document.getElementById("od-chat-input");
 const send = document.getElementById("od-chat-send");
 const status = document.getElementById("od-chat-status");
 const closeBtn = document.getElementById("od-chat-close");
+
+function odNormalizeBlockedWord(value){
+  return String(value || "").trim().replace(/\\s+/g," ").toLocaleLowerCase("de-DE");
+}
+
+function odMessageContainsBlockedWord(message){
+  const text = String(message || "").toLocaleLowerCase("de-DE");
+  return odBlockedWords.some(word=>{
+    const w = odNormalizeBlockedWord(word);
+    if(!w) return false;
+    if(w.includes(" ")) return text.includes(w);
+    try{
+      return new RegExp("(^|[^\\p{L}\\p{N}_])" + w.replace(/[.*+?^${}()|[\\]\\\\]/g,"\\\\$&") + "($|[^\\p{L}\\p{N}_])","iu").test(text);
+    }catch{
+      return text.includes(w);
+    }
+  });
+}
+
+onValue(ref(odChatDb, OD_BLOCKED_WORDS_PATH), snap=>{
+  const data = snap.val();
+  if(Array.isArray(data)){
+    odBlockedWords = data.map(odNormalizeBlockedWord).filter(Boolean);
+  }else{
+    odBlockedWords = Object.values(data || {}).map(odNormalizeBlockedWord).filter(Boolean);
+  }
+});
 const launcher = document.getElementById("od-chat-launcher");
 launcher.addEventListener("click",()=>{ chat.classList.remove("od-chat-hidden"); input.focus(); });
 
@@ -3083,6 +3112,11 @@ form.addEventListener("submit", async e=>{
     return;
   }
   if(!text) return;
+
+  if(odMessageContainsBlockedWord(text)){
+    status.textContent="❌ Diese Nachricht enthält ein gesperrtes Wort.";
+    return;
+  }
 
   send.disabled=true;
   try{
