@@ -5568,57 +5568,5 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 
-
-<script id="offline-dice-install-handler">
-(() => {
-  let deferredInstallPrompt = null;
-  const installBtn = document.getElementById('offlineDiceInstallBtn');
-  if (!installBtn) return;
-
-  installBtn.style.border = '0';
-  installBtn.style.fontFamily = 'inherit';
-
-  const isStandalone = () =>
-    window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true;
-
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-
-  window.addEventListener('beforeinstallprompt', (event) => {
-    event.preventDefault();
-    deferredInstallPrompt = event;
-  });
-
-  installBtn.addEventListener('click', async () => {
-    if (isStandalone()) {
-      installBtn.style.display = 'none';
-      return;
-    }
-
-    if (deferredInstallPrompt) {
-      const promptEvent = deferredInstallPrompt;
-      deferredInstallPrompt = null;
-      await promptEvent.prompt();
-      try { await promptEvent.userChoice; } catch (_) {}
-      return;
-    }
-
-    if (isIOS) {
-      alert('Offline Dice installieren:\\n\\nTippe in Safari auf „Teilen“ und danach auf „Zum Home-Bildschirm“.');
-      return;
-    }
-
-    alert('Der Browser bietet die Installation gerade noch nicht an. Lade die Seite einmal neu. Falls es danach weiterhin nicht geht, öffne das Browser-Menü und wähle „App installieren“ bzw. „Zum Startbildschirm hinzufügen“.');
-  });
-
-  window.addEventListener('appinstalled', () => {
-    deferredInstallPrompt = null;
-    installBtn.style.display = 'none';
-  });
-
-  if (isStandalone()) installBtn.style.display = 'none';
-})();
-</script>
-
-</body>
+\n<script id="offline-dice-install-handler">\n(() => {\n  let deferredInstallPrompt = null;\n  const installBtn = document.getElementById('offlineDiceInstallBtn');\n  if (!installBtn) return;\n\n  const isStandalone = () =>\n    window.matchMedia('(display-mode: standalone)').matches ||\n    window.navigator.standalone === true;\n  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);\n\n  window.addEventListener('beforeinstallprompt', event => {\n    event.preventDefault();\n    deferredInstallPrompt = event;\n  });\n\n  installBtn.addEventListener('click', async () => {\n    if (isStandalone()) {\n      installBtn.style.display = 'none';\n      return;\n    }\n    if (deferredInstallPrompt) {\n      const promptEvent = deferredInstallPrompt;\n      deferredInstallPrompt = null;\n      await promptEvent.prompt();\n      try { await promptEvent.userChoice; } catch (_) {}\n      return;\n    }\n    if (isIOS) {\n      alert('Offline Dice installieren:\\n\\nTippe in Safari auf „Teilen“ und danach auf „Zum Home-Bildschirm“.');\n      return;\n    }\n    alert('Die automatische Installation ist für diesen Browser gerade nicht verfügbar. Öffne das Browser-Menü (⋮) und wähle „App installieren“ bzw. „Offline Dice installieren“.');\n  });\n\n  window.addEventListener('appinstalled', () => {\n    deferredInstallPrompt = null;\n    installBtn.style.display = 'none';\n  });\n\n  if (isStandalone()) installBtn.style.display = 'none';\n})();\n</script>\n</body>
 </html>
