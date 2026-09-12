@@ -5594,7 +5594,17 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
     const updateVisibility = () => {
-      if (isStandalone()) installBtn.style.display = "none";
+      // Hide the button permanently on this browser once the app has been installed,
+      // and also hide it whenever the page is running as the installed PWA.
+      let installed = false;
+      try { installed = localStorage.getItem("offlineDiceAppInstalled") === "1"; } catch (_) {}
+      if (installed || isStandalone()) {
+        installBtn.style.display = "none";
+        installBtn.setAttribute("aria-hidden", "true");
+      } else {
+        installBtn.style.display = "flex";
+        installBtn.removeAttribute("aria-hidden");
+      }
     };
 
     installBtn.addEventListener("click", async () => {
@@ -5625,7 +5635,11 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     window.addEventListener("offline-dice-install-ready", () => {
       installBtn.disabled = false;
     });
-    window.addEventListener("appinstalled", updateVisibility);
+    window.addEventListener("appinstalled", () => {
+      window.__offlineDiceInstallPrompt = null;
+      try { localStorage.setItem("offlineDiceAppInstalled", "1"); } catch (_) {}
+      updateVisibility();
+    });
     updateVisibility();
   }
 
