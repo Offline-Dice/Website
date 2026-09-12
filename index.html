@@ -2247,7 +2247,7 @@ background:transparent;
 <span id="nonceValue">0</span>
 </div>
 <div class="mini-counter" id="miniCounter">
-<button class="dice-counter-button" id="offlineDiceInstallBtn" type="button">📲 App installieren</button>
+<button class="dice-counter-button" id="offlineDiceInstallBtn" type="button">Install App</button>
 </div>
 <div class="color-container">
 <div class="color-info" id="colorInfo">
@@ -3690,6 +3690,59 @@ onValue(ref(db, "online"), (snapshot) => {
 });
 
 </script>
+
+<style id="offline-dice-install-clean-style">
+/* Clean Install App control: sits directly left of Anti-Ban Mode. */
+#miniCounter{
+  position:fixed !important;
+  right:145px !important;
+  bottom:15px !important;
+  width:auto !important;
+  margin:0 !important;
+  padding:0 !important;
+  z-index:2147483646 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+#miniCounter .dice-counter-button,
+#offlineDiceInstallBtn{
+  width:112px !important;
+  min-width:112px !important;
+  height:34px !important;
+  padding:0 14px !important;
+  border:1px solid rgba(255,255,255,.55) !important;
+  border-radius:9px !important;
+  background:rgba(20,20,20,.72) !important;
+  color:#fff !important;
+  font-family:Arial,sans-serif !important;
+  font-size:13px !important;
+  font-weight:700 !important;
+  letter-spacing:.2px !important;
+  line-height:1 !important;
+  text-decoration:none !important;
+  text-shadow:none !important;
+  box-shadow:0 3px 10px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.14) !important;
+  cursor:pointer !important;
+  transition:transform .12s ease, background .12s ease, filter .12s ease !important;
+}
+#miniCounter .dice-counter-button:hover,
+#offlineDiceInstallBtn:hover{
+  transform:translateY(-1px) !important;
+  background:rgba(35,35,35,.86) !important;
+  filter:brightness(1.08) !important;
+}
+#miniCounter .dice-counter-button:active,
+#offlineDiceInstallBtn:active{
+  transform:translateY(1px) scale(.98) !important;
+}
+@media (max-width:600px){
+  #miniCounter{right:130px !important; bottom:15px !important;}
+  #miniCounter .dice-counter-button,
+  #offlineDiceInstallBtn{width:105px !important; min-width:105px !important; font-size:12px !important;}
+}
+</style>
+
 <!-- Anti Ban Mode -->
 <style>
 #antiBanBox{
@@ -5594,22 +5647,16 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
     const updateVisibility = () => {
-      // Hide the button permanently on this browser once the app has been installed,
-      // and also hide it whenever the page is running as the installed PWA.
-      let installed = false;
-      try { installed = localStorage.getItem("offlineDiceAppInstalled") === "1"; } catch (_) {}
-      if (installed || isStandalone()) {
-        installBtn.style.display = "none";
-        installBtn.setAttribute("aria-hidden", "true");
-      } else {
-        installBtn.style.display = "flex";
-        installBtn.removeAttribute("aria-hidden");
-      }
+      // Do not store an "installed" flag: after uninstalling the PWA,
+      // the normal website will show the button again automatically.
+      const installed = isStandalone();
+      installBtn.style.display = installed ? "none" : "flex";
+      installBtn.setAttribute("aria-hidden", installed ? "true" : "false");
     };
 
     installBtn.addEventListener("click", async () => {
       if (isStandalone()) {
-        installBtn.style.display = "none";
+        updateVisibility();
         return;
       }
 
@@ -5620,16 +5667,16 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
           await promptEvent.prompt();
           await promptEvent.userChoice;
         } catch (_) {}
+        updateVisibility();
         return;
       }
 
       if (isIOS) {
-        alert("Offline Dice installieren:\n\nTippe in Safari auf „Teilen“ und danach auf „Zum Home-Bildschirm“. ");
+        alert("Install Offline Dice:\n\nIn Safari, tap Share and then Add to Home Screen.");
         return;
       }
 
-      // No browser API can force an install when Chrome has not offered one.
-      alert("Chrome bietet die automatische Installation gerade nicht an. Öffne oben rechts ⋮ und wähle „Offline Dice installieren“.");
+      alert("Chrome is not offering installation yet. Open ⋮ and choose Install Offline Dice.");
     });
 
     window.addEventListener("offline-dice-install-ready", () => {
@@ -5637,9 +5684,9 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     });
     window.addEventListener("appinstalled", () => {
       window.__offlineDiceInstallPrompt = null;
-      try { localStorage.setItem("offlineDiceAppInstalled", "1"); } catch (_) {}
       updateVisibility();
     });
+
     updateVisibility();
   }
 
