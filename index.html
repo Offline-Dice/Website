@@ -2241,6 +2241,17 @@ background:transparent;
 <span id="persistentAnnouncementText"></span><span id="persistentAnnouncementLink"><a href="#" id="persistentAnnouncementLinkAnchor" rel="noopener noreferrer" target="_blank"></a></span>
 </div>
 <button id="rollButton">ROLL AGAIN !</button>
+<div id="rollCounter" class="roll-counter" aria-label="Counter">
+<div class="roll-counter-side">
+<button type="button" onclick="changeRollCounter(-1)">-1</button>
+<button type="button" onclick="changeRollCounter(-10)">-10</button>
+</div>
+<div id="rollCounterValue" class="roll-counter-value">0</div>
+<div class="roll-counter-side">
+<button type="button" onclick="changeRollCounter(1)">+1</button>
+<button type="button" onclick="changeRollCounter(10)">+10</button>
+</div>
+</div>
 <div id="provablyFairBox" style="display:none;">
 <code id="serverSeedHash">Loading...</code>
 <input id="clientSeedInput" type="text"/>
@@ -3691,6 +3702,15 @@ onValue(ref(db, "online"), (snapshot) => {
 
 </script>
 
+<style id="rollCounterStyle">
+.roll-counter{width:90%;max-width:700px;height:62px;margin:10px auto 8px;padding:0;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;overflow:hidden;border:1px solid rgba(255,255,255,.18);border-radius:4px;background:rgba(95,90,84,.52);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);}
+.roll-counter-side{width:72px;height:100%;display:flex;flex-direction:column;justify-content:center;gap:2px;}
+.roll-counter-side button{all:unset;width:100%;height:27px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;color:#fff;font-family:Arial,sans-serif;font-size:17px;font-weight:800;line-height:1;cursor:pointer;text-align:center;user-select:none;}
+.roll-counter-side button:hover{background:rgba(255,255,255,.08);}
+.roll-counter-side button:active{background:rgba(255,255,255,.14);}
+.roll-counter-value{flex:1;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-family:Arial,sans-serif;font-size:40px;font-weight:900;line-height:1;text-align:center;}
+@media(max-width:600px){.roll-counter{width:94%;height:58px;}.roll-counter-side{width:60px;}.roll-counter-side button{font-size:16px;}.roll-counter-value{font-size:36px;}}
+</style>
 <style id="offline-dice-install-clean-style">
 /* Clean Install App button: placed directly beside Anti-Ban Mode. */
 #miniCounter{
@@ -3941,6 +3961,12 @@ function changeMiniCounter(amount) {
   miniCounterValue += amount;
   const el = document.getElementById("miniCounterValue");
   if (el) el.textContent = miniCounterValue;
+}
+let rollCounterValue = 0;
+function changeRollCounter(amount) {
+  rollCounterValue += amount;
+  const el = document.getElementById("rollCounterValue");
+  if (el) el.textContent = rollCounterValue;
 }
 </script>
 <style>
