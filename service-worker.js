@@ -1,50 +1,48 @@
-const CACHE_NAME = "offline-dice-shell-v1";
+const CACHE_NAME = "offline-dice-shell-v2";
 const APP_SHELL = [
   "/",
   "/index.html",
   "/manifest.json",
-  "/offline-dice-icon.png"
+  "/offline-dice-icon-192.png",
+  "/offline-dice-icon-512.png"
 ];
 
 self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(APP_SHELL))
-      .then(() => self.skipWaiting())
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    for (const url of APP_SHELL) {
+      try { await cache.add(url); }
+      catch (error) { console.warn("Offline Dice cache skip:", url, error); }
+    }
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener("activate", event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-      )
-    ).then(() => self.clients.claim())
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)));
+    await self.clients.claim();
+  })());
 });
 
-// Network-first for the website itself so Firebase, Cloudflare Worker,
-// TikTok Live/API data and other online features keep working normally.
-// If the network is unavailable, fall back to the cached app shell.
 self.addEventListener("fetch", event => {
   const request = event.request;
   if (request.method !== "GET") return;
-
   const url = new URL(request.url);
-
-  // Never cache Firebase, Cloudflare Worker/API or other cross-origin data.
   if (url.origin !== self.location.origin) return;
 
-  event.respondWith(
-    fetch(request)
-      .then(response => {
-        if (response && response.ok) {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
-        }
-        return response;
-      })
-      .catch(() => caches.match(request).then(cached => cached || caches.match("/index.html")))
-  );
+  event.respondWith((async () => {
+    try {
+      const response = await fetch(request);
+      if (response && response.ok) {
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put(request, response.clone());
+      }
+      return response;
+    } catch (error) {
+      const cached = await caches.match(request);
+      return cached || caches.match("/index.html");
+    }
+  })());
 });
