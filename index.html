@@ -3692,12 +3692,13 @@ onValue(ref(db, "online"), (snapshot) => {
 </script>
 
 <style id="offline-dice-install-clean-style">
-/* Clean Install App control: sits directly left of Anti-Ban Mode. */
+/* Clean Install App button: placed directly beside Anti-Ban Mode. */
 #miniCounter{
   position:fixed !important;
-  right:145px !important;
+  right:15px !important;
   bottom:15px !important;
   width:auto !important;
+  height:auto !important;
   margin:0 !important;
   padding:0 !important;
   z-index:2147483646 !important;
@@ -3705,41 +3706,37 @@ onValue(ref(db, "online"), (snapshot) => {
   align-items:center !important;
   justify-content:center !important;
 }
-#miniCounter .dice-counter-button,
 #offlineDiceInstallBtn{
-  width:112px !important;
-  min-width:112px !important;
-  height:34px !important;
-  padding:0 14px !important;
-  border:1px solid rgba(255,255,255,.55) !important;
-  border-radius:9px !important;
-  background:rgba(20,20,20,.72) !important;
+  box-sizing:border-box !important;
+  width:auto !important;
+  min-width:0 !important;
+  height:30px !important;
+  padding:0 11px !important;
+  margin:0 !important;
+  border:1px solid rgba(255,255,255,.32) !important;
+  border-radius:999px !important;
+  background:rgba(18,18,18,.72) !important;
   color:#fff !important;
   font-family:Arial,sans-serif !important;
-  font-size:13px !important;
+  font-size:12px !important;
   font-weight:700 !important;
-  letter-spacing:.2px !important;
-  line-height:1 !important;
+  letter-spacing:.1px !important;
+  line-height:30px !important;
+  white-space:nowrap !important;
   text-decoration:none !important;
   text-shadow:none !important;
-  box-shadow:0 3px 10px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.14) !important;
+  box-shadow:0 2px 8px rgba(0,0,0,.22) !important;
   cursor:pointer !important;
-  transition:transform .12s ease, background .12s ease, filter .12s ease !important;
+  transition:transform .12s ease, background .12s ease, opacity .15s ease !important;
 }
-#miniCounter .dice-counter-button:hover,
 #offlineDiceInstallBtn:hover{
   transform:translateY(-1px) !important;
-  background:rgba(35,35,35,.86) !important;
-  filter:brightness(1.08) !important;
+  background:rgba(35,35,35,.88) !important;
 }
-#miniCounter .dice-counter-button:active,
-#offlineDiceInstallBtn:active{
-  transform:translateY(1px) scale(.98) !important;
-}
+#offlineDiceInstallBtn:active{transform:translateY(1px) !important;}
+#antiBanBox #offlineDiceInstallBtn{display:flex !important;}
 @media (max-width:600px){
-  #miniCounter{right:130px !important; bottom:15px !important;}
-  #miniCounter .dice-counter-button,
-  #offlineDiceInstallBtn{width:105px !important; min-width:105px !important; font-size:12px !important;}
+  #offlineDiceInstallBtn{height:28px !important; padding:0 9px !important; font-size:11px !important; line-height:28px !important;}
 }
 </style>
 
@@ -5638,25 +5635,31 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 (() => {
   function setup() {
     const installBtn = document.getElementById("offlineDiceInstallBtn");
+    const antiBanBox = document.getElementById("antiBanBox");
     if (!installBtn || installBtn.dataset.installReady === "1") return;
     installBtn.dataset.installReady = "1";
 
+    // Put the install button directly beside Anti-Ban Mode.
+    if (antiBanBox) {
+      antiBanBox.insertBefore(installBtn, antiBanBox.firstChild);
+      installBtn.parentElement && installBtn.parentElement.classList.add("offline-dice-install-parent");
+    }
+
     const isStandalone = () =>
       window.matchMedia("(display-mode: standalone)").matches ||
+      window.matchMedia("(display-mode: window-controls-overlay)").matches ||
       window.navigator.standalone === true;
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
-    const updateVisibility = () => {
-      // Do not store an "installed" flag: after uninstalling the PWA,
-      // the normal website will show the button again automatically.
-      const installed = isStandalone();
+    const updateVisibility = (hide = false) => {
+      const installed = isStandalone() || hide;
       installBtn.style.display = installed ? "none" : "flex";
       installBtn.setAttribute("aria-hidden", installed ? "true" : "false");
     };
 
     installBtn.addEventListener("click", async () => {
       if (isStandalone()) {
-        updateVisibility();
+        updateVisibility(true);
         return;
       }
 
@@ -5665,9 +5668,9 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
         window.__offlineDiceInstallPrompt = null;
         try {
           await promptEvent.prompt();
-          await promptEvent.userChoice;
+          const choice = await promptEvent.userChoice;
+          if (choice && choice.outcome === "accepted") updateVisibility(true);
         } catch (_) {}
-        updateVisibility();
         return;
       }
 
@@ -5681,17 +5684,21 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 
     window.addEventListener("offline-dice-install-ready", () => {
       installBtn.disabled = false;
-    });
-    window.addEventListener("appinstalled", () => {
-      window.__offlineDiceInstallPrompt = null;
-      updateVisibility();
+      updateVisibility(false);
     });
 
-    updateVisibility();
+    window.addEventListener("appinstalled", () => {
+      window.__offlineDiceInstallPrompt = null;
+      updateVisibility(true);
+    });
+
+    // If opened as the installed PWA, hide it. No localStorage flag is used,
+    // so a normal browser visit after uninstalling shows the button again.
+    updateVisibility(false);
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", setup, {once: true});
+    document.addEventListener("DOMContentLoaded", setup, {once:true});
   } else {
     setup();
   }
