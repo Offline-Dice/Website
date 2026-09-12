@@ -3703,13 +3703,13 @@ onValue(ref(db, "online"), (snapshot) => {
 </script>
 
 <style id="rollCounterStyle">
-.roll-counter{width:84%;max-width:650px;height:52px;margin:10px auto 8px;padding:0;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;overflow:hidden;border:1px solid rgba(255,255,255,.18);border-radius:4px;background:rgba(95,90,84,.52);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);}
+.roll-counter{width:78%;max-width:600px;height:52px;margin:10px auto 8px;padding:0;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;overflow:hidden;border:1px solid rgba(255,255,255,.18);border-radius:4px;background:rgba(95,90,84,.52);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);}
 .roll-counter-side{width:64px;height:100%;display:flex;flex-direction:column;justify-content:center;gap:1px;}
 .roll-counter-side button{all:unset;width:100%;height:22px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;color:#fff;font-family:Arial,sans-serif;font-size:15px;font-weight:800;line-height:1;cursor:pointer;text-align:center;user-select:none;}
 .roll-counter-side button:hover{background:rgba(255,255,255,.08);}
 .roll-counter-side button:active{background:rgba(255,255,255,.14);}
 .roll-counter-value{flex:1;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-family:Arial,sans-serif;font-size:34px;font-weight:900;line-height:1;text-align:center;}
-@media(max-width:600px){.roll-counter{width:94%;height:50px;}.roll-counter-side{width:54px;}.roll-counter-side button{font-size:14px;}.roll-counter-value{font-size:31px;}}
+@media(max-width:600px){.roll-counter{width:90%;height:50px;}.roll-counter-side{width:54px;}.roll-counter-side button{font-size:14px;}.roll-counter-value{font-size:31px;}}
 </style>
 <style id="offline-dice-install-clean-style">
 /* Clean Install App button: placed directly beside Anti-Ban Mode. */
@@ -3962,12 +3962,19 @@ function changeMiniCounter(amount) {
   const el = document.getElementById("miniCounterValue");
   if (el) el.textContent = miniCounterValue;
 }
-let rollCounterValue = 0;
-function changeRollCounter(amount) {
-  rollCounterValue += amount;
+const ROLL_COUNTER_STORAGE_KEY = "offlineDiceRollCounterValue";
+let rollCounterValue = Number(localStorage.getItem(ROLL_COUNTER_STORAGE_KEY));
+if (!Number.isFinite(rollCounterValue)) rollCounterValue = 0;
+function updateRollCounterDisplay() {
   const el = document.getElementById("rollCounterValue");
   if (el) el.textContent = rollCounterValue >= 0 ? "+" + rollCounterValue : rollCounterValue;
 }
+function changeRollCounter(amount) {
+  rollCounterValue += amount;
+  localStorage.setItem(ROLL_COUNTER_STORAGE_KEY, String(rollCounterValue));
+  updateRollCounterDisplay();
+}
+document.addEventListener("DOMContentLoaded", updateRollCounterDisplay);
 </script>
 <style>
 .offline-dice-footer{
