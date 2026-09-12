@@ -5399,34 +5399,78 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 
   const STATUS_URL = "https://api.offline-dice.de/tiktok-live";
   const CHECK_INTERVAL = 30000;
+  let checkTimer = null;
+  let checkInProgress = false;
 
   async function updateTopStreamerLive(){
-    const cards = document.querySelectorAll('[data-top-streamer-username]');
-    if(!cards.length) return;
+    if(checkInProgress) return;
+    checkInProgress = true;
 
-    await Promise.all(Array.from(cards).map(async function(card){
-      const username = String(card.getAttribute('data-top-streamer-username') || '').trim();
-      if(!username) return;
+    try{
+      const cards = document.querySelectorAll('[data-top-streamer-username]');
+      if(!cards.length) return;
 
-      try{
-        const response = await fetch(STATUS_URL + '?username=' + encodeURIComponent(username), {
-          method: 'GET',
-          cache: 'no-store'
-        });
+      await Promise.all(Array.from(cards).map(async function(card){
+        const username = String(card.getAttribute('data-top-streamer-username') || '').trim();
+        if(!username) return;
 
-        if(!response.ok) throw new Error('status');
-        const data = await response.json();
-        card.classList.toggle('top-streamer-card-live', data && data.live === true);
-      }catch(e){
-        // If the status service is unavailable, leave the original card unchanged.
-        card.classList.remove('top-streamer-card-live');
-      }
-    }));
+        try{
+          const response = await fetch(
+            STATUS_URL + '?username=' + encodeURIComponent(username) + '&_=' + Date.now(),
+            {
+              method: 'GET',
+              cache: 'no-store',
+              credentials: 'omit'
+            }
+          );
+
+          if(!response.ok) throw new Error('status');
+
+          const data = await response.json();
+
+          // Nur ein erfolgreich gelesener Status darf die Anzeige ändern.
+          card.classList.toggle(
+            'top-streamer-card-live',
+            data && data.live === true
+          );
+        }catch(e){
+          // Bei einem einzelnen fehlgeschlagenen Check den letzten
+          // bekannten Status behalten, statt LIVE fälschlich zu entfernen.
+        }
+      }));
+    }finally{
+      checkInProgress = false;
+    }
+  }
+
+  function scheduleNextCheck(){
+    if(checkTimer) window.clearTimeout(checkTimer);
+
+    checkTimer = window.setTimeout(async function(){
+      await updateTopStreamerLive();
+      scheduleNextCheck();
+    }, CHECK_INTERVAL);
+  }
+
+  function forceRefresh(){
+    updateTopStreamerLive();
+    scheduleNextCheck();
   }
 
   function start(){
-    updateTopStreamerLive();
-    window.setInterval(updateTopStreamerLive, CHECK_INTERVAL);
+    forceRefresh();
+
+    // Browser können Timer in Hintergrund-/AFK-Tabs stark verlangsamen.
+    // Beim Zurückkehren deshalb sofort einen frischen Status holen.
+    document.addEventListener('visibilitychange', function(){
+      if(!document.hidden) forceRefresh();
+    });
+
+    window.addEventListener('focus', forceRefresh);
+    window.addEventListener('pageshow', forceRefresh);
+
+    // Falls der Tab nach langer Inaktivität wieder aktiv wird.
+    window.addEventListener('online', forceRefresh);
   }
 
   if(document.readyState === 'loading'){
