@@ -2226,7 +2226,7 @@ background:transparent;
 <span id="nonceValue">0</span>
 </div>
 <div class="mini-counter" id="miniCounter">
-<a class="dice-counter-button" href="https://dice-counter.pages.dev/" target="_blank">Dice Counter</a>
+<button class="dice-counter-button" id="installAppBtn" type="button">📲 App installieren</button>
 </div>
 <div class="color-container">
 <div class="color-info" id="colorInfo">
@@ -5557,6 +5557,47 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
   };
   render();
 })();
+</script>
+
+<script>
+let deferredInstallPrompt = null;
+const installAppBtn = document.getElementById('installAppBtn');
+
+window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+});
+
+if (installAppBtn) {
+  installAppBtn.addEventListener('click', async () => {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      return;
+    }
+
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+    if (isStandalone) return;
+
+    if (isIOS) {
+      alert('Auf iPhone/iPad: Tippe auf „Teilen“ und dann auf „Zum Home-Bildschirm“.');
+    } else {
+      alert('Wenn keine Installation geöffnet wird, nutze im Browser-Menü „App installieren“ bzw. „Offline Dice installieren“.');
+    }
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  if (installAppBtn) installAppBtn.style.display = 'none';
+  deferredInstallPrompt = null;
+});
+
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+  if (installAppBtn) installAppBtn.style.display = 'none';
+}
 </script>
 
 <script>
