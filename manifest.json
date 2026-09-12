@@ -1,0 +1,19 @@
+{
+  "name": "Offline Dice",
+  "short_name": "Offline Dice",
+  "description": "Offline Dice – Color Dice",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "icons": [
+    {
+      "src": "/offline-dice-icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
