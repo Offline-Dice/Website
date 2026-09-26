@@ -1868,6 +1868,93 @@ body.dice-roll-active #od-public-chat{
 #od-social-links .od-discord{background:#5865F2}
 #od-social-links svg{width:14px;height:14px;fill:#fff}
 </style>
+<style id="od-clean-layout-css">
+/* CLEAN: make the complete dice area narrower, like the reference layout. */
+#od-social-links .od-clean-toggle{
+  width:auto;
+  min-width:42px;
+  height:25px;
+  padding:0 8px;
+  border:1px solid rgba(255,255,255,.24);
+  border-radius:7px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-sizing:border-box;
+  cursor:pointer;
+  color:#fff;
+  background:rgba(255,255,255,.10);
+  font:700 10px Arial,sans-serif;
+  letter-spacing:.2px;
+  box-shadow:0 1px 4px rgba(0,0,0,.2);
+  transition:transform .15s ease,background .15s ease,filter .15s ease;
+}
+#od-social-links .od-clean-toggle:hover{
+  transform:translateY(-1px);
+  background:rgba(255,255,255,.18);
+  filter:brightness(1.08);
+}
+#od-social-links .od-clean-toggle:active{
+  transform:translateY(1px);
+}
+#od-social-links .od-clean-toggle.is-on{
+  background:rgba(255,255,255,.22);
+}
+.layout-row.od-clean-layout{
+  width:920px !important;
+  max-width:calc(100vw - 24px) !important;
+  gap:10px !important;
+  margin-top:42px !important;
+  margin-bottom:20px !important;
+}
+.layout-row.od-clean-layout > .side-box{
+  width:240px !important;
+  min-width:240px !important;
+  box-sizing:border-box !important;
+}
+.layout-row.od-clean-layout > .wrapper{
+  width:400px !important;
+  max-width:400px !important;
+  box-sizing:border-box !important;
+  padding:16px 14px !important;
+  margin-top:0 !important;
+  margin-bottom:0 !important;
+}
+.layout-row.od-clean-layout .dropdown-container{
+  width:100% !important;
+  gap:8px !important;
+}
+.layout-row.od-clean-layout .dropdown-container select{
+  min-width:0 !important;
+}
+@media(max-width:1100px){
+  .layout-row.od-clean-layout{
+    width:calc(100vw - 24px) !important;
+    max-width:calc(100vw - 24px) !important;
+  }
+  .layout-row.od-clean-layout > .side-box{
+    width:240px !important;
+    min-width:240px !important;
+  }
+  .layout-row.od-clean-layout > .wrapper{
+    width:400px !important;
+    max-width:400px !important;
+  }
+}
+@media(max-width:920px){
+  .layout-row.od-clean-layout{
+    flex-direction:column !important;
+    align-items:center !important;
+    width:100% !important;
+  }
+  .layout-row.od-clean-layout > .side-box,
+  .layout-row.od-clean-layout > .wrapper{
+    width:min(92vw,520px) !important;
+    max-width:min(92vw,520px) !important;
+    min-width:0 !important;
+  }
+}
+</style>
 <style id="worker-dice-style-loader">
 #worker-dice-style-status{display:none}
 </style>
@@ -5498,7 +5585,32 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 <svg aria-hidden="true" viewbox="0 0 24 24"><path d="M16.7 2c.3 2.4 1.7 4.2 4.3 4.5v3.2c-1.6.1-3-.4-4.3-1.2v7.1c0 4.4-3.1 7.4-7.3 7.4-3.9 0-6.9-2.7-6.9-6.4 0-4.1 3.5-6.8 7.8-6.2v3.3c-2.2-.4-4 .8-4 2.8 0 1.7 1.4 2.9 3.1 2.9 2 0 3.8-1.3 3.8-4.2V2h3.5z"></path></svg></a>
 <a aria-label="Discord" class="od-discord" href="https://discord.com/invite/GtsH5jpSUn" rel="noopener noreferrer" target="_blank">
 <svg aria-hidden="true" viewbox="0 0 24 24"><path d="M19.5 4.2A16.2 16.2 0 0 0 15.5 3l-.5 1.1a14.7 14.7 0 0 0-6 0L8.5 3a16.2 16.2 0 0 0-4 1.2C2 7.8 1.3 11.4 1.7 15a16.5 16.5 0 0 0 5 2.5l1.2-1.7c-.7-.3-1.4-.6-2-1 .2-.2.4-.3.6-.5 3.9 1.8 8.1 1.8 12 0 .2.2.4.3.6.5-.6.4-1.3.7-2 1l1.2 1.7a16.5 16.5 0 0 0 5-2.5c.5-4.2-.8-7.8-3.8-10.8zM8.8 13.5c-1.2 0-2.1-1.1-2.1-2.4s1-2.4 2.1-2.4 2.1 1.1 2.1 2.4-.9 2.4-2.1 2.4zm6.4 0c-1.2 0-2.1-1.1-2.1-2.4s1-2.4 2.1-2.4 2.1 1.1 2.1 2.4-.9 2.4-2.1 2.4z"></path></svg></a>
+<button aria-label="Clean layout" class="od-clean-toggle" id="od-clean-toggle" type="button">CLEAN</button>
 </div>
+<script id="od-clean-layout-script">
+(function(){
+  "use strict";
+  var KEY="offlineDiceCleanLayout";
+  var row=document.querySelector(".layout-row");
+  var btn=document.getElementById("od-clean-toggle");
+  if(!row || !btn) return;
+
+  function apply(on){
+    row.classList.toggle("od-clean-layout", on);
+    btn.classList.toggle("is-on", on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+    try{ localStorage.setItem(KEY, on ? "1" : "0"); }catch(e){}
+  }
+
+  var saved=false;
+  try{ saved=localStorage.getItem(KEY)==="1"; }catch(e){}
+  apply(saved);
+
+  btn.addEventListener("click", function(){
+    apply(!row.classList.contains("od-clean-layout"));
+  });
+})();
+</script>
 <script id="od-runtime-4">
 (function(){
   "use strict";
