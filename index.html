@@ -3304,6 +3304,326 @@ z-index:9999;">
 🟢 Online 0
 </div>
 <span class="od-user-box-name" id="od-user-box-name"></span>
+<style id="od-profile-system-css">
+#od-profile-trigger{
+  position:fixed;
+  top:20px;
+  left:20px;
+  transform:translateY(54px);
+  z-index:10002;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-height:44px;
+  max-width:220px;
+  padding:5px 12px 5px 6px;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:24px;
+  background:rgba(15,18,24,.48);
+  color:#fff;
+  cursor:pointer;
+  font:700 13px Arial,sans-serif;
+  box-shadow:0 10px 30px rgba(0,0,0,.22);
+  backdrop-filter:blur(16px) saturate(140%);
+  -webkit-backdrop-filter:blur(16px) saturate(140%);
+}
+#od-profile-trigger:hover{background:rgba(25,30,40,.64);transform:translateY(53px)}
+#od-profile-avatar{
+  width:32px;height:32px;border-radius:50%;object-fit:cover;
+  display:block;background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.25);
+  flex:0 0 32px;
+}
+#od-profile-trigger-name{
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:145px;
+}
+#od-profile-trigger-arrow{opacity:.7;font-size:11px}
+
+#od-profile-panel{
+  position:fixed;
+  top:76px;
+  left:20px;
+  width:min(340px,calc(100vw - 28px));
+  z-index:10003;
+  padding:18px;
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:20px;
+  background:rgba(15,18,24,.72);
+  color:#fff;
+  box-shadow:0 24px 70px rgba(0,0,0,.38);
+  backdrop-filter:blur(24px) saturate(145%);
+  -webkit-backdrop-filter:blur(24px) saturate(145%);
+  font-family:Arial,sans-serif;
+}
+#od-profile-panel[hidden]{display:none!important}
+.od-profile-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+#od-profile-preview{
+  width:58px;height:58px;border-radius:50%;object-fit:cover;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.24);
+}
+.od-profile-title{font-size:17px;font-weight:800}
+.od-profile-subtitle{font-size:11px;color:rgba(255,255,255,.52);margin-top:3px}
+.od-profile-label{display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.62);margin:12px 0 7px}
+#od-profile-name-input{
+  width:100%;height:42px;box-sizing:border-box;padding:0 12px;
+  border-radius:12px;border:1px solid rgba(255,255,255,.16);
+  background:rgba(0,0,0,.22);color:#fff;outline:none;
+  font-size:14px;
+}
+#od-profile-name-input:focus{border-color:rgba(255,255,255,.36)}
+.od-profile-avatars{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}
+.od-profile-avatar-choice{
+  width:100%;aspect-ratio:1;border-radius:12px;
+  border:1px solid rgba(255,255,255,.13);
+  background:rgba(255,255,255,.07);
+  cursor:pointer;padding:4px;font-size:21px;
+}
+.od-profile-avatar-choice:hover{background:rgba(255,255,255,.14)}
+.od-profile-avatar-choice.selected{border-color:#4da3ff;box-shadow:0 0 0 2px rgba(77,163,255,.2)}
+#od-profile-upload{
+  display:block;width:100%;margin-top:9px;
+  color:rgba(255,255,255,.7);font-size:11px;
+}
+.od-profile-actions{display:flex;gap:8px;margin-top:15px}
+.od-profile-actions button{
+  flex:1;height:40px;border:0;border-radius:11px;cursor:pointer;
+  font-weight:800;font-size:13px;
+}
+#od-profile-cancel{background:rgba(255,255,255,.1);color:#fff}
+#od-profile-save{background:#1687ff;color:#fff}
+#od-profile-error{min-height:17px;margin-top:8px;color:#ff7180;font-size:11px}
+@media(max-width:600px){
+  #od-profile-trigger{left:12px;top:12px;transform:translateY(50px)}
+  #od-profile-trigger:hover{transform:translateY(49px)}
+  #od-profile-panel{left:12px;top:70px}
+}
+</style>
+
+<button id="od-profile-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" title="Profil öffnen">
+  <img id="od-profile-avatar" alt="Profilbild">
+  <span id="od-profile-trigger-name">Gast</span>
+  <span id="od-profile-trigger-arrow">⌄</span>
+</button>
+
+<div id="od-profile-panel" hidden role="dialog" aria-label="Profil bearbeiten">
+  <div class="od-profile-head">
+    <img id="od-profile-preview" alt="Profilbild Vorschau">
+    <div>
+      <div class="od-profile-title">Mein Profil</div>
+      <div class="od-profile-subtitle">Name und Profilbild ändern</div>
+    </div>
+  </div>
+
+  <label class="od-profile-label" for="od-profile-name-input">Benutzername</label>
+  <input id="od-profile-name-input" maxlength="24" autocomplete="nickname" type="text" placeholder="Benutzername">
+
+  <div class="od-profile-label">Profilbild auswählen</div>
+  <div class="od-profile-avatars" id="od-profile-avatars">
+    <button class="od-profile-avatar-choice" type="button" data-avatar="👤" aria-label="Standard">👤</button>
+    <button class="od-profile-avatar-choice" type="button" data-avatar="😀" aria-label="Avatar 1">😀</button>
+    <button class="od-profile-avatar-choice" type="button" data-avatar="😎" aria-label="Avatar 2">😎</button>
+    <button class="od-profile-avatar-choice" type="button" data-avatar="🤖" aria-label="Avatar 3">🤖</button>
+    <button class="od-profile-avatar-choice" type="button" data-avatar="🐱" aria-label="Avatar 4">🐱</button>
+    <button class="od-profile-avatar-choice" type="button" data-avatar="🐺" aria-label="Avatar 5">🐺</button>
+  </div>
+  <input id="od-profile-upload" type="file" accept="image/*">
+
+  <div id="od-profile-error" aria-live="polite"></div>
+  <div class="od-profile-actions">
+    <button id="od-profile-cancel" type="button">Abbrechen</button>
+    <button id="od-profile-save" type="button">Speichern</button>
+  </div>
+</div>
+
+<script id="od-profile-system" type="module">
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+
+(() => {
+  const CONFIG = {
+    apiKey:"AIzaSyBUT0t1I9Dkee5Ok_uYMzs4WfdwapOA5As",
+    authDomain:"kenzy-dice.firebaseapp.com",
+    projectId:"kenzy-dice",
+    databaseURL:"https://kenzy-dice-default-rtdb.europe-west1.firebasedatabase.app",
+    storageBucket:"kenzy-dice.firebasestorage.app",
+    messagingSenderId:"578956722062",
+    appId:"1:578956722062:web:5156f5737e51ef75246edf"
+  };
+
+  const app = getApps().length ? getApps()[0] : initializeApp(CONFIG);
+  const db = getDatabase(app);
+
+  const trigger = document.getElementById("od-profile-trigger");
+  const panel = document.getElementById("od-profile-panel");
+  const triggerName = document.getElementById("od-profile-trigger-name");
+  const avatar = document.getElementById("od-profile-avatar");
+  const preview = document.getElementById("od-profile-preview");
+  const nameInput = document.getElementById("od-profile-name-input");
+  const upload = document.getElementById("od-profile-upload");
+  const error = document.getElementById("od-profile-error");
+  const save = document.getElementById("od-profile-save");
+  const cancel = document.getElementById("od-profile-cancel");
+
+  const NAME_KEY = "offlineDicePlayerName";
+  const AVATAR_KEY = "offlineDiceProfileImage";
+
+  const avatarData = {
+    "👤":"data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#273142"/><text x="50" y="65" text-anchor="middle" font-size="55">👤</text></svg>'
+    ),
+    "😀":"data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#ffd54f"/><text x="50" y="68" text-anchor="middle" font-size="58">😀</text></svg>'
+    ),
+    "😎":"data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#5b8def"/><text x="50" y="68" text-anchor="middle" font-size="58">😎</text></svg>'
+    ),
+    "🤖":"data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#607d8b"/><text x="50" y="68" text-anchor="middle" font-size="58">🤖</text></svg>'
+    ),
+    "🐱":"data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#a97852"/><text x="50" y="68" text-anchor="middle" font-size="58">🐱</text></svg>'
+    ),
+    "🐺":"data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="50" fill="#68727d"/><text x="50" y="68" text-anchor="middle" font-size="58">🐺</text></svg>'
+    )
+  };
+
+  let selectedAvatar = localStorage.getItem(AVATAR_KEY) || avatarData["👤"];
+
+  function setAvatar(src){
+    selectedAvatar = src;
+    avatar.src = src;
+    preview.src = src;
+    localStorage.setItem(AVATAR_KEY, src);
+  }
+
+  function currentName(){
+    return String(localStorage.getItem(NAME_KEY) || "").trim().replace(/\s+/g," ").slice(0,24);
+  }
+
+  function refreshUI(){
+    const name = currentName() || "Gast";
+    triggerName.textContent = name;
+    nameInput.value = name === "Gast" ? "" : name;
+    const src = localStorage.getItem(AVATAR_KEY) || avatarData["👤"];
+    avatar.src = src;
+    preview.src = src;
+  }
+
+  function openPanel(){
+    refreshUI();
+    error.textContent = "";
+    upload.value = "";
+    document.querySelectorAll(".od-profile-avatar-choice").forEach(btn => {
+      btn.classList.toggle("selected", avatarData[btn.dataset.avatar] === selectedAvatar);
+    });
+    panel.hidden = false;
+    trigger.setAttribute("aria-expanded","true");
+    setTimeout(() => nameInput.focus(), 30);
+  }
+
+  function closePanel(){
+    panel.hidden = true;
+    trigger.setAttribute("aria-expanded","false");
+    error.textContent = "";
+  }
+
+  document.querySelectorAll(".od-profile-avatar-choice").forEach(btn => {
+    btn.addEventListener("click", () => {
+      setAvatar(avatarData[btn.dataset.avatar]);
+      document.querySelectorAll(".od-profile-avatar-choice").forEach(x => x.classList.remove("selected"));
+      btn.classList.add("selected");
+    });
+  });
+
+  upload.addEventListener("change", () => {
+    const file = upload.files && upload.files[0];
+    if(!file) return;
+    if(!file.type.startsWith("image/")){
+      error.textContent = "Bitte ein Bild auswählen.";
+      return;
+    }
+    if(file.size > 2 * 1024 * 1024){
+      error.textContent = "Das Bild darf höchstens 2 MB groß sein.";
+      upload.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setAvatar(String(reader.result || ""));
+      document.querySelectorAll(".od-profile-avatar-choice").forEach(x => x.classList.remove("selected"));
+      error.textContent = "";
+    };
+    reader.readAsDataURL(file);
+  });
+
+  trigger.addEventListener("click", () => {
+    if(panel.hidden) openPanel();
+    else closePanel();
+  });
+
+  cancel.addEventListener("click", closePanel);
+
+  document.addEventListener("click", e => {
+    if(!panel.hidden && !panel.contains(e.target) && !trigger.contains(e.target)) closePanel();
+  });
+
+  save.addEventListener("click", async () => {
+    const newName = String(nameInput.value || "").trim().replace(/\s+/g," ").slice(0,24);
+    const oldName = currentName();
+    const userId = localStorage.getItem("offlineDiceFirebaseUserId");
+
+    if(!newName){
+      error.textContent = "Bitte einen Benutzernamen eingeben.";
+      nameInput.focus();
+      return;
+    }
+
+    save.disabled = true;
+    error.textContent = "Prüfe Benutzernamen …";
+
+    try{
+      if(newName.toLowerCase() !== oldName.toLowerCase()){
+        const snap = await get(ref(db,"registeredUsers"));
+        const users = snap.val() || {};
+        const taken = Object.entries(users).some(([id,user]) => {
+          if(id === userId || !user || typeof user.name !== "string") return false;
+          return user.name.trim().replace(/\s+/g," ").toLowerCase() === newName.toLowerCase();
+        });
+
+        if(taken){
+          error.textContent = "Dieser Benutzername ist bereits vergeben.";
+          nameInput.focus();
+          nameInput.select();
+          return;
+        }
+      }
+
+      localStorage.setItem(NAME_KEY,newName);
+      localStorage.setItem(AVATAR_KEY,selectedAvatar || avatarData["👤"]);
+
+      window.dispatchEvent(new CustomEvent("offlineDiceLogin", {
+        detail:{name:newName}
+      }));
+
+      refreshUI();
+      closePanel();
+    }catch(err){
+      console.error("Profil speichern:",err);
+      error.textContent = "Profil konnte nicht gespeichert werden.";
+    }finally{
+      save.disabled = false;
+    }
+  });
+
+  window.addEventListener("offlineDiceLogin", refreshUI);
+
+  refreshUI();
+})();
+</script>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import { getDatabase, ref, onValue, onDisconnect, set, update, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
