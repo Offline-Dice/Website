@@ -6387,7 +6387,7 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
   var COLORS = {
     red: "#ef4444",
     orange: "#f59e0b",
-    gold: "#facc15",
+    yellow: "#facc15",
     green: "#3baa35",
     blue: "#3b5bea",
     purple: "#9c27b0"
@@ -6402,6 +6402,7 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     if (!Array.isArray(colors)) return [];
     return colors.map(function (c) {
       return String(c == null ? "" : c).trim().toLowerCase();
+    if (c === "gold") c = "yellow";
     }).filter(function (c) {
       return !!COLORS[c];
     });
@@ -6452,7 +6453,7 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     box.appendChild(statsLabel);
 
     var stats = make("div", "last20-stats", "");
-    var counts = {red:0, orange:0, gold:0, green:0, blue:0, purple:0};
+    var counts = {red:0, orange:0, yellow:0, green:0, blue:0, purple:0};
     history.forEach(function (roll) {
       roll.colors.forEach(function (color) { counts[color]++; });
     });
