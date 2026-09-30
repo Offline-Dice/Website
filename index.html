@@ -3355,8 +3355,14 @@ async function getRandomResult(mode) {
 
             // LAST 20 ROLLS: save the exact colors returned by the Worker and the exact Verify Code.
             // Use the local result array here so the history cannot be affected by later UI changes.
-            if (typeof window.addSpinHistory === "function") {
-                window.addSpinHistory(verifyColors.slice(), String(window.provablyFair.lastVerify || ""));
+            // LAST 20 ROLLS: use the exact colors that were just rendered.
+            // This is deliberately independent of the capture/timer logic.
+            try {
+                if (typeof window.addSpinHistory === "function") {
+                    window.addSpinHistory(verifyColors.slice(), String(window.provablyFair?.lastVerify || ""));
+                }
+            } catch (last20Error) {
+                console.error("LAST20 ERROR:", last20Error);
             }
 
             // The Verify Code was already created by the Worker.
@@ -6371,82 +6377,121 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
   'use strict';
   const KEY='offlineDiceLast20Rolls';
   const COLORS={red:'#ef4444',orange:'#f59e0b',gold:'#facc15',green:'#3baa35',blue:'#3b5bea',purple:'#9c27b0'};
-  const VALID=Object.keys(COLORS);
   let history=[];
-  let lastSavedVerify='';
 
   function normalizeColors(colors){
     if(!Array.isArray(colors)) return [];
-    return colors.map(c=>String(c==null?'':c).trim().toLowerCase()).filter(c=>Object.prototype.hasOwnProperty.call(COLORS,c));
+    return colors.map(function(c){
+      const v=String(c==null?'':c).trim().toLowerCase();
+      if(v==='#ef4444') return 'red';
+      if(v==='#f59e0b') return 'orange';
+      if(v==='#facc15') return 'gold';
+      if(v==='#3baa35') return 'green';
+      if(v==='#3b5bea') return 'blue';
+      if(v==='#9c27b0') return 'purple';
+      return v;
+    }).filter(function(c){return Object.prototype.hasOwnProperty.call(COLORS,c);});
   }
+
   function load(){
     try{
-      const data=JSON.parse(localStorage.getItem(KEY)||'[]');
-      history=Array.isArray(data)?data.map(r=>({colors:normalizeColors(r&&r.colors),code:r&&r.code!=null?String(r.code):''})).filter(r=>r.colors.length).slice(0,20):[];
-      if(history[0]) lastSavedVerify=history[0].code||'';
-    }catch(e){history=[];lastSavedVerify='';}
+      const raw=localStorage.getItem(KEY);
+      const data=raw?JSON.parse(raw):[];
+      history=Array.isArray(data)?data.map(function(r){
+        return {colors:normalizeColors(r&&r.colors),code:r&&r.code!=null?String(r.code):''};
+      }).filter(function(r){return r.colors.length>0;}).slice(0,20):[];
+    }catch(e){history=[];}
   }
-  function save(){try{localStorage.setItem(KEY,JSON.stringify(history));}catch(e){console.warn('LAST20 localStorage:',e);}}
+
+  function save(){
+    try{localStorage.setItem(KEY,JSON.stringify(history));}catch(e){}
+  }
+
   function render(){
-    const stats=document.getElementById('last20Stats'), current=document.getElementById('last20Current'), previous=document.getElementById('last20Previous');
-    if(!stats||!current||!previous) return false;
-    stats.replaceChildren(); current.replaceChildren(); previous.replaceChildren();
+    const stats=document.getElementById('last20Stats');
+    const current=document.getElementById('last20Current');
+    const previous=document.getElementById('last20Previous');
+    if(!stats||!current||!previous) return;
+
+    stats.innerHTML='';
+    current.innerHTML='';
+    previous.innerHTML='';
+
     const counts={red:0,orange:0,gold:0,green:0,blue:0,purple:0};
-    history.forEach(r=>r.colors.forEach(c=>{counts[c]++;}));
-    VALID.forEach(c=>{const stat=document.createElement('div');stat.className='last20-stat';const dot=document.createElement('span');dot.className='last20-dot';dot.style.backgroundColor=COLORS[c];stat.append(dot,document.createTextNode(' × '+counts[c]));stats.appendChild(stat);});
-    history.forEach((r,i)=>{
-      const box=document.createElement('div'); box.className='last20-roll'+(i===0?' current':'');
-      const head=document.createElement('div');head.className='last20-roll-head';
-      const name=document.createElement('div');name.className='last20-roll-name';name.textContent=i===0?'THIS ROLL':'ROLL '+(i+1);
-      const id=document.createElement('div');id.className='last20-roll-id';id.textContent=r.code||'Verify code unavailable';
-      head.append(name,id);
-      const dice=document.createElement('div');dice.className='last20-dice';
-      r.colors.forEach(c=>{const d=document.createElement('span');d.className='last20-die';d.style.backgroundColor=COLORS[c];dice.appendChild(d);});
-      box.append(head,dice); (i===0?current:previous).appendChild(box);
+    history.forEach(function(r){r.colors.forEach(function(c){if(counts[c]!==undefined) counts[c]++;});});
+
+    Object.keys(counts).forEach(function(c){
+      const stat=document.createElement('div');
+      stat.className='last20-stat';
+      const dot=document.createElement('span');
+      dot.className='last20-dot';
+      dot.style.backgroundColor=COLORS[c];
+      stat.appendChild(dot);
+      stat.appendChild(document.createTextNode(' × '+counts[c]));
+      stats.appendChild(stat);
     });
+
+    history.forEach(function(r,i){
+      const box=document.createElement('div');
+      box.className='last20-roll'+(i===0?' current':'');
+
+      const head=document.createElement('div');
+      head.className='last20-roll-head';
+
+      const name=document.createElement('div');
+      name.className='last20-roll-name';
+      name.textContent=i===0?'THIS ROLL':'ROLL '+(i+1);
+
+      const id=document.createElement('div');
+      id.className='last20-roll-id';
+      id.textContent=r.code||'';
+
+      head.appendChild(name);
+      head.appendChild(id);
+
+      const dice=document.createElement('div');
+      dice.className='last20-dice';
+
+      r.colors.forEach(function(c){
+        const d=document.createElement('span');
+        d.className='last20-die';
+        d.style.backgroundColor=COLORS[c];
+        d.title=c.toUpperCase();
+        dice.appendChild(d);
+      });
+
+      box.appendChild(head);
+      box.appendChild(dice);
+      (i===0?current:previous).appendChild(box);
+    });
+  }
+
+  function addSpinHistory(colors,code){
+    const arr=normalizeColors(colors);
+    if(!arr.length) return false;
+
+    history.unshift({
+      colors:arr.slice(),
+      code:code==null?'':String(code)
+    });
+    history=history.slice(0,20);
+    save();
+    render();
     return true;
   }
-  function add(colors,code){
-    const arr=normalizeColors(colors), verify=code==null?'':String(code);
-    if(!arr.length){console.warn('LAST20: invalid colors',colors);return false;}
-    // A Verify Code identifies the completed roll. If there is no code, use the color signature.
-    if(verify && verify===lastSavedVerify) return false;
-    if(!verify && history[0] && history[0].colors.join(',')===arr.join(',')) return false;
-    history.unshift({colors:arr.slice(),code:verify}); history=history.slice(0,20); lastSavedVerify=verify; save(); render(); return true;
-  }
-  window.addSpinHistory=function(colors,code){ return add(colors,code); };
 
-  // Fail-safe capture: do not depend on the internal rollDice() function reaching
-  // the Last-20 call. Watch the authoritative Worker result after every Color Dice roll.
-  function installCapture(){
-    const button=document.getElementById('rollButton');
-    if(!button || button.dataset.last20Capture==='1') return;
-    button.dataset.last20Capture='1';
-    let watching=false, beforeVerify='';
-    button.addEventListener('click',function(){
-      const mode=document.getElementById('colorDice');
-      if(!mode || mode.value!=='color') return;
-      watching=true;
-      beforeVerify=String(window.provablyFair&&window.provablyFair.lastVerify||'');
-      const started=Date.now();
-      const timer=setInterval(function(){
-        const pf=window.provablyFair||{};
-        const verify=String(pf.lastVerify||'');
-        const colors=normalizeColors(pf.lastColors);
-        if(watching && colors.length && verify && verify!==beforeVerify){
-          add(colors,verify); watching=false; clearInterval(timer); return;
-        }
-        if(Date.now()-started>15000){watching=false;clearInterval(timer);}
-      },100);
-    },true);
-  }
+  window.addSpinHistory=addSpinHistory;
+
   function init(){
-    load(); render(); installCapture();
-    setTimeout(()=>{render();installCapture();},0);
-    setTimeout(()=>{render();installCapture();},500);
-    setTimeout(()=>{render();installCapture();},1500);
+    load();
+    render();
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',init,{once:true});
+  }else{
+    init();
+  }
 })();
 </script>
 <script id="offline-dice-install-handler">
