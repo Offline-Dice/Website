@@ -3948,11 +3948,27 @@ function renderMessages(data){
     avatar.className="od-chat-avatar";
     avatar.alt="";
     avatar.loading="lazy";
-    const profileImage=odChatProfileImages[String(m.name).trim().toLowerCase()];
-    if(profileImage&&profileImage.indexOf("data:image/")===0){
+    // Prefer the image saved with the chat message. This makes the avatar
+    // stay attached to that user's message even if the profile changes later.
+    const messageImage=String(m.profileImage||"");
+    const profileImage=messageImage.indexOf("data:image/")===0
+      ? messageImage
+      : odChatProfileImages[String(m.name).trim().toLowerCase()]||"";
+
+    if(profileImage.indexOf("data:image/")===0){
       avatar.src=profileImage;
+      avatar.style.display="block";
     }else{
-      avatar.style.display="none";
+      // Keep a visible neutral avatar slot so the name is always positioned
+      // next to the profile-picture area.
+      avatar.style.display="block";
+      avatar.src="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">'+
+        '<circle cx="12" cy="12" r="12" fill="#252830"/>'+
+        '<circle cx="12" cy="9" r="4" fill="#9aa0aa"/>'+
+        '<path d="M5 21c.9-4 3.3-6 7-6s6.1 2 7 6" fill="#9aa0aa"/>'+
+        '</svg>'
+      );
     }
     nameRow.appendChild(avatar);
 
@@ -4026,9 +4042,11 @@ form.addEventListener("submit", async e=>{
 
   send.disabled=true;
   try{
+    const senderProfileImage=String(localStorage.getItem("offlineDiceProfileImage")||"");
     await push(ref(odChatDb, OD_CHAT_PATH), {
       name:name,
       text:text,
+      profileImage: senderProfileImage.indexOf("data:image/")===0 ? senderProfileImage : "",
       createdAt:serverTimestamp()
     });
     input.value="";
@@ -6624,5 +6642,35 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 #od-profile-dashboard .odpd-open-sub {
   color: rgba(255,255,255,.48) !important;
   -webkit-text-fill-color: rgba(255,255,255,.48) !important;
+}
+</style>
+
+<style id="od-chat-avatar-final-position">
+#od-public-chat .od-chat-name-row{
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  width:100% !important;
+  gap:7px !important;
+}
+#od-public-chat .od-chat-avatar{
+  display:block !important;
+  flex:0 0 24px !important;
+  width:24px !important;
+  height:24px !important;
+  min-width:24px !important;
+  min-height:24px !important;
+  max-width:24px !important;
+  max-height:24px !important;
+  margin:0 !important;
+  padding:0 !important;
+  border-radius:50% !important;
+  object-fit:cover !important;
+}
+#od-public-chat .od-chat-name{
+  display:inline-block !important;
+  margin:0 !important;
 }
 </style>
