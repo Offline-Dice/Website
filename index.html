@@ -4740,26 +4740,72 @@ document.addEventListener("DOMContentLoaded", initAntiBan);
 window.addEventListener("load", initAntiBan);
 </script>
 <a class="announcements-link" href="Announcements.html">📢 Announcements</a>
-<script>
-let miniCounterValue = 0;
-function changeMiniCounter(amount) {
-  miniCounterValue += amount;
-  const el = document.getElementById("miniCounterValue");
-  if (el) el.textContent = miniCounterValue;
-}
-const ROLL_COUNTER_STORAGE_KEY = "offlineDiceRollCounterValue";
-let rollCounterValue = Number(localStorage.getItem(ROLL_COUNTER_STORAGE_KEY));
-if (!Number.isFinite(rollCounterValue)) rollCounterValue = 0;
-function updateRollCounterDisplay() {
-  const el = document.getElementById("rollCounterValue");
-  if (el) el.textContent = rollCounterValue >= 0 ? "+" + rollCounterValue : rollCounterValue;
-}
-function changeRollCounter(amount) {
-  rollCounterValue += amount;
-  localStorage.setItem(ROLL_COUNTER_STORAGE_KEY, String(rollCounterValue));
-  updateRollCounterDisplay();
-}
-document.addEventListener("DOMContentLoaded", updateRollCounterDisplay);
+<script id="offline-dice-last20-final">
+(function(){
+  'use strict';
+  const KEY='offlineDiceLast20Rolls';
+  const COLORS={red:'#ef4444',orange:'#f59e0b',gold:'#facc15',green:'#3baa35',blue:'#3b5bea',purple:'#9c27b0'};
+  let history=[];
+  try { const saved=JSON.parse(localStorage.getItem(KEY)||'[]'); if(Array.isArray(saved)) history=saved; } catch(e) {}
+  history=history.filter(x=>x&&Array.isArray(x.colors)).slice(0,20);
+
+  function normalize(arr){ return (Array.isArray(arr)?arr:[]).map(v=>String(v).trim().toLowerCase()).filter(Boolean); }
+  function render(){
+    const root=document.getElementById('last20Rolls');
+    const stats=document.getElementById('last20Stats');
+    const current=document.getElementById('last20Current');
+    const previous=document.getElementById('last20Previous');
+    if(!root||!stats||!current||!previous) return false;
+    root.style.display='flex';
+    stats.innerHTML=''; current.innerHTML=''; previous.innerHTML='';
+    const counts={red:0,orange:0,gold:0,green:0,blue:0,purple:0};
+    history.forEach(r=>r.colors.forEach(c=>{ if(Object.prototype.hasOwnProperty.call(counts,c)) counts[c]++; }));
+    Object.keys(counts).forEach(c=>{
+      const stat=document.createElement('div'); stat.className='last20-stat';
+      const dot=document.createElement('span'); dot.className='last20-dot'; dot.style.background=COLORS[c];
+      stat.append(dot,document.createTextNode('× '+counts[c])); stats.appendChild(stat);
+    });
+    history.forEach((r,i)=>{
+      const box=document.createElement('div'); box.className='last20-roll'+(i===0?' current':'');
+      const head=document.createElement('div'); head.className='last20-roll-head';
+      const name=document.createElement('div'); name.className='last20-roll-name'; name.textContent=i===0?'THIS ROLL':String(i+1);
+      const id=document.createElement('div'); id.className='last20-roll-id'; id.textContent=r.code || 'Verify code unavailable';
+      head.append(name,id);
+      const dice=document.createElement('div'); dice.className='last20-dice';
+      r.colors.forEach(c=>{ const d=document.createElement('span'); d.className='last20-die'; d.style.background=COLORS[c]||c; dice.appendChild(d); });
+      box.append(head,dice);
+      (i===0?current:previous).appendChild(box);
+    });
+    return true;
+  }
+  function save(){ try{localStorage.setItem(KEY,JSON.stringify(history.slice(0,20)));}catch(e){} }
+  function add(colors,code){
+    const arr=normalize(colors); if(!arr.length) return false;
+    const verify=String(code==null?'':code);
+    const sig=verify+'|'+arr.join(',');
+    const old=history[0];
+    if(old && (old._sig===sig || (verify && old.code===verify))) return false;
+    history.unshift({colors:arr,code:verify,_sig:sig});
+    history=history.slice(0,20); save(); render(); return true;
+  }
+  window.addSpinHistory=function(colors,code){ return add(colors,code); };
+
+  function readAuthoritativeRoll(){
+    const pf=window.provablyFair;
+    if(!pf) return;
+    const colors=normalize(pf.lastColors);
+    if(!colors.length) return;
+    add(colors,pf.lastVerify);
+  }
+
+  function init(){
+    render();
+    readAuthoritativeRoll();
+    setInterval(readAuthoritativeRoll,150);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
+  else init();
+})();
 </script>
 <style>
 .offline-dice-footer{
