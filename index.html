@@ -3353,53 +3353,10 @@ async function getRandomResult(mode) {
             console.log("CURRENT COLORS:", verifyColors);
             window.provablyFair.lastColors = verifyColors.map(c => c.toLowerCase());
 
-            // LAST 20 ROLLS: record the exact Worker result immediately.
-            // Keep this directly coupled to the successful Color Dice roll so
-            // the history cannot depend on script-load timing.
-            try {
-                const historyColors = verifyColors
-                    .map(c => String(c || "").trim().toLowerCase())
-                    .filter(c => ["red","orange","gold","green","blue","purple"].includes(c));
-                const historyCode = String(window.provablyFair?.lastVerify || "").trim();
-
-                if (historyColors.length) {
-                    const historyKey = "offlineDiceLast20Rolls";
-                    let history = [];
-                    try {
-                        const stored = JSON.parse(localStorage.getItem(historyKey) || "[]");
-                        if (Array.isArray(stored)) history = stored;
-                    } catch (_) {}
-
-                    const entry = {
-                        colors: historyColors,
-                        code: historyCode
-                    };
-
-                    // Prevent the exact same roll from being inserted twice.
-                    const sameAsFirst = history[0] &&
-                        Array.isArray(history[0].colors) &&
-                        history[0].colors.map(c => String(c).toLowerCase()).join(",") === historyColors.join(",") &&
-                        String(history[0].code || "") === historyCode;
-
-                    if (!sameAsFirst) {
-                        history.unshift(entry);
-                        history = history.slice(0, 20);
-                        try {
-                            localStorage.setItem(historyKey, JSON.stringify(history));
-                        } catch (_) {}
-                    }
-
-                    // Update the visible Last 20 Rolls immediately.
-                    const renderHistory = window.renderLast20Rolls;
-                    if (typeof renderHistory === "function") {
-                        renderHistory();
-                    } else if (typeof window.addSpinHistory === "function") {
-                        // Compatibility fallback for the existing history renderer.
-                        window.addSpinHistory(historyColors, historyCode);
-                    }
-                }
-            } catch (historyError) {
-                console.warn("Last 20 Rolls update failed:", historyError);
+            // LAST 20 ROLLS: save the exact colors returned by the Worker and the exact Verify Code.
+            // Use the local result array here so the history cannot be affected by later UI changes.
+            if (typeof window.addSpinHistory === "function") {
+                window.addSpinHistory(verifyColors.slice(), String(window.provablyFair.lastVerify || ""));
             }
 
             // The Verify Code was already created by the Worker.
@@ -6418,48 +6375,53 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 
   function normalizeColors(colors){
     if(!Array.isArray(colors)) return [];
-    return colors.map(c=>String(c).trim().toLowerCase()).filter(c=>Object.prototype.hasOwnProperty.call(COLORS,c));
+    return colors.map(function(c){ return String(c == null ? '' : c).trim().toLowerCase(); })
+      .filter(function(c){ return Object.prototype.hasOwnProperty.call(COLORS,c); });
   }
 
   function load(){
     try{
-      const data=JSON.parse(localStorage.getItem(KEY)||'[]');
-      if(Array.isArray(data)) history=data.map(r=>({
-        colors:normalizeColors(r&&r.colors),
-        code:r&&r.code!=null?String(r.code):''
-      })).filter(r=>r.colors.length).slice(0,20);
+      const raw=localStorage.getItem(KEY);
+      const data=raw?JSON.parse(raw):[];
+      if(!Array.isArray(data)){ history=[]; return; }
+      history=data.map(function(r){
+        return {
+          colors:normalizeColors(r && r.colors),
+          code:r && r.code != null ? String(r.code) : ''
+        };
+      }).filter(function(r){ return r.colors.length; }).slice(0,20);
     }catch(e){ history=[]; }
   }
 
   function save(){
-    try{localStorage.setItem(KEY,JSON.stringify(history));}catch(e){}
+    try{ localStorage.setItem(KEY,JSON.stringify(history)); }catch(e){}
   }
 
   function render(){
     const stats=document.getElementById('last20Stats');
     const current=document.getElementById('last20Current');
     const previous=document.getElementById('last20Previous');
-    if(!stats||!current||!previous)return;
+    if(!stats || !current || !previous) return false;
 
-    stats.innerHTML='';
-    current.innerHTML='';
-    previous.innerHTML='';
-
+    stats.innerHTML=''; current.innerHTML=''; previous.innerHTML='';
     const counts={red:0,orange:0,gold:0,green:0,blue:0,purple:0};
-    history.forEach(r=>r.colors.forEach(c=>counts[c]++));
-    Object.keys(counts).forEach(c=>{
+    history.forEach(function(r){ r.colors.forEach(function(c){ counts[c]++; }); });
+
+    Object.keys(counts).forEach(function(c){
       const stat=document.createElement('div');
       stat.className='last20-stat';
       const dot=document.createElement('span');
       dot.className='last20-dot';
-      dot.style.background=COLORS[c];
-      stat.append(dot,document.createTextNode(' × '+counts[c]));
+      dot.style.backgroundColor=COLORS[c];
+      stat.appendChild(dot);
+      stat.appendChild(document.createTextNode(' × '+counts[c]));
       stats.appendChild(stat);
     });
 
-    history.forEach((r,i)=>{
+    history.forEach(function(r,i){
       const box=document.createElement('div');
       box.className='last20-roll'+(i===0?' current':'');
+
       const head=document.createElement('div');
       head.className='last20-roll-head';
       const name=document.createElement('div');
@@ -6468,52 +6430,45 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
       const id=document.createElement('div');
       id.className='last20-roll-id';
       id.textContent=r.code || 'Verify code unavailable';
-      head.append(name,id);
+      head.appendChild(name); head.appendChild(id);
+
       const dice=document.createElement('div');
       dice.className='last20-dice';
-      r.colors.forEach(c=>{
+      r.colors.forEach(function(c){
         const d=document.createElement('span');
         d.className='last20-die';
-        d.style.background=COLORS[c];
+        d.style.backgroundColor=COLORS[c];
         dice.appendChild(d);
       });
-      box.append(head,dice);
+      box.appendChild(head); box.appendChild(dice);
       (i===0?current:previous).appendChild(box);
     });
+    return true;
   }
 
-  // This is the ONLY entry point used by the main Color Dice roll.
-  // The main roll already supplies the authoritative Worker colors + verify code.
   window.addSpinHistory=function(colors,code){
     const arr=normalizeColors(colors);
-    if(!arr.length)return;
-    const verify=code==null?'':String(code);
-    const signature=arr.join(',')+'|'+verify;
-    const first=history[0];
-    if(first && first.colors.join(',')+'|'+String(first.code||'')===signature)return;
+    if(!arr.length){ console.warn('LAST20: no valid colors',colors); return; }
+    const verify=code == null ? '' : String(code);
+    // Always record the actual new roll. Do not reject it merely because a previous
+    // entry has the same colors/code; repeated identical rolls are still separate rolls.
     history.unshift({colors:arr.slice(),code:verify});
     history=history.slice(0,20);
     save();
     render();
   };
 
-  // Expose only the renderer globally. The main Color Dice roll stores the
-  // authoritative Worker result itself and then calls this function.
-  window.renderLast20Rolls = function(){
-    load();
-    render();
-  };
-
   function init(){
     load();
+    // Render now and once after DOM settles, so this also works if another script
+    // moves/rebuilds the Last-20 container during startup.
     render();
+    setTimeout(render,0);
+    setTimeout(render,250);
   }
 
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',init,{once:true});
-  }else{
-    init();
-  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
+  else init();
 })();
 </script>
 <script id="offline-dice-install-handler">
