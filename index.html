@@ -3307,96 +3307,203 @@ z-index:9999;">
 <style id="od-profile-system-css">
 #od-profile-trigger{
   position:fixed;
-  top:20px;
-  left:20px;
-  transform:translateY(54px);
+  top:14px;
+  left:14px;
+  transform:none;
   z-index:10002;
   display:flex;
   align-items:center;
-  gap:9px;
-  min-height:44px;
-  max-width:220px;
-  padding:5px 12px 5px 6px;
-  border:1px solid rgba(255,255,255,.22);
-  border-radius:24px;
-  background:rgba(15,18,24,.48);
+  gap:7px;
+  height:34px;
+  max-width:170px;
+  padding:3px 9px 3px 4px;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:18px;
+  background:rgba(10,13,18,.52);
   color:#fff;
   cursor:pointer;
-  font:700 13px Arial,sans-serif;
-  box-shadow:0 10px 30px rgba(0,0,0,.22);
-  backdrop-filter:blur(16px) saturate(140%);
-  -webkit-backdrop-filter:blur(16px) saturate(140%);
+  font:600 11px/1 Arial,sans-serif;
+  box-shadow:0 7px 24px rgba(0,0,0,.20);
+  backdrop-filter:blur(14px) saturate(135%);
+  -webkit-backdrop-filter:blur(14px) saturate(135%);
+  transition:background .18s,transform .18s,box-shadow .18s;
 }
-#od-profile-trigger:hover{background:rgba(25,30,40,.64);transform:translateY(53px)}
+#od-profile-trigger:hover{
+  background:rgba(20,25,33,.72);
+  transform:translateY(-1px);
+  box-shadow:0 10px 28px rgba(0,0,0,.27);
+}
 #od-profile-avatar{
-  width:32px;height:32px;border-radius:50%;object-fit:cover;
-  display:block;background:rgba(255,255,255,.12);
-  border:1px solid rgba(255,255,255,.25);
-  flex:0 0 32px;
+  width:27px;
+  height:27px;
+  border-radius:50%;
+  object-fit:cover;
+  display:block;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.20);
+  flex:0 0 27px;
 }
 #od-profile-trigger-name{
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:145px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  max-width:105px;
 }
-#od-profile-trigger-arrow{opacity:.7;font-size:11px}
+#od-profile-trigger-arrow{
+  opacity:.55;
+  font-size:10px;
+  margin-left:1px;
+}
 
 #od-profile-panel{
   position:fixed;
-  top:76px;
-  left:20px;
-  width:min(340px,calc(100vw - 28px));
+  top:57px;
+  left:14px;
+  width:min(300px,calc(100vw - 28px));
   z-index:10003;
-  padding:18px;
-  border:1px solid rgba(255,255,255,.2);
-  border-radius:20px;
-  background:rgba(15,18,24,.72);
+  box-sizing:border-box;
+  padding:14px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:16px;
+  background:rgba(12,15,21,.84);
   color:#fff;
-  box-shadow:0 24px 70px rgba(0,0,0,.38);
-  backdrop-filter:blur(24px) saturate(145%);
-  -webkit-backdrop-filter:blur(24px) saturate(145%);
+  box-shadow:0 18px 55px rgba(0,0,0,.34);
+  backdrop-filter:blur(22px) saturate(145%);
+  -webkit-backdrop-filter:blur(22px) saturate(145%);
   font-family:Arial,sans-serif;
+  animation:odProfileIn .15s ease-out;
 }
 #od-profile-panel[hidden]{display:none!important}
-.od-profile-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+@keyframes odProfileIn{
+  from{opacity:0;transform:translateY(-5px) scale(.98)}
+  to{opacity:1;transform:none}
+}
+.od-profile-head{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:13px;
+}
 #od-profile-preview{
-  width:58px;height:58px;border-radius:50%;object-fit:cover;
-  background:rgba(255,255,255,.1);
-  border:1px solid rgba(255,255,255,.24);
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  object-fit:cover;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18);
 }
-.od-profile-title{font-size:17px;font-weight:800}
-.od-profile-subtitle{font-size:11px;color:rgba(255,255,255,.52);margin-top:3px}
-.od-profile-label{display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.62);margin:12px 0 7px}
-#od-profile-name-input{
-  width:100%;height:42px;box-sizing:border-box;padding:0 12px;
-  border-radius:12px;border:1px solid rgba(255,255,255,.16);
-  background:rgba(0,0,0,.22);color:#fff;outline:none;
+.od-profile-title{
   font-size:14px;
+  font-weight:800;
+  letter-spacing:.1px;
 }
-#od-profile-name-input:focus{border-color:rgba(255,255,255,.36)}
-.od-profile-avatars{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}
+.od-profile-subtitle{
+  font-size:10px;
+  color:rgba(255,255,255,.48);
+  margin-top:3px;
+}
+.od-profile-label{
+  display:block;
+  font-size:10px;
+  font-weight:700;
+  color:rgba(255,255,255,.55);
+  margin:10px 0 6px;
+}
+#od-profile-name-input{
+  width:100%;
+  height:36px;
+  box-sizing:border-box;
+  padding:0 10px;
+  border-radius:9px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(0,0,0,.20);
+  color:#fff;
+  outline:none;
+  font-size:12px;
+  transition:border-color .15s,background .15s;
+}
+#od-profile-name-input:focus{
+  border-color:rgba(77,163,255,.65);
+  background:rgba(0,0,0,.27);
+}
+.od-profile-avatars{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:6px;
+}
 .od-profile-avatar-choice{
-  width:100%;aspect-ratio:1;border-radius:12px;
-  border:1px solid rgba(255,255,255,.13);
-  background:rgba(255,255,255,.07);
-  cursor:pointer;padding:4px;font-size:21px;
+  width:100%;
+  aspect-ratio:1;
+  border-radius:9px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.055);
+  cursor:pointer;
+  padding:3px;
+  font-size:17px;
+  transition:.15s;
 }
-.od-profile-avatar-choice:hover{background:rgba(255,255,255,.14)}
-.od-profile-avatar-choice.selected{border-color:#4da3ff;box-shadow:0 0 0 2px rgba(77,163,255,.2)}
+.od-profile-avatar-choice:hover{
+  background:rgba(255,255,255,.11);
+  transform:translateY(-1px);
+}
+.od-profile-avatar-choice.selected{
+  border-color:#4da3ff;
+  box-shadow:0 0 0 2px rgba(77,163,255,.14);
+  background:rgba(77,163,255,.10);
+}
 #od-profile-upload{
-  display:block;width:100%;margin-top:9px;
-  color:rgba(255,255,255,.7);font-size:11px;
+  display:block;
+  width:100%;
+  box-sizing:border-box;
+  margin-top:7px;
+  padding:6px 0;
+  color:rgba(255,255,255,.58);
+  font-size:9px;
 }
-.od-profile-actions{display:flex;gap:8px;margin-top:15px}
+.od-profile-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:11px;
+}
 .od-profile-actions button{
-  flex:1;height:40px;border:0;border-radius:11px;cursor:pointer;
-  font-weight:800;font-size:13px;
+  height:34px;
+  border:0;
+  border-radius:9px;
+  cursor:pointer;
+  font-weight:800;
+  font-size:11px;
+  transition:.15s;
 }
-#od-profile-cancel{background:rgba(255,255,255,.1);color:#fff}
-#od-profile-save{background:#1687ff;color:#fff}
-#od-profile-error{min-height:17px;margin-top:8px;color:#ff7180;font-size:11px}
+.od-profile-actions button:hover{transform:translateY(-1px)}
+#od-profile-cancel{
+  background:rgba(255,255,255,.075);
+  color:#fff;
+}
+#od-profile-cancel:hover{background:rgba(255,255,255,.12)}
+#od-profile-save{
+  background:#1687ff;
+  color:#fff;
+  box-shadow:0 5px 16px rgba(22,135,255,.20);
+}
+#od-profile-save:hover{background:#2791ff}
+#od-profile-error{
+  min-height:14px;
+  margin-top:6px;
+  color:#ff7180;
+  font-size:9px;
+}
 @media(max-width:600px){
-  #od-profile-trigger{left:12px;top:12px;transform:translateY(50px)}
-  #od-profile-trigger:hover{transform:translateY(49px)}
-  #od-profile-panel{left:12px;top:70px}
+  #od-profile-trigger{
+    top:10px;
+    left:10px;
+    height:32px;
+  }
+  #od-profile-panel{
+    top:51px;
+    left:10px;
+    width:min(292px,calc(100vw - 20px));
+  }
 }
 </style>
 
