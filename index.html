@@ -2041,386 +2041,358 @@ body.dice-roll-active #od-public-chat{
 
 <!-- OFFLINE DICE PROFILE DASHBOARD START -->
 <style id="offline-dice-profile-dashboard">
-/* Completely isolated account UI */
-#od-profile-dashboard,
-#od-profile-dashboard *,
-#od-profile-dashboard *::before,
-#od-profile-dashboard *::after{
-  box-sizing:border-box !important;
+/* Account page: intentionally mirrors the supplied reference layout.
+   Accent colors are neutral; the page background comes from the active Dice theme. */
+#od-profile-dashboard{
+  position:fixed;
+  inset:0;
+  z-index:2147483000;
   font-family:'Luckiest Guy',cursive !important;
-  color:#f5f5f5 !important;
-  -webkit-text-fill-color:#f5f5f5 !important;
+}
+#od-profile-dashboard,
+#od-profile-dashboard *{
+  box-sizing:border-box;
   text-shadow:none !important;
 }
-
-#od-profile-dashboard{
-  position:fixed !important;
-  top:15px !important;
-  left:15px !important;
-  z-index:2147483000 !important;
-}
-
-/* Small profile opener */
 #od-profile-dashboard .odpd-open{
-  appearance:none !important;
-  width:142px !important;
-  height:46px !important;
-  padding:5px 11px !important;
-  border:1px solid rgba(255,255,255,.20) !important;
-  border-radius:13px !important;
-  background:rgba(7,8,12,.78) !important;
-  display:flex !important;
-  align-items:center !important;
-  gap:9px !important;
-  cursor:pointer !important;
-  box-shadow:0 10px 28px rgba(0,0,0,.30) !important;
-  backdrop-filter:blur(16px) !important;
-  -webkit-backdrop-filter:blur(16px) !important;
+  position:fixed;
+  top:15px;
+  left:15px;
+  width:142px;
+  height:46px;
+  padding:5px 11px;
+  border:1px solid rgba(255,255,255,.20);
+  border-radius:13px;
+  background:rgba(5,6,9,.78);
+  color:#fff !important;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  cursor:pointer;
+  box-shadow:0 10px 28px rgba(0,0,0,.30);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
 }
 #od-profile-dashboard .odpd-open-avatar{
-  width:34px !important;
-  height:34px !important;
-  flex:0 0 34px !important;
-  border-radius:50% !important;
-  object-fit:cover !important;
-  background:#20242a !important;
+  width:34px;height:34px;flex:0 0 34px;
+  border-radius:50%;object-fit:cover;background:#20242a;
 }
-#od-profile-dashboard .odpd-open-copy{
-  min-width:0 !important;
-  flex:1 !important;
-  text-align:left !important;
-}
+#od-profile-dashboard .odpd-open-copy{min-width:0;flex:1;text-align:left}
 #od-profile-dashboard .odpd-open-name{
-  display:block !important;
-  font-size:12px !important;
-  line-height:1 !important;
-  font-weight:400 !important;
-  white-space:nowrap !important;
-  overflow:hidden !important;
-  text-overflow:ellipsis !important;
+  display:block;color:#fff !important;font-size:12px;font-weight:400;
+  line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 #od-profile-dashboard .odpd-open-sub{
-  display:block !important;
-  margin-top:4px !important;
-  font-size:8px !important;
-  line-height:1 !important;
-  opacity:.48 !important;
+  display:block;margin-top:4px;color:rgba(255,255,255,.45) !important;
+  font-size:8px;line-height:1;font-weight:400;
 }
 #od-profile-dashboard .odpd-chevron{
-  font-family:Arial,sans-serif !important;
-  font-size:18px !important;
-  opacity:.55 !important;
+  color:rgba(255,255,255,.55) !important;
+  font-family:Arial,sans-serif !important;font-size:18px;
 }
 
-/* Full account page */
+/* Full screen, with NO purple color wash. */
 #od-profile-dashboard .odpd-screen{
-  position:fixed !important;
-  inset:0 !important;
-  display:none !important;
-  overflow:auto !important;
-  padding:0 24px 50px !important;
-  background-position:center center !important;
-  background-size:cover !important;
-  background-repeat:no-repeat !important;
-  background-attachment:fixed !important;
+  position:fixed;
+  inset:0;
+  display:none;
+  overflow:auto;
+  padding:0 8px 24px;
+  color:#fff !important;
+  background-color:#111;
+  background-position:center center;
+  background-size:cover;
+  background-repeat:no-repeat;
+  background-attachment:fixed;
 }
 #od-profile-dashboard .odpd-screen::before{
-  content:"" !important;
-  position:fixed !important;
-  inset:0 !important;
-  z-index:0 !important;
-  pointer-events:none !important;
-  background:rgba(0,0,0,.58) !important;
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  background:rgba(0,0,0,.18);
 }
-#od-profile-dashboard.odpd-active .odpd-screen{
-  display:block !important;
-}
+#od-profile-dashboard.odpd-active .odpd-screen{display:block}
 #od-profile-dashboard .odpd-page{
-  position:relative !important;
-  z-index:1 !important;
-  width:min(100%,920px) !important;
-  margin:0 auto !important;
+  position:relative;
+  z-index:1;
+  width:100%;
+  max-width:687px;
+  margin:0 auto;
+  padding:0;
 }
 
-/* Header exactly like the reference structure */
+/* Header dimensions/spacing follow the reference. */
 #od-profile-dashboard .odpd-topbar{
-  min-height:82px !important;
-  padding:0 !important;
-  display:flex !important;
-  align-items:flex-start !important;
-  justify-content:space-between !important;
+  height:84px;
+  min-height:84px;
+  padding:0;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
 }
-#od-profile-dashboard .odpd-top-left{
-  padding-top:0 !important;
-}
+#od-profile-dashboard .odpd-top-left{padding:0}
 #od-profile-dashboard .odpd-back{
-  appearance:none !important;
-  display:block !important;
-  margin:4px 0 4px !important;
-  padding:0 !important;
-  border:0 !important;
-  background:transparent !important;
-  font-size:11px !important;
-  line-height:1 !important;
-  font-weight:400 !important;
-  cursor:pointer !important;
-  opacity:.65 !important;
+  /* kept functional but visually minimal so it does not change the reference composition */
+  position:absolute;
+  left:0;
+  top:4px;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:0;
+  border:0;
+  opacity:0;
+  pointer-events:none;
 }
 #od-profile-dashboard .odpd-account-title{
-  margin:0 !important;
-  font-size:29px !important;
-  line-height:1 !important;
-  font-weight:400 !important;
-  letter-spacing:-.2px !important;
+  margin:8px 0 0;
+  padding:0;
+  color:#fff !important;
+  font-size:28px;
+  line-height:1;
+  font-weight:400;
+  letter-spacing:0;
 }
 #od-profile-dashboard .odpd-account-sub{
-  margin:5px 0 0 !important;
-  font-size:12px !important;
-  line-height:1 !important;
-  opacity:.48 !important;
-  font-weight:400 !important;
+  margin:5px 0 0;
+  color:rgba(255,255,255,.52) !important;
+  font-size:12px;
+  line-height:1;
+  font-weight:400;
 }
 #od-profile-dashboard .odpd-logout{
-  appearance:none !important;
-  margin-top:11px !important;
-  height:34px !important;
-  padding:0 15px !important;
-  border:1px solid rgba(255,255,255,.20) !important;
-  border-radius:9px !important;
-  background:rgba(8,9,12,.70) !important;
-  font-size:11px !important;
-  font-weight:400 !important;
-  cursor:pointer !important;
+  margin:21px 0 0;
+  height:34px;
+  padding:0 15px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:9px;
+  background:rgba(8,9,12,.68);
+  color:#fff !important;
+  font-size:11px;
+  line-height:1;
+  font-weight:400;
+  cursor:pointer;
 }
 
-/* Reference-style cards */
+/* Reference card */
 #od-profile-dashboard .odpd-section{
-  margin:0 !important;
-  padding:21px 22px 23px !important;
-  border:1px solid rgba(255,255,255,.19) !important;
-  border-radius:19px !important;
-  background:rgba(3,4,7,.91) !important;
-  box-shadow:0 18px 50px rgba(0,0,0,.30) !important;
-  backdrop-filter:blur(7px) !important;
-  -webkit-backdrop-filter:blur(7px) !important;
+  width:100%;
+  margin:0;
+  padding:22px 22px 24px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:19px;
+  background:rgba(2,3,6,.91);
+  color:#fff !important;
+  box-shadow:0 16px 45px rgba(0,0,0,.28);
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
 }
-#od-profile-dashboard .odpd-section + .odpd-section{
-  margin-top:18px !important;
-}
+#od-profile-dashboard .odpd-section + .odpd-section{margin-top:18px}
 #od-profile-dashboard .odpd-section-title{
-  margin:0 0 24px !important;
-  font-size:18px !important;
-  line-height:1 !important;
-  font-weight:400 !important;
+  margin:0 0 24px;
+  color:#fff !important;
+  font-size:18px;
+  line-height:1;
+  font-weight:400;
 }
 
-/* Photo row */
+/* Profile photo */
 #od-profile-dashboard .odpd-photo-row{
-  display:flex !important;
-  align-items:center !important;
-  gap:17px !important;
-  margin:0 0 25px !important;
+  display:flex;
+  align-items:center;
+  gap:17px;
+  margin:0 0 24px;
 }
 #od-profile-dashboard .odpd-photo{
-  width:64px !important;
-  height:64px !important;
-  flex:0 0 64px !important;
-  border-radius:50% !important;
-  object-fit:cover !important;
-  background:#20242a !important;
-  border:1px solid rgba(255,255,255,.16) !important;
-}
-#od-profile-dashboard .odpd-photo-copy{
-  min-width:0 !important;
+  width:64px;height:64px;flex:0 0 64px;
+  border-radius:50%;object-fit:cover;
+  background:#20242a;
+  border:1px solid rgba(255,255,255,.16);
 }
 #od-profile-dashboard .odpd-photo-label{
-  margin:0 0 7px !important;
-  font-size:11px !important;
-  line-height:1 !important;
-  font-weight:400 !important;
+  margin:0 0 7px;
+  color:#fff !important;
+  font-size:11px;
+  line-height:1;
+  font-weight:400;
 }
 #od-profile-dashboard .odpd-file-row{
-  display:flex !important;
-  align-items:center !important;
-  gap:9px !important;
-  flex-wrap:wrap !important;
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap;
 }
 #od-profile-dashboard .odpd-file-btn{
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  height:33px !important;
-  padding:0 12px !important;
-  border:1px solid rgba(255,255,255,.25) !important;
-  border-radius:8px !important;
-  background:#08090c !important;
-  font-size:11px !important;
-  font-weight:400 !important;
-  cursor:pointer !important;
+  height:33px;
+  padding:0 12px;
+  border:1px solid rgba(255,255,255,.23);
+  border-radius:8px;
+  background:#08090c;
+  color:#fff !important;
+  font-family:'Luckiest Guy',cursive !important;
+  font-size:11px;
+  font-weight:400;
+  cursor:pointer;
 }
 #od-profile-dashboard .odpd-file-name,
 #od-profile-dashboard .odpd-help{
   font-family:Arial,Helvetica,sans-serif !important;
-  font-size:11px !important;
-  opacity:.48 !important;
+  color:rgba(255,255,255,.47) !important;
+  font-size:11px;
 }
-#od-profile-dashboard .odpd-help{
-  margin-top:7px !important;
-}
+#od-profile-dashboard .odpd-help{margin-top:7px}
 
-/* Inputs */
-#od-profile-dashboard .odpd-field{
-  margin-top:21px !important;
-}
+/* Inputs exactly like the reference proportions, neutral border. */
+#od-profile-dashboard .odpd-field{margin-top:21px}
 #od-profile-dashboard .odpd-label{
-  display:block !important;
-  margin-bottom:7px !important;
-  font-size:11px !important;
-  line-height:1 !important;
-  font-weight:400 !important;
+  display:block;
+  margin:0 0 7px;
+  color:#fff !important;
+  font-size:11px;
+  line-height:1;
+  font-weight:400;
 }
 #od-profile-dashboard .odpd-input,
 #od-profile-dashboard .odpd-textarea{
-  width:100% !important;
-  border:1px solid rgba(255,255,255,.22) !important;
-  border-radius:10px !important;
-  outline:none !important;
-  background:rgba(0,0,0,.48) !important;
+  width:100%;
+  border:1px solid rgba(255,255,255,.20);
+  border-radius:10px;
+  outline:none;
+  background:rgba(0,0,0,.46);
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
   font-family:Arial,Helvetica,sans-serif !important;
-  font-size:13px !important;
-  -webkit-text-fill-color:#f5f5f5 !important;
+  font-size:13px;
 }
-#od-profile-dashboard .odpd-input{
-  height:40px !important;
-  padding:0 12px !important;
-}
+#od-profile-dashboard .odpd-input{height:40px;padding:0 12px}
 #od-profile-dashboard .odpd-textarea{
-  min-height:94px !important;
-  padding:11px 12px !important;
-  resize:vertical !important;
+  min-height:95px;padding:11px 12px;resize:vertical;
+}
+#od-profile-dashboard .odpd-input::placeholder,
+#od-profile-dashboard .odpd-textarea::placeholder{
+  color:rgba(255,255,255,.40) !important;
+  opacity:1;
+}
+#od-profile-dashboard .odpd-input:focus,
+#od-profile-dashboard .odpd-textarea:focus{
+  border-color:rgba(255,255,255,.42);
+  box-shadow:none;
 }
 #od-profile-dashboard .odpd-field-help{
-  margin-top:7px !important;
+  margin-top:7px;
+  color:rgba(255,255,255,.44) !important;
   font-family:Arial,Helvetica,sans-serif !important;
-  font-size:10px !important;
-  line-height:1.25 !important;
-  opacity:.44 !important;
+  font-size:10px;
+  line-height:1.25;
 }
 
-/* Small action buttons */
+/* Actions */
 #od-profile-dashboard .odpd-actions{
-  display:flex !important;
-  align-items:center !important;
-  gap:15px !important;
-  margin-top:23px !important;
+  display:flex;
+  align-items:center;
+  gap:15px;
+  margin-top:23px;
 }
 #od-profile-dashboard .odpd-save{
-  height:40px !important;
-  padding:0 15px !important;
-  border:1px solid rgba(255,255,255,.25) !important;
-  border-radius:10px !important;
-  background:#eeeeef !important;
+  height:41px;
+  padding:0 15px;
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:10px;
+  background:#f0f0f0 !important;
   color:#111 !important;
   -webkit-text-fill-color:#111 !important;
-  font-size:11px !important;
-  font-weight:400 !important;
-  cursor:pointer !important;
+  font-family:'Luckiest Guy',cursive !important;
+  font-size:11px;
+  font-weight:400;
+  cursor:pointer;
+  box-shadow:none;
 }
 #od-profile-dashboard .odpd-view{
-  border:0 !important;
-  background:transparent !important;
-  padding:7px 0 !important;
-  font-size:11px !important;
-  font-weight:400 !important;
-  cursor:pointer !important;
-  opacity:.78 !important;
+  padding:7px 0;
+  border:0;
+  background:transparent;
+  color:#fff !important;
+  font-family:'Luckiest Guy',cursive !important;
+  font-size:11px;
+  font-weight:400;
+  cursor:pointer;
 }
 #od-profile-dashboard .odpd-error{
-  display:none !important;
-  margin-top:9px !important;
-  font-family:Arial,Helvetica,sans-serif !important;
+  display:none;
+  margin-top:9px;
   color:#ff9a9a !important;
-  -webkit-text-fill-color:#ff9a9a !important;
-  font-size:11px !important;
+  font-family:Arial,Helvetica,sans-serif !important;
+  font-size:11px;
 }
 
-/* Statistics: only rolls + coin flips */
+/* Statistics */
 #od-profile-dashboard .odpd-stats{
-  display:grid !important;
-  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-  gap:10px !important;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
 }
 #od-profile-dashboard .odpd-stat{
-  min-height:118px !important;
-  border:1px solid rgba(255,255,255,.19) !important;
-  border-radius:13px !important;
-  background:rgba(0,0,0,.22) !important;
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:center !important;
-  justify-content:center !important;
+  min-height:118px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:13px;
+  background:rgba(0,0,0,.20);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
 }
 #od-profile-dashboard .odpd-stat-icon{
-  font-family:Arial,Helvetica,sans-serif !important;
-  font-size:19px !important;
-  line-height:1 !important;
-  margin-bottom:10px !important;
-  filter:grayscale(1) !important;
+  font-family:Arial,sans-serif !important;
+  font-size:19px;
+  line-height:1;
+  margin-bottom:10px;
+  filter:grayscale(1);
 }
 #od-profile-dashboard .odpd-stat-number{
-  font-size:21px !important;
-  line-height:1 !important;
-  font-weight:400 !important;
+  color:#fff !important;
+  font-size:21px;
+  line-height:1;
+  font-weight:400;
 }
 #od-profile-dashboard .odpd-stat-label{
-  margin-top:9px !important;
-  font-size:9px !important;
-  line-height:1 !important;
-  font-weight:400 !important;
-  letter-spacing:.3px !important;
-  opacity:.50 !important;
+  margin-top:9px;
+  color:rgba(255,255,255,.48) !important;
+  font-size:9px;
+  line-height:1;
+  font-weight:400;
+  letter-spacing:.3px;
 }
 
 /* View profile */
 #od-profile-dashboard .odpd-profile-view{
-  display:none !important;
-  margin-top:16px !important;
-  padding-top:16px !important;
-  border-top:1px solid rgba(255,255,255,.10) !important;
+  display:none;
+  margin-top:16px;
+  padding-top:16px;
+  border-top:1px solid rgba(255,255,255,.10);
 }
-#od-profile-dashboard .odpd-profile-view.active{display:block !important}
+#od-profile-dashboard .odpd-profile-view.active{display:block}
 #od-profile-dashboard .odpd-profile-view-head{
-  display:flex !important;
-  align-items:center !important;
-  gap:13px !important;
+  display:flex;align-items:center;gap:13px;
 }
 #od-profile-dashboard .odpd-view-avatar{
-  width:54px !important;
-  height:54px !important;
-  border-radius:50% !important;
-  object-fit:cover !important;
-  background:#20242a !important;
+  width:54px;height:54px;border-radius:50%;object-fit:cover;background:#20242a;
 }
 #od-profile-dashboard .odpd-view-name{
-  font-size:16px !important;
-  font-weight:400 !important;
+  color:#fff !important;font-size:16px;font-weight:400;
 }
 #od-profile-dashboard .odpd-view-bio{
-  margin:12px 0 0 !important;
+  margin:12px 0 0;
+  color:rgba(255,255,255,.65) !important;
   font-family:Arial,Helvetica,sans-serif !important;
-  font-size:12px !important;
-  line-height:1.5 !important;
-  opacity:.65 !important;
-  white-space:pre-wrap !important;
+  font-size:12px;line-height:1.5;
+  white-space:pre-wrap;
 }
 
 @media(max-width:650px){
-  #od-profile-dashboard .odpd-screen{padding:0 12px 35px !important}
-  #od-profile-dashboard .odpd-topbar{min-height:78px !important}
-  #od-profile-dashboard .odpd-account-title{font-size:25px !important}
-  #od-profile-dashboard .odpd-section{padding:19px 16px 20px !important}
-  #od-profile-dashboard .odpd-stats{grid-template-columns:1fr !important}
-  #od-profile-dashboard .odpd-stat{min-height:94px !important}
+  #od-profile-dashboard .odpd-screen{padding:0 8px 24px}
+  #od-profile-dashboard .odpd-topbar{height:78px;min-height:78px}
+  #od-profile-dashboard .odpd-account-title{font-size:25px}
+  #od-profile-dashboard .odpd-section{padding:20px 16px 22px}
+  #od-profile-dashboard .odpd-stats{grid-template-columns:1fr}
 }
 </style>
 
