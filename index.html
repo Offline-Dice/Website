@@ -6383,7 +6383,8 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 (function () {
   "use strict";
 
-  var STORAGE_KEY = "offlineDiceLast20Rolls";
+  // LAST 20 ROLLS is SESSION-ONLY.
+  // Nothing is read from or written to localStorage/sessionStorage.
   var COLORS = {
     red: "#ef4444",
     orange: "#f59e0b",
@@ -6401,35 +6402,11 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
   function cleanColors(colors) {
     if (!Array.isArray(colors)) return [];
     return colors.map(function (c) {
-      return String(c == null ? "" : c).trim().toLowerCase();
-    if (c === "gold") c = "yellow";
+      c = String(c == null ? "" : c).trim().toLowerCase();
+      return c === "gold" ? "yellow" : c;
     }).filter(function (c) {
-      return !!COLORS[c];
+      return Object.prototype.hasOwnProperty.call(COLORS, c);
     });
-  }
-
-  function load() {
-    try {
-      var raw = localStorage.getItem(STORAGE_KEY);
-      var data = raw ? JSON.parse(raw) : [];
-      if (!Array.isArray(data)) data = [];
-      history = data.map(function (item) {
-        return {
-          colors: cleanColors(item && item.colors),
-          code: item && item.code != null ? String(item.code) : ""
-        };
-      }).filter(function (item) {
-        return item.colors.length > 0;
-      }).slice(0, 20);
-    } catch (e) {
-      history = [];
-    }
-  }
-
-  function save() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-    } catch (e) {}
   }
 
   function make(tag, className, text) {
@@ -6439,64 +6416,11 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     return el;
   }
 
-  function render() {
-    var box = getBox();
-    if (!box) return;
-
-    // Rebuild the whole Last 20 area every time. Nothing from the old implementation is reused.
-    box.innerHTML = "";
-
-    var title = make("div", "last20-title", "LAST 20 ROLLS");
-    box.appendChild(title);
-
-    var statsLabel = make("div", "last20-label", "STATS");
-    box.appendChild(statsLabel);
-
-    var stats = make("div", "last20-stats", "");
-    var counts = {red:0, orange:0, yellow:0, green:0, blue:0, purple:0};
-    history.forEach(function (roll) {
-      roll.colors.forEach(function (color) { counts[color]++; });
-    });
-
-    Object.keys(COLORS).forEach(function (color) {
-      var stat = make("div", "last20-stat", "");
-      var dot = make("span", "last20-dot", "");
-      dot.style.backgroundColor = COLORS[color];
-      var label = make("span", "", color.toUpperCase() + " × " + counts[color]);
-      stat.appendChild(dot);
-      stat.appendChild(label);
-      stats.appendChild(stat);
-    });
-    box.appendChild(stats);
-
-    if (history.length === 0) {
-      box.appendChild(make("div", "last20-empty", "Noch keine Rolls vorhanden."));
-      return;
-    }
-
-    var currentLabel = make("div", "last20-label", "LAST ROLL");
-    currentLabel.style.marginTop = "16px";
-    box.appendChild(currentLabel);
-    box.appendChild(createRoll(history[0], 0));
-
-    if (history.length > 1) {
-      var previousLabel = make("div", "last20-label", "PREVIOUS ROLLS");
-      previousLabel.style.marginTop = "16px";
-      box.appendChild(previousLabel);
-      for (var i = 1; i < history.length; i++) {
-        box.appendChild(createRoll(history[i], i));
-      }
-    }
-  }
-
   function createRoll(roll, index) {
     var row = make("div", "last20-roll" + (index === 0 ? " current" : ""), "");
-
     var head = make("div", "last20-roll-head", "");
     head.appendChild(make("div", "last20-roll-name", index === 0 ? "THIS ROLL" : "ROLL " + (index + 1)));
-    if (roll.code) {
-      head.appendChild(make("div", "last20-roll-id", roll.code));
-    }
+    if (roll.code) head.appendChild(make("div", "last20-roll-id", roll.code));
     row.appendChild(head);
 
     var dice = make("div", "last20-dice", "");
@@ -6510,7 +6434,49 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     return row;
   }
 
-  // This is the ONLY function the main roll needs to call.
+  function render() {
+    var box = getBox();
+    if (!box) return;
+    box.innerHTML = "";
+
+    box.appendChild(make("div", "last20-title", "LAST 20 ROLLS"));
+    box.appendChild(make("div", "last20-label", "STATS"));
+
+    var stats = make("div", "last20-stats", "");
+    var counts = {red:0, orange:0, yellow:0, green:0, blue:0, purple:0};
+    history.forEach(function (roll) {
+      roll.colors.forEach(function (color) { counts[color]++; });
+    });
+
+    Object.keys(COLORS).forEach(function (color) {
+      var stat = make("div", "last20-stat", "");
+      var dot = make("span", "last20-dot", "");
+      dot.style.backgroundColor = COLORS[color];
+      stat.appendChild(dot);
+      stat.appendChild(make("span", "", color.toUpperCase() + " × " + counts[color]));
+      stats.appendChild(stat);
+    });
+    box.appendChild(stats);
+
+    if (!history.length) {
+      box.appendChild(make("div", "last20-empty", "Noch keine Rolls vorhanden."));
+      return;
+    }
+
+    box.appendChild(make("div", "last20-label", "LAST ROLL"));
+    box.lastChild.style.marginTop = "16px";
+    box.appendChild(createRoll(history[0], 0));
+
+    if (history.length > 1) {
+      var previous = make("div", "last20-label", "PREVIOUS ROLLS");
+      previous.style.marginTop = "16px";
+      box.appendChild(previous);
+      for (var i = 1; i < history.length; i++) {
+        box.appendChild(createRoll(history[i], i));
+      }
+    }
+  }
+
   window.last20AddRoll = function (colors, code) {
     var cleaned = cleanColors(colors);
     if (!cleaned.length) {
@@ -6523,13 +6489,15 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
       code: code == null ? "" : String(code)
     });
     history = history.slice(0, 20);
-    save();
     render();
     return true;
   };
 
+  // Start empty on every page load. No persistence at all.
   function init() {
-    load();
+    history = [];
+    // Remove any history written by older versions. This version never writes it.
+    try { localStorage.removeItem("offlineDiceLast20Rolls"); } catch (e) {}
     render();
   }
 
