@@ -6371,7 +6371,14 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
   'use strict';
   const KEY='offlineDiceLast20Rolls';
   const COLORS={red:'#ef4444',orange:'#f59e0b',gold:'#facc15',green:'#3baa35',blue:'#3b5bea',purple:'#9c27b0'};
+  const RGB={
+    red:'rgb(239, 68, 68)',orange:'rgb(245, 158, 11)',gold:'rgb(250, 204, 21)',
+    green:'rgb(59, 170, 53)',blue:'rgb(59, 91, 234)',purple:'rgb(156, 39, 176)'
+  };
   let history=[];
+  let armed=false;
+  let armTime=0;
+  let lastSignature='';
 
   function normalizeColors(value){
     if(!Array.isArray(value)) return [];
@@ -6384,106 +6391,113 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
       const parsed=raw?JSON.parse(raw):[];
       if(Array.isArray(parsed)) history=parsed;
     }catch(e){ history=[]; }
-    history=history.filter(r=>r && Array.isArray(r.colors) && r.colors.length).map(r=>({
-      colors:normalizeColors(r.colors),
-      code:r.code==null?'':String(r.code)
+    history=history.map(r=>({
+      colors:normalizeColors(r&&r.colors),
+      code:r&&r.code!=null?String(r.code):''
     })).filter(r=>r.colors.length).slice(0,20);
   }
 
-  function save(){
-    try{ localStorage.setItem(KEY,JSON.stringify(history.slice(0,20))); }catch(e){}
-  }
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(history));}catch(e){}}
 
   function render(){
-    const root=document.getElementById('last20Rolls');
     const stats=document.getElementById('last20Stats');
     const current=document.getElementById('last20Current');
     const previous=document.getElementById('last20Previous');
-    if(!root||!stats||!current||!previous) return;
-
-    stats.innerHTML='';
-    current.innerHTML='';
-    previous.innerHTML='';
-
+    if(!stats||!current||!previous)return;
+    stats.innerHTML=''; current.innerHTML=''; previous.innerHTML='';
     const counts={red:0,orange:0,gold:0,green:0,blue:0,purple:0};
-    history.forEach(r=>r.colors.forEach(c=>{ if(counts[c]!==undefined) counts[c]++; }));
+    history.forEach(r=>r.colors.forEach(c=>counts[c]++));
     Object.keys(counts).forEach(c=>{
-      const stat=document.createElement('div');
-      stat.className='last20-stat';
-      const dot=document.createElement('span');
-      dot.className='last20-dot';
-      dot.style.background=COLORS[c];
-      stat.appendChild(dot);
-      stat.appendChild(document.createTextNode(' × '+counts[c]));
-      stats.appendChild(stat);
+      const stat=document.createElement('div'); stat.className='last20-stat';
+      const dot=document.createElement('span'); dot.className='last20-dot'; dot.style.background=COLORS[c];
+      stat.append(dot,document.createTextNode(' × '+counts[c])); stats.appendChild(stat);
     });
-
     history.forEach((r,i)=>{
-      const box=document.createElement('div');
-      box.className='last20-roll'+(i===0?' current':'');
-
-      const head=document.createElement('div');
-      head.className='last20-roll-head';
-      const name=document.createElement('div');
-      name.className='last20-roll-name';
-      name.textContent=i===0?'THIS ROLL':String(i+1);
-      const id=document.createElement('div');
-      id.className='last20-roll-id';
-      id.textContent=r.code || 'Verify code unavailable';
+      const box=document.createElement('div'); box.className='last20-roll'+(i===0?' current':'');
+      const head=document.createElement('div'); head.className='last20-roll-head';
+      const name=document.createElement('div'); name.className='last20-roll-name'; name.textContent=i===0?'THIS ROLL':'ROLL '+(i+1);
+      const id=document.createElement('div'); id.className='last20-roll-id'; id.textContent=r.code||'Verify code unavailable';
       head.append(name,id);
-
-      const dice=document.createElement('div');
-      dice.className='last20-dice';
-      r.colors.forEach(c=>{
-        const d=document.createElement('span');
-        d.className='last20-die';
-        d.style.background=COLORS[c];
-        dice.appendChild(d);
-      });
-
-      box.append(head,dice);
-      (i===0?current:previous).appendChild(box);
+      const dice=document.createElement('div'); dice.className='last20-dice';
+      r.colors.forEach(c=>{const d=document.createElement('span'); d.className='last20-die'; d.style.background=COLORS[c]; dice.appendChild(d);});
+      box.append(head,dice); (i===0?current:previous).appendChild(box);
     });
   }
 
-  function addSpinHistory(colors,code){
+  function record(colors,code){
     const arr=normalizeColors(colors);
-    if(!arr.length) return false;
+    if(!arr.length)return false;
     const verify=code==null?'':String(code);
     const sig=arr.join(',')+'|'+verify;
-
-    // Prevent the same roll from being inserted by both the roll hook and the watcher.
+    if(sig===lastSignature)return false;
     if(history.length){
-      const first=history[0];
-      const firstSig=first.colors.join(',')+'|'+String(first.code||'');
-      if(firstSig===sig) return false;
+      const f=history[0];
+      if(f.colors.join(',')+'|'+String(f.code||'')===sig){lastSignature=sig;return false;}
     }
-
     history.unshift({colors:arr,code:verify});
     history=history.slice(0,20);
-    save();
-    render();
+    lastSignature=sig;
+    save(); render();
     return true;
   }
 
-  window.addSpinHistory=addSpinHistory;
-
-  function watch(){
+  // Primary source: the exact Worker result already written by the page.
+  function checkWorker(){
+    if(!armed)return;
     const pf=window.provablyFair;
-    if(!pf || !Array.isArray(pf.lastColors) || !pf.lastColors.length) return;
-    addSpinHistory(pf.lastColors,pf.lastVerify);
+    if(pf && Array.isArray(pf.lastColors) && pf.lastColors.length){
+      const arr=normalizeColors(pf.lastColors);
+      const code=pf.lastVerify==null?'':String(pf.lastVerify);
+      if(arr.length && (code || Date.now()-armTime>2500)){
+        if(record(arr,code)) armed=false;
+      }
+    }
+  }
+
+  // Fallback: read the actual final colored dice from the DOM. This makes the
+  // history independent of any other callback used by the main roll code.
+  function checkDom(){
+    if(!armed)return;
+    if(Date.now()-armTime<250)return;
+    const area=document.getElementById('diceResultArea');
+    if(!area)return;
+    const blocks=Array.from(area.querySelectorAll('.color-block'));
+    if(!blocks.length)return;
+    const colors=[];
+    const rgbToName={}; Object.keys(RGB).forEach(k=>rgbToName[RGB[k]]=k);
+    for(const b of blocks){
+      const bg=getComputedStyle(b).backgroundColor;
+      const name=rgbToName[bg];
+      if(!name)return;
+      colors.push(name);
+    }
+    // The final result has real colors; the rolling state is light grey.
+    if(colors.length && !document.body.classList.contains('dice-roll-active')){
+      const vc=document.getElementById('verifyCodeDisplay');
+      const code=vc?String(vc.textContent||'').trim():'';
+      record(colors,code);
+      armed=false;
+    }
+  }
+
+  function arm(){
+    armed=true; armTime=Date.now();
+    lastSignature='';
+    // Poll briefly after every click; no changes are made to the dice DOM.
+    let tries=0;
+    const timer=setInterval(()=>{
+      checkWorker(); checkDom();
+      if(!armed || ++tries>100)clearInterval(timer);
+    },100);
   }
 
   function init(){
-    load();
-    render();
-    watch();
-    // Fallback for rolls made by another code path; normal Color Dice rolls
-    // are recorded directly by the authoritative roll code above.
-    setInterval(watch,300);
+    load(); render();
+    const btn=document.getElementById('rollButton');
+    if(btn) btn.addEventListener('click',arm,true);
   }
 
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
 })();
 </script>
