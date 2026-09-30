@@ -6382,81 +6382,63 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
   }
 })();
 </script>
-<script>
+<script id="last20-rolls-fixed">
 (function(){
-  const HISTORY_KEY='offlineDiceLast20Rolls';
+  const KEY='offlineDiceLast20Rolls';
+  const colors={red:'#ef4444',orange:'#f59e0b',gold:'#facc15',green:'#3baa35',blue:'#3b5bea',purple:'#9c27b0'};
   let history=[];
-  try{
-    const saved=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
-    if(Array.isArray(saved)) history=saved.filter(x=>x && Array.isArray(x.colors)).slice(0,20);
-  }catch(e){ history=[]; }
-  const colorMap={
-    red:'#ef4444', orange:'#f59e0b', gold:'#facc15', green:'#3baa35', blue:'#3b5bea', purple:'#9c27b0'
-  };
-
-  function die(color){
-    const d=document.createElement('span');
-    d.className='last20-die';
-    d.style.background=colorMap[color] || color;
-    return d;
-  }
-
-  function makeRoll(item,index,current){
-    const box=document.createElement('div');
-    box.className='last20-roll'+(current?' current':'');
-    const head=document.createElement('div');
-    head.className='last20-roll-head';
-    const name=document.createElement('div');
-    name.className='last20-roll-name';
-    name.textContent=current?'THIS ROLL':String(index+2);
-    const id=document.createElement('div');
-    id.className='last20-roll-id';
-    id.textContent=item.code || 'Verify code unavailable';
-    head.append(name,id);
-    const dice=document.createElement('div');
-    dice.className='last20-dice';
-    (item.colors||[]).forEach(c=>dice.appendChild(die(String(c).toLowerCase())));
-    box.append(head,dice);
-    return box;
-  }
+  try { history=JSON.parse(localStorage.getItem(KEY)||'[]'); if(!Array.isArray(history)) history=[]; } catch(e){ history=[]; }
+  history=history.filter(x=>x&&Array.isArray(x.colors)).slice(0,20);
 
   function render(){
+    const root=document.getElementById('last20Rolls');
     const stats=document.getElementById('last20Stats');
     const current=document.getElementById('last20Current');
     const previous=document.getElementById('last20Previous');
-    if(!stats||!current||!previous)return;
-    stats.innerHTML='';
-    current.innerHTML='';
-    previous.innerHTML='';
-
+    if(!root||!stats||!current||!previous)return;
+    stats.innerHTML=''; current.innerHTML=''; previous.innerHTML='';
     const counts={red:0,orange:0,gold:0,green:0,blue:0,purple:0};
-    history.forEach(item=>(item.colors||[]).forEach(c=>{
-      c=String(c).toLowerCase();
-      if(counts[c]!==undefined)counts[c]++;
-    }));
-    Object.keys(counts).forEach(c=>{
-      const stat=document.createElement('div');
-      stat.className='last20-stat';
-      const dot=document.createElement('span');
-      dot.className='last20-dot';
-      dot.style.background=colorMap[c];
-      stat.append(dot,document.createTextNode('× '+counts[c]));
-      stats.appendChild(stat);
+    history.forEach(r=>(r.colors||[]).forEach(c=>{c=String(c).toLowerCase();if(counts[c]!=null)counts[c]++;}));
+    Object.keys(counts).forEach(c=>{const x=document.createElement('div');x.className='last20-stat';const d=document.createElement('span');d.className='last20-dot';d.style.background=colors[c];x.append(d,document.createTextNode('× '+counts[c]));stats.appendChild(x);});
+    history.forEach((r,i)=>{
+      const box=document.createElement('div'); box.className='last20-roll'+(i===0?' current':'');
+      const head=document.createElement('div'); head.className='last20-roll-head';
+      const name=document.createElement('div'); name.className='last20-roll-name'; name.textContent=i===0?'THIS ROLL':String(i+1);
+      const id=document.createElement('div'); id.className='last20-roll-id'; id.textContent=r.code||'Verify code unavailable';
+      head.append(name,id);
+      const dice=document.createElement('div'); dice.className='last20-dice';
+      r.colors.forEach(c=>{const d=document.createElement('span');d.className='last20-die';d.style.background=colors[String(c).toLowerCase()]||c;dice.appendChild(d);});
+      box.append(head,dice);
+      (i===0?current:previous).appendChild(box);
     });
-    if(history.length){
-      current.appendChild(makeRoll(history[0],0,true));
-      history.slice(1).forEach((item,i)=>previous.appendChild(makeRoll(item,i,false)));
-    }
   }
 
-  window.addSpinHistory=function(colors,code){
-    const item={colors:Array.isArray(colors)?colors.slice():[],code:code||''};
-    history.unshift(item);
-    if(history.length>20)history.length=20;
-    try{ localStorage.setItem(HISTORY_KEY,JSON.stringify(history)); }catch(e){}
-    render();
-  };
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(history.slice(0,20)));}catch(e){}}
+  function add(colorsIn,code){
+    const arr=Array.isArray(colorsIn)?colorsIn.map(String):[];
+    if(!arr.length)return;
+    const normalized=arr.map(c=>c.toLowerCase());
+    if(history[0] && history[0].code && code && history[0].code===String(code))return;
+    history.unshift({colors:normalized,code:String(code||'')});
+    history=history.slice(0,20); save(); render();
+  }
+  window.addSpinHistory=function(c,code){add(c,code);};
   render();
+
+  let lastSeen='';
+  setInterval(function(){
+    try{
+      const pf=window.provablyFair;
+      if(!pf)return;
+      const cs=Array.isArray(pf.lastColors)?pf.lastColors:[];
+      const code=pf.lastVerify==null?'':String(pf.lastVerify);
+      if(!cs.length)return;
+      const sig=code+'|'+cs.join(',');
+      if(sig===lastSeen)return;
+      lastSeen=sig;
+      add(cs,code);
+    }catch(e){}
+  },250);
 })();
 </script>
 
