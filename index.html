@@ -3353,13 +3353,24 @@ async function getRandomResult(mode) {
             rollButton.disabled = false;
             diceRollInProgress = false;
 
+            // LAST 20 ROLLS — FIRST priority after a successful Worker result.
+            // Keep this completely independent from counters/verify UI so another
+            // unrelated error can never prevent the roll from being recorded.
+            try {
+                if (typeof window.last20AddRoll === "function") {
+                    window.last20AddRoll(Array.from(verifyColors),
+                        window.provablyFair && window.provablyFair.lastVerify
+                            ? String(window.provablyFair.lastVerify) : "");
+                } else {
+                    console.error("LAST20: last20AddRoll is missing");
+                }
+            } catch (last20Error) {
+                console.error("LAST20 ERROR:", last20Error);
+            }
+
             addCounter('offlineDiceProfileRolls');
             console.log("CURRENT COLORS:", verifyColors);
             window.provablyFair.lastColors = verifyColors.map(c => c.toLowerCase());
-            // LAST 20 ROLLS — record the exact colors from this completed roll.
-            if (typeof window.last20AddRoll === "function") {
-                window.last20AddRoll(verifyColors, window.provablyFair && window.provablyFair.lastVerify ? window.provablyFair.lastVerify : "");
-            }
 
             // The Verify Code was already created by the Worker.
             const historyVerifyCode = window.provablyFair.lastVerify;
