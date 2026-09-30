@@ -2048,6 +2048,11 @@ body.dice-roll-active #od-public-chat{
   inset:0;
   z-index:2147483000;
   font-family:'Luckiest Guy',cursive !important;
+  /* The invisible profile layer must never block the rest of the Dice UI. */
+  pointer-events:none;
+}
+#od-profile-dashboard.odpd-active{
+  pointer-events:auto;
 }
 #od-profile-dashboard,
 #od-profile-dashboard *{
@@ -2055,6 +2060,7 @@ body.dice-roll-active #od-public-chat{
   text-shadow:none !important;
 }
 #od-profile-dashboard .odpd-open{
+  pointer-events:auto;
   position:fixed;
   top:15px;
   left:15px;
