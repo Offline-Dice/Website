@@ -2310,32 +2310,35 @@ body.dice-roll-active #od-public-chat{
 #od-profile-dashboard .odpd-actions{
   display:flex;
   align-items:center;
-  gap:15px;
+  gap:14px;
   margin-top:23px;
 }
-#od-profile-dashboard .odpd-save{
+#od-profile-dashboard .odpd-save,
+#od-profile-dashboard .odpd-view{
+  width:50%;
   height:41px;
-  padding:0 15px;
-  border:1px solid rgba(255,255,255,.25);
+  padding:0 12px;
   border-radius:10px;
+  box-sizing:border-box;
+  font-family:Arial,Helvetica,sans-serif !important;
+  font-size:12px;
+  font-weight:600;
+  line-height:1;
+  letter-spacing:0;
+  cursor:pointer;
+}
+#od-profile-dashboard .odpd-save{
+  border:1px solid rgba(255,255,255,.22);
   background:#f0f0f0 !important;
   color:#111 !important;
   -webkit-text-fill-color:#111 !important;
-  font-family:'Luckiest Guy',cursive !important;
-  font-size:11px;
-  font-weight:400;
-  cursor:pointer;
   box-shadow:none;
 }
 #od-profile-dashboard .odpd-view{
-  padding:7px 0;
-  border:0;
-  background:transparent;
+  border:1px solid rgba(255,255,255,.20);
+  background:rgba(8,9,12,.72) !important;
   color:#fff !important;
-  font-family:'Luckiest Guy',cursive !important;
-  font-size:11px;
-  font-weight:400;
-  cursor:pointer;
+  -webkit-text-fill-color:#fff !important;
 }
 #od-profile-dashboard .odpd-error{
   display:none;
@@ -2480,21 +2483,7 @@ body.dice-roll-active #od-public-chat{
         </div>
       </section>
 
-      <section class="odpd-section">
-        <h2 class="odpd-section-title">My statistics</h2>
-        <div class="odpd-stats odpd-stats-two">
-          <div class="odpd-stat">
-            <div class="odpd-stat-icon">🎲</div>
-            <div class="odpd-stat-number" id="odpdRolls">0</div>
-            <div class="odpd-stat-label">ROLLS</div>
-          </div>
-          <div class="odpd-stat">
-            <div class="odpd-stat-icon">🪙</div>
-            <div class="odpd-stat-number" id="odpdFlips">0</div>
-            <div class="odpd-stat-label">COIN FLIPS</div>
-          </div>
-        </div>
-      </section>
+      
     </div>
   </div>
 </div>
@@ -6438,3 +6427,19 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 </script>
 </body>
 </html>
+
+<style id="od-profile-neutral-buttons-final">
+#od-profile-dashboard .odpd-save,
+#od-profile-dashboard .odpd-view,
+#od-profile-dashboard .odpd-logout,
+#od-profile-dashboard .odpd-file-btn,
+#od-profile-dashboard .odpd-back{
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  text-shadow:none !important;
+}
+#od-profile-dashboard .odpd-save{
+  color:#111 !important;
+  -webkit-text-fill-color:#111 !important;
+}
+</style>
