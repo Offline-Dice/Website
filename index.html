@@ -3354,9 +3354,52 @@ async function getRandomResult(mode) {
             window.provablyFair.lastColors = verifyColors.map(c => c.toLowerCase());
 
             // LAST 20 ROLLS: record the exact Worker result immediately.
-            // This is intentionally separate from the dice animation/layout.
-            if (typeof window.addSpinHistory === "function") {
-                window.addSpinHistory(window.provablyFair.lastColors, window.provablyFair.lastVerify);
+            // Keep this directly coupled to the successful Color Dice roll so
+            // the history cannot depend on script-load timing.
+            try {
+                const historyColors = verifyColors
+                    .map(c => String(c || "").trim().toLowerCase())
+                    .filter(c => ["red","orange","gold","green","blue","purple"].includes(c));
+                const historyCode = String(window.provablyFair?.lastVerify || "").trim();
+
+                if (historyColors.length) {
+                    const historyKey = "offlineDiceLast20Rolls";
+                    let history = [];
+                    try {
+                        const stored = JSON.parse(localStorage.getItem(historyKey) || "[]");
+                        if (Array.isArray(stored)) history = stored;
+                    } catch (_) {}
+
+                    const entry = {
+                        colors: historyColors,
+                        code: historyCode
+                    };
+
+                    // Prevent the exact same roll from being inserted twice.
+                    const sameAsFirst = history[0] &&
+                        Array.isArray(history[0].colors) &&
+                        history[0].colors.map(c => String(c).toLowerCase()).join(",") === historyColors.join(",") &&
+                        String(history[0].code || "") === historyCode;
+
+                    if (!sameAsFirst) {
+                        history.unshift(entry);
+                        history = history.slice(0, 20);
+                        try {
+                            localStorage.setItem(historyKey, JSON.stringify(history));
+                        } catch (_) {}
+                    }
+
+                    // Update the visible Last 20 Rolls immediately.
+                    const renderHistory = window.renderLast20Rolls;
+                    if (typeof renderHistory === "function") {
+                        renderHistory();
+                    } else if (typeof window.addSpinHistory === "function") {
+                        // Compatibility fallback for the existing history renderer.
+                        window.addSpinHistory(historyColors, historyCode);
+                    }
+                }
+            } catch (historyError) {
+                console.warn("Last 20 Rolls update failed:", historyError);
             }
 
             // The Verify Code was already created by the Worker.
@@ -6451,6 +6494,13 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     history.unshift({colors:arr.slice(),code:verify});
     history=history.slice(0,20);
     save();
+    render();
+  };
+
+  // Expose only the renderer globally. The main Color Dice roll stores the
+  // authoritative Worker result itself and then calls this function.
+  window.renderLast20Rolls = function(){
+    load();
     render();
   };
 
