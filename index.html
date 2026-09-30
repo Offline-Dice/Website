@@ -2578,14 +2578,13 @@ body.dice-roll-active #od-public-chat{
     const v=Number(localStorage.getItem(key));
     return Number.isFinite(v)&&v>=0 ? Math.floor(v) : 0;
   }
-  function syncStats(){
-    document.getElementById('odpdRolls').textContent=readCounter('offlineDiceProfileRolls');
-    document.getElementById('odpdFlips').textContent=readCounter('offlineDiceProfileCoinFlips');
-  }
+  // Statistics cards were removed from the profile UI.
+  // Keep these functions harmless so the existing dice logic can still call
+  // addCounter without breaking the profile script.
+  function syncStats(){}
   function addCounter(key){
     const next=readCounter(key)+1;
     localStorage.setItem(key,String(next));
-    syncStats();
   }
 
   function open(){
