@@ -865,13 +865,6 @@ width:52px;height:52px;border-radius:50%;object-fit:cover;
 <style>
 .stream-btn span{font-family:'Luckiest Guy',cursive;font-size:17px;white-space:normal;overflow-wrap:anywhere;flex:1;line-height:1.1;font-weight:normal;}
 </style>
-<style id="last20RollsVisibilityFix">
-#last20Rolls{
-  display:flex !important;
-  visibility:visible !important;
-  opacity:1 !important;
-}
-</style>
 <style id="last20RollsStyle">
 .last20-rolls{
   width:90%;
@@ -6393,28 +6386,19 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 (function(){
   const STORAGE_KEY='offlineDiceLast20Rolls';
   const colorMap={
-    red:'#ef4444', orange:'#f59e0b', gold:'#facc15',
-    green:'#3baa35', blue:'#3b5bea', purple:'#9c27b0'
+    red:'#ef4444', orange:'#f59e0b', gold:'#facc15', green:'#3baa35', blue:'#3b5bea', purple:'#9c27b0'
   };
-
   let history=[];
+
   try{
     const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
     if(Array.isArray(saved)){
-      history=saved.filter(item =>
-        item &&
-        Array.isArray(item.colors) &&
-        item.colors.length>0
-      ).slice(0,20);
+      history=saved.filter(item=>item && Array.isArray(item.colors) && item.colors.length).slice(0,20);
     }
-  }catch(e){
-    history=[];
-  }
+  }catch(e){ history=[]; }
 
   function save(){
-    try{
-      localStorage.setItem(STORAGE_KEY,JSON.stringify(history.slice(0,20)));
-    }catch(e){}
+    try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(history.slice(0,20))); }catch(e){}
   }
 
   function die(color){
@@ -6429,23 +6413,16 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     box.className='last20-roll'+(current?' current':'');
     const head=document.createElement('div');
     head.className='last20-roll-head';
-
     const name=document.createElement('div');
     name.className='last20-roll-name';
     name.textContent=current?'THIS ROLL':'ROLL #'+(index+2);
-
     const id=document.createElement('div');
     id.className='last20-roll-id';
     id.textContent=item.code || 'Verify code unavailable';
-
     head.append(name,id);
-
     const dice=document.createElement('div');
     dice.className='last20-dice';
-    (item.colors||[]).forEach(c=>{
-      dice.appendChild(die(String(c).toLowerCase()));
-    });
-
+    (item.colors||[]).forEach(c=>dice.appendChild(die(String(c).toLowerCase())));
     box.append(head,dice);
     return box;
   }
@@ -6455,7 +6432,6 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     const current=document.getElementById('last20Current');
     const previous=document.getElementById('last20Previous');
     const panel=document.getElementById('last20Rolls');
-
     if(!stats||!current||!previous)return;
 
     if(panel){
@@ -6468,10 +6444,7 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     current.innerHTML='';
     previous.innerHTML='';
 
-    const counts={
-      red:0,orange:0,gold:0,green:0,blue:0,purple:0
-    };
-
+    const counts={red:0,orange:0,gold:0,green:0,blue:0,purple:0};
     history.forEach(item=>(item.colors||[]).forEach(c=>{
       c=String(c).toLowerCase();
       if(counts[c]!==undefined)counts[c]++;
@@ -6480,23 +6453,16 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     Object.keys(counts).forEach(c=>{
       const stat=document.createElement('div');
       stat.className='last20-stat';
-
       const dot=document.createElement('span');
       dot.className='last20-dot';
       dot.style.background=colorMap[c];
-
-      const label=document.createElement('span');
-      label.textContent='× '+counts[c];
-
-      stat.append(dot,label);
+      stat.append(dot,document.createTextNode('× '+counts[c]));
       stats.appendChild(stat);
     });
 
     if(history.length){
       current.appendChild(makeRoll(history[0],0,true));
-      history.slice(1).forEach((item,i)=>{
-        previous.appendChild(makeRoll(item,i,false));
-      });
+      history.slice(1).forEach((item,i)=>previous.appendChild(makeRoll(item,i,false)));
     }else{
       const empty=document.createElement('div');
       empty.className='last20-roll';
@@ -6509,19 +6475,15 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 
   window.addSpinHistory=function(colors,code){
     if(!Array.isArray(colors)||!colors.length)return;
-
-    history.unshift({
-      colors:colors.slice(),
-      code:code||''
-    });
-
+    history.unshift({colors:colors.slice(),code:code||''});
     if(history.length>20)history.length=20;
-
     save();
     render();
   };
 
-  render();
+  function init(){ render(); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
+  else init();
 })();
 </script>
 
