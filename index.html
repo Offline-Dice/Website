@@ -2733,6 +2733,7 @@ body.dice-roll-active #od-public-chat{
 
   window.addEventListener('offlineDiceLogin',()=>setTimeout(load,0));
   window.addEventListener('offlineDiceLogout',()=>setTimeout(load,0));
+  window.addEventListener('offlineDiceOpenProfile',()=>setTimeout(open,50));
 
   load();
 })();
@@ -5608,7 +5609,12 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
     window.dispatchEvent(new CustomEvent("offlineDiceLogin",{detail:{name:cleanName}}));
     intro.classList.remove("od-show-login");
     phase.setAttribute("aria-hidden","true");
-    setTimeout(function(){showWelcome(cleanName);},350);
+
+    // After entering a new name, open the profile settings immediately.
+    setTimeout(function(){
+      window.dispatchEvent(new CustomEvent("offlineDiceOpenProfile"));
+      setTimeout(finish,120);
+    },350);
   }
 
   function showLogin(){
