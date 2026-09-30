@@ -2039,381 +2039,570 @@ body.dice-roll-active #od-public-chat{
 </head>
 <body>
 
-<!-- OFFLINE DICE PROFILE V3 START -->
-<style id="offline-dice-profile-v3">
-#od-profile-v3{
+<!-- OFFLINE DICE PROFILE DASHBOARD START -->
+<style id="offline-dice-profile-dashboard">
+#od-profile-dashboard{
   position:fixed;
-  top:18px;
-  left:18px;
+  top:16px;
+  left:16px;
   z-index:2147483000;
-  font-family:Inter,Arial,sans-serif;
+  font-family:Arial,Helvetica,sans-serif;
 }
-#od-profile-v3 .odp-trigger{
-  width:46px;
-  height:46px;
-  padding:0;
-  border:1px solid rgba(255,255,255,.24);
-  border-radius:15px;
-  background:rgba(12,17,28,.72);
+#od-profile-dashboard .odpd-open{
+  appearance:none;
+  width:154px;
+  height:52px;
+  padding:6px 12px 6px 7px;
+  border:1px solid rgba(255,255,255,.20);
+  border-radius:14px;
+  background:rgba(7,10,15,.78);
   color:#fff;
   display:flex;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+  box-shadow:0 12px 35px rgba(0,0,0,.32);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+#od-profile-dashboard .odpd-open-avatar{
+  width:39px;height:39px;flex:0 0 39px;
+  border-radius:50%;object-fit:cover;background:#20242a;
+}
+#od-profile-dashboard .odpd-open-copy{min-width:0;flex:1;text-align:left}
+#od-profile-dashboard .odpd-open-name{
+  display:block;color:#fff;font-size:12px;font-weight:800;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+#od-profile-dashboard .odpd-open-sub{
+  display:block;margin-top:3px;color:rgba(255,255,255,.48);font-size:9px;
+}
+#od-profile-dashboard .odpd-chevron{color:rgba(255,255,255,.55);font-size:15px}
+
+#od-profile-dashboard .odpd-screen{
+  position:fixed;
+  inset:0;
+  display:none;
+  overflow:auto;
+  box-sizing:border-box;
+  padding:0 24px 60px;
+  color:#f7f7f8;
+  background:#111;
+  background-position:center center;
+  background-size:cover;
+  background-repeat:no-repeat;
+  background-attachment:fixed;
+}
+#od-profile-dashboard .odpd-screen::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:rgba(0,0,0,.66);
+  z-index:0;
+}
+#od-profile-dashboard.odpd-active .odpd-screen{
+  display:block;
+  animation:odpdFade .18s ease-out;
+}
+#od-profile-dashboard .odpd-page{
+  position:relative;
+  z-index:1;
+  width:min(100%,920px);
+  margin:0 auto;
+  padding-top:0;
+}
+#od-profile-dashboard .odpd-topbar{
+  min-height:74px;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:20px;
+}
+#od-profile-dashboard .odpd-top-left{padding-top:1px}
+#od-profile-dashboard .odpd-account-title{
+  margin:0;
+  font-size:28px;
+  line-height:1.1;
+  font-weight:900;
+  letter-spacing:-.8px;
+}
+#od-profile-dashboard .odpd-account-sub{
+  margin:4px 0 0;
+  color:rgba(255,255,255,.52);
+  font-size:13px;
+  font-weight:600;
+}
+#od-profile-dashboard .odpd-logout{
+  margin-top:10px;
+  height:38px;
+  padding:0 17px;
+  border:1px solid rgba(255,255,255,.20);
+  border-radius:9px;
+  background:rgba(10,10,12,.68);
+  color:#fff;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+#od-profile-dashboard .odpd-logout:hover{background:rgba(255,255,255,.10)}
+
+#od-profile-dashboard .odpd-section{
+  box-sizing:border-box;
+  margin-top:0;
+  padding:22px 23px 23px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:20px;
+  background:rgba(5,6,9,.88);
+  box-shadow:0 20px 55px rgba(0,0,0,.30);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+#od-profile-dashboard .odpd-section + .odpd-section{margin-top:18px}
+#od-profile-dashboard .odpd-section-title{
+  margin:0 0 24px;
+  font-size:18px;
+  line-height:1.2;
+  font-weight:900;
+}
+#od-profile-dashboard .odpd-photo-row{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  margin-bottom:25px;
+}
+#od-profile-dashboard .odpd-photo{
+  width:64px;height:64px;
+  flex:0 0 64px;
+  border-radius:50%;
+  object-fit:cover;
+  background:#20242a;
+  border:1px solid rgba(255,255,255,.15);
+}
+#od-profile-dashboard .odpd-photo-copy{min-width:0}
+#od-profile-dashboard .odpd-photo-label{
+  margin:0 0 7px;
+  font-size:12px;
+  font-weight:800;
+}
+#od-profile-dashboard .odpd-file-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+#od-profile-dashboard .odpd-file-btn{
+  display:inline-flex;
   align-items:center;
   justify-content:center;
-  cursor:pointer;
-  box-shadow:0 12px 35px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.10);
-  backdrop-filter:blur(18px) saturate(135%);
-  -webkit-backdrop-filter:blur(18px) saturate(135%);
-  transition:.2s ease;
-}
-#od-profile-v3 .odp-trigger:hover{
-  transform:translateY(-2px);
-  border-color:rgba(80,160,255,.55);
-  box-shadow:0 16px 42px rgba(0,0,0,.35),0 0 0 4px rgba(70,150,255,.08);
-}
-#od-profile-v3 .odp-avatar{
-  width:32px;
-  height:32px;
-  border-radius:11px;
-  display:block;
-  object-fit:cover;
-  background:#202938;
-}
-#od-profile-v3 .odp-panel{
-  position:absolute;
-  top:0;
-  left:58px;
-  width:340px;
-  max-width:calc(100vw - 84px);
-  padding:18px;
-  box-sizing:border-box;
-  border:1px solid rgba(255,255,255,.16);
-  border-radius:22px;
-  background:linear-gradient(145deg,rgba(18,24,37,.97),rgba(8,12,20,.96));
-  box-shadow:0 24px 70px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08);
-  backdrop-filter:blur(24px);
-  -webkit-backdrop-filter:blur(24px);
-  opacity:0;
-  transform:translateX(-8px) scale(.97);
-  pointer-events:none;
-  transition:opacity .18s ease,transform .18s ease;
-}
-#od-profile-v3.open .odp-panel{
-  opacity:1;
-  transform:translateX(0) scale(1);
-  pointer-events:auto;
-}
-#od-profile-v3 .odp-head{
-  display:flex;
-  align-items:center;
-  gap:13px;
-  margin-bottom:18px;
-}
-#od-profile-v3 .odp-big-avatar{
-  width:54px;
-  height:54px;
-  flex:0 0 54px;
-  border-radius:17px;
-  object-fit:cover;
-  background:#202938;
-  border:1px solid rgba(255,255,255,.16);
-  box-shadow:0 8px 24px rgba(0,0,0,.24);
-}
-#od-profile-v3 .odp-user{
-  min-width:0;
-  flex:1;
-}
-#od-profile-v3 .odp-name{
-  margin:0;
-  color:#fff;
-  font-size:18px;
-  font-weight:800;
-  letter-spacing:-.3px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-#od-profile-v3 .odp-status{
-  margin-top:4px;
-  color:rgba(255,255,255,.48);
-  font-size:11px;
-}
-#od-profile-v3 .odp-close{
-  width:32px;
-  height:32px;
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:10px;
-  background:rgba(255,255,255,.055);
-  color:rgba(255,255,255,.75);
-  cursor:pointer;
-  font-size:19px;
-}
-#od-profile-v3 .odp-section{
-  margin-top:14px;
-  padding-top:14px;
-  border-top:1px solid rgba(255,255,255,.09);
-}
-#od-profile-v3 .odp-label{
-  display:block;
-  margin-bottom:8px;
-  color:rgba(255,255,255,.48);
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:1.2px;
-  text-transform:uppercase;
-}
-#od-profile-v3 .odp-input{
-  width:100%;
-  height:43px;
-  box-sizing:border-box;
-  border:1px solid rgba(255,255,255,.13);
-  border-radius:12px;
-  outline:none;
-  background:rgba(255,255,255,.055);
-  color:#fff;
+  height:34px;
   padding:0 13px;
-  font:600 13px Arial,sans-serif;
-}
-#od-profile-v3 .odp-input:focus{
-  border-color:rgba(76,154,255,.72);
-  background:rgba(76,154,255,.07);
-}
-#od-profile-v3 .odp-avatars{
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:7px;
-}
-#od-profile-v3 .odp-avatar-choice{
-  aspect-ratio:1;
-  padding:0;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.11);
-  background:rgba(255,255,255,.045);
-  cursor:pointer;
-  transition:.15s ease;
-}
-#od-profile-v3 .odp-avatar-choice:hover{
-  transform:translateY(-2px);
-  background:rgba(255,255,255,.09);
-}
-#od-profile-v3 .odp-avatar-choice.active{
-  border-color:#4c9aff;
-  box-shadow:0 0 0 2px rgba(76,154,255,.16);
-  background:rgba(76,154,255,.12);
-}
-#od-profile-v3 .odp-avatar-choice img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  border-radius:11px;
-}
-#od-profile-v3 .odp-upload{
-  width:100%;
-  height:40px;
-  margin-top:9px;
-  border:1px dashed rgba(255,255,255,.20);
-  border-radius:11px;
-  background:rgba(255,255,255,.035);
-  color:rgba(255,255,255,.68);
-  cursor:pointer;
+  border:1px solid rgba(255,255,255,.28);
+  border-radius:8px;
+  background:#090a0d;
+  color:#fff;
   font-size:12px;
   font-weight:700;
-}
-#od-profile-v3 .odp-upload:hover{
-  background:rgba(255,255,255,.07);
-  border-color:rgba(76,154,255,.45);
-}
-#od-profile-v3 .odp-actions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-top:17px;
-}
-#od-profile-v3 .odp-btn{
-  height:42px;
-  border-radius:12px;
   cursor:pointer;
+}
+#od-profile-dashboard .odpd-file-name{
+  color:rgba(255,255,255,.48);
+  font-size:12px;
+}
+#od-profile-dashboard .odpd-help{
+  margin-top:7px;
+  color:rgba(255,255,255,.42);
+  font-size:11px;
+}
+#od-profile-dashboard .odpd-field{margin-top:21px}
+#od-profile-dashboard .odpd-label{
+  display:block;
+  margin-bottom:7px;
+  color:#f4f4f5;
   font-size:12px;
   font-weight:800;
-  border:1px solid rgba(255,255,255,.12);
+}
+#od-profile-dashboard .odpd-input,
+#od-profile-dashboard .odpd-textarea{
+  width:100%;
+  box-sizing:border-box;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:10px;
+  outline:none;
+  background:rgba(0,0,0,.48);
   color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+  font-size:14px;
 }
-#od-profile-v3 .odp-cancel{background:rgba(255,255,255,.055)}
-#od-profile-v3 .odp-save{
-  background:#368cff;
-  border-color:#5da5ff;
-  box-shadow:0 8px 22px rgba(54,140,255,.22);
+#od-profile-dashboard .odpd-input{
+  height:41px;
+  padding:0 13px;
 }
-#od-profile-v3 .odp-save:hover{background:#4b98ff}
-#od-profile-v3 .odp-cancel:hover{background:rgba(255,255,255,.10)}
-#od-profile-v3 .odp-error{
+#od-profile-dashboard .odpd-textarea{
+  min-height:95px;
+  padding:12px 13px;
+  resize:vertical;
+}
+#od-profile-dashboard .odpd-input:focus,
+#od-profile-dashboard .odpd-textarea:focus{
+  border-color:rgba(255,255,255,.55);
+  box-shadow:0 0 0 2px rgba(255,255,255,.06);
+}
+#od-profile-dashboard .odpd-field-help{
+  margin-top:7px;
+  color:rgba(255,255,255,.44);
+  font-size:11px;
+}
+#od-profile-dashboard .odpd-actions{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin-top:24px;
+}
+#od-profile-dashboard .odpd-save{
+  height:42px;
+  padding:0 17px;
+  border:1px solid rgba(255,255,255,.28);
+  border-radius:10px;
+  background:#f1f1f2;
+  color:#0a0a0c;
+  box-shadow:0 7px 18px rgba(0,0,0,.24);
+  font-size:12px;
+  font-weight:900;
+  cursor:pointer;
+}
+#od-profile-dashboard .odpd-save:hover{background:#fff}
+#od-profile-dashboard .odpd-view{
+  border:0;
+  background:transparent;
+  color:rgba(255,255,255,.78);
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  padding:8px 0;
+}
+#od-profile-dashboard .odpd-view:hover{color:#fff}
+#od-profile-dashboard .odpd-error{
   display:none;
   margin-top:9px;
-  color:#ff7c91;
+  color:#ff8c8c;
   font-size:11px;
-  line-height:1.35;
 }
-@media(max-width:600px){
-  #od-profile-v3{top:12px;left:12px}
-  #od-profile-v3 .odp-panel{
-    left:0;
-    top:55px;
-    width:calc(100vw - 24px);
-    max-width:none;
-    transform:translateY(-8px) scale(.97);
-  }
-  #od-profile-v3.open .odp-panel{transform:translateY(0) scale(1)}
+#od-profile-dashboard .odpd-stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+#od-profile-dashboard .odpd-stat{
+  min-height:121px;
+  box-sizing:border-box;
+  border:1px solid rgba(255,255,255,.19);
+  border-radius:13px;
+  background:rgba(0,0,0,.25);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+#od-profile-dashboard .odpd-stat-icon{
+  font-size:20px;
+  line-height:1;
+  margin-bottom:11px;
+  filter:grayscale(1);
+}
+#od-profile-dashboard .odpd-stat-number{
+  font-size:21px;
+  line-height:1;
+  font-weight:900;
+}
+#od-profile-dashboard .odpd-stat-label{
+  margin-top:9px;
+  color:rgba(255,255,255,.50);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.4px;
+}
+#od-profile-dashboard .odpd-close{
+  display:none;
+}
+#od-profile-dashboard .odpd-profile-view{
+  display:none;
+  margin-top:16px;
+  padding-top:16px;
+  border-top:1px solid rgba(255,255,255,.10);
+}
+#od-profile-dashboard .odpd-profile-view.active{display:block}
+#od-profile-dashboard .odpd-profile-view-head{
+  display:flex;align-items:center;gap:13px;
+}
+#od-profile-dashboard .odpd-view-avatar{
+  width:54px;height:54px;border-radius:50%;object-fit:cover;background:#20242a;
+}
+#od-profile-dashboard .odpd-view-name{font-size:16px;font-weight:900}
+#od-profile-dashboard .odpd-view-bio{
+  margin:12px 0 0;color:rgba(255,255,255,.65);font-size:12px;line-height:1.5;
+  white-space:pre-wrap;
+}
+
+@keyframes odpdFade{from{opacity:0}to{opacity:1}}
+@media(max-width:650px){
+  #od-profile-dashboard .odpd-screen{padding:0 12px 35px}
+  #od-profile-dashboard .odpd-topbar{min-height:80px}
+  #od-profile-dashboard .odpd-account-title{font-size:25px}
+  #od-profile-dashboard .odpd-section{padding:19px 16px}
+  #od-profile-dashboard .odpd-stats{grid-template-columns:1fr}
+  #od-profile-dashboard .odpd-stat{min-height:94px}
+  #od-profile-dashboard .odpd-actions{gap:13px}
 }
 </style>
 
-<div id="od-profile-v3">
-  <button class="odp-trigger" id="odProfileTrigger" aria-label="Profil öffnen">
-    <img class="odp-avatar" id="odProfileMiniAvatar" alt="">
+<div id="od-profile-dashboard">
+  <button class="odpd-open" id="odpdOpen" type="button">
+    <img class="odpd-open-avatar" id="odpdOpenAvatar" alt="">
+    <span class="odpd-open-copy">
+      <span class="odpd-open-name" id="odpdOpenName">Gast</span>
+      <span class="odpd-open-sub">PROFIL</span>
+    </span>
+    <span class="odpd-chevron">›</span>
   </button>
 
-  <div class="odp-panel" id="odProfilePanel">
-    <div class="odp-head">
-      <img class="odp-big-avatar" id="odProfileBigAvatar" alt="">
-      <div class="odp-user">
-        <p class="odp-name" id="odProfileDisplayName">Gast</p>
-        <div class="odp-status">Dein Offline Dice Profil</div>
+  <div class="odpd-screen" id="odpdScreen">
+    <div class="odpd-page">
+      <div class="odpd-topbar">
+        <div class="odpd-top-left">
+          <h1 class="odpd-account-title">My account</h1>
+          <div class="odpd-account-sub">Logged in as <span id="odpdLoggedName">Gast</span></div>
+        </div>
+        <button class="odpd-logout" id="odpdLogout" type="button">Log out</button>
       </div>
-      <button class="odp-close" id="odProfileClose" type="button">×</button>
-    </div>
 
-    <div class="odp-section" style="margin-top:0;padding-top:0;border-top:0">
-      <label class="odp-label" for="odProfileName">Benutzername</label>
-      <input class="odp-input" id="odProfileName" maxlength="24" autocomplete="off" placeholder="Dein Benutzername">
-    </div>
+      <section class="odpd-section">
+        <h2 class="odpd-section-title">My profile</h2>
 
-    <div class="odp-section">
-      <span class="odp-label">Avatar auswählen</span>
-      <div class="odp-avatars" id="odProfileAvatars"></div>
-      <input id="odProfileFile" type="file" accept="image/*" hidden>
-      <button class="odp-upload" id="odProfileUpload" type="button">＋ Eigenes Bild auswählen</button>
-      <div class="odp-error" id="odProfileError"></div>
-    </div>
+        <div class="odpd-photo-row">
+          <img class="odpd-photo" id="odpdPhoto" alt="">
+          <div class="odpd-photo-copy">
+            <div class="odpd-photo-label">Profile photo</div>
+            <div class="odpd-file-row">
+              <input id="odpdFile" type="file" accept="image/png,image/jpeg,image/gif" hidden>
+              <button class="odpd-file-btn" id="odpdChooseFile" type="button">Choose file</button>
+              <span class="odpd-file-name" id="odpdFileName">No file selected</span>
+            </div>
+            <div class="odpd-help">PNG, JPG or GIF, max 5 MB.</div>
+          </div>
+        </div>
 
-    <div class="odp-actions">
-      <button class="odp-btn odp-cancel" id="odProfileCancel" type="button">Abbrechen</button>
-      <button class="odp-btn odp-save" id="odProfileSave" type="button">Speichern</button>
+        <div class="odpd-field">
+          <label class="odpd-label" for="odpdName">Display name</label>
+          <input class="odpd-input" id="odpdName" maxlength="24" autocomplete="off" placeholder="Kenzy">
+          <div class="odpd-field-help">This is how you're shown. Leave empty to use your username (<span id="odpdUsernameHelp">Gast</span>).</div>
+        </div>
+
+        <div class="odpd-field">
+          <label class="odpd-label" for="odpdBio">Bio</label>
+          <textarea class="odpd-textarea" id="odpdBio" maxlength="180" placeholder="Tell something about yourself..."></textarea>
+        </div>
+
+        <div class="odpd-actions">
+          <button class="odpd-save" id="odpdSave" type="button">Save profile</button>
+          <button class="odpd-view" id="odpdView" type="button">View my profile</button>
+        </div>
+        <div class="odpd-error" id="odpdError"></div>
+
+        <div class="odpd-profile-view" id="odpdProfileView">
+          <div class="odpd-profile-view-head">
+            <img class="odpd-view-avatar" id="odpdViewAvatar" alt="">
+            <div class="odpd-view-name" id="odpdViewName">Gast</div>
+          </div>
+          <div class="odpd-view-bio" id="odpdViewBio"></div>
+        </div>
+      </section>
+
+      <section class="odpd-section">
+        <h2 class="odpd-section-title">My statistics</h2>
+        <div class="odpd-stats">
+          <div class="odpd-stat">
+            <div class="odpd-stat-icon">🎲</div>
+            <div class="odpd-stat-number" id="odpdRolls">0</div>
+            <div class="odpd-stat-label">ROLLS</div>
+          </div>
+          <div class="odpd-stat">
+            <div class="odpd-stat-icon">🪙</div>
+            <div class="odpd-stat-number" id="odpdFlips">0</div>
+            <div class="odpd-stat-label">FLIPS</div>
+          </div>
+          <div class="odpd-stat">
+            <div class="odpd-stat-icon">●</div>
+            <div class="odpd-stat-number" id="odpdSpins">0</div>
+            <div class="odpd-stat-label">SPINS</div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 </div>
 
-<script id="offline-dice-profile-v3-script">
+<script id="offline-dice-profile-dashboard-script">
 (function(){
-  const root=document.getElementById('od-profile-v3');
+  const root=document.getElementById('od-profile-dashboard');
   if(!root) return;
 
-  const trigger=document.getElementById('odProfileTrigger');
-  const panel=document.getElementById('odProfilePanel');
-  const closeBtn=document.getElementById('odProfileClose');
-  const cancelBtn=document.getElementById('odProfileCancel');
-  const saveBtn=document.getElementById('odProfileSave');
-  const nameInput=document.getElementById('odProfileName');
-  const miniAvatar=document.getElementById('odProfileMiniAvatar');
-  const bigAvatar=document.getElementById('odProfileBigAvatar');
-  const avatarGrid=document.getElementById('odProfileAvatars');
-  const uploadBtn=document.getElementById('odProfileUpload');
-  const fileInput=document.getElementById('odProfileFile');
-  const errorBox=document.getElementById('odProfileError');
-  const displayName=document.getElementById('odProfileDisplayName');
+  const openBtn=document.getElementById('odpdOpen');
+  const screen=document.getElementById('odpdScreen');
+  const saveBtn=document.getElementById('odpdSave');
+  const logoutBtn=document.getElementById('odpdLogout');
+  const viewBtn=document.getElementById('odpdView');
+  const nameInput=document.getElementById('odpdName');
+  const bioInput=document.getElementById('odpdBio');
+  const file=document.getElementById('odpdFile');
+  const chooseFile=document.getElementById('odpdChooseFile');
+  const fileName=document.getElementById('odpdFileName');
+  const photo=document.getElementById('odpdPhoto');
+  const openAvatar=document.getElementById('odpdOpenAvatar');
+  const openName=document.getElementById('odpdOpenName');
+  const loggedName=document.getElementById('odpdLoggedName');
+  const usernameHelp=document.getElementById('odpdUsernameHelp');
+  const error=document.getElementById('odpdError');
+  const profileView=document.getElementById('odpdProfileView');
+  const viewAvatar=document.getElementById('odpdViewAvatar');
+  const viewName=document.getElementById('odpdViewName');
+  const viewBio=document.getElementById('odpdViewBio');
 
-  const avatars=['👤','😀','😎','🤖','🐱','🐺'];
-  let selectedAvatar=localStorage.getItem('offlineDiceProfileImage')||'';
-  let pendingAvatar=selectedAvatar;
-  let originalName=localStorage.getItem('offlineDicePlayerName')||'Gast';
-  let customAvatar=selectedAvatar;
+  let pendingAvatar='';
+  let selectedFileName='No file selected';
 
-  function svgAvatar(emoji){
-    return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'+
-      '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#182235"/><stop offset="1" stop-color="#386ca8"/></linearGradient></defs>'+
-      '<rect width="100" height="100" rx="25" fill="url(#g)"/><text x="50" y="64" text-anchor="middle" font-size="50">'+emoji+'</text></svg>'
-    );
+  function avatarSrc(v){
+    if(!v) return '';
+    if(String(v).indexOf('data:image')===0) return v;
+    return '';
   }
-  function avatarSrc(value){
-    if(!value) return svgAvatar('👤');
-    if(value.startsWith('data:image')) return value;
-    if(value.length<=4) return svgAvatar(value);
-    return value;
+
+  function syncBackground(){
+    const bodyStyle=getComputedStyle(document.body);
+    const bg=bodyStyle.backgroundImage;
+    if(bg && bg!=='none'){
+      screen.style.backgroundImage=bg;
+    }else{
+      screen.style.backgroundImage='none';
+    }
+    screen.style.backgroundColor=bodyStyle.backgroundColor||'#111';
+    screen.style.backgroundSize=bodyStyle.backgroundSize||'cover';
+    screen.style.backgroundPosition=bodyStyle.backgroundPosition||'center center';
+    screen.style.backgroundRepeat=bodyStyle.backgroundRepeat||'no-repeat';
   }
-  function setDisplayedAvatar(value){
-    const src=avatarSrc(value);
-    miniAvatar.src=src;
-    bigAvatar.src=src;
+
+  function setImage(el,v){
+    const s=avatarSrc(v);
+    if(s){
+      el.src=s;
+      el.style.display='';
+    }else{
+      el.removeAttribute('src');
+      el.style.display='none';
+    }
   }
-  function renderChoices(){
-    avatarGrid.innerHTML='';
-    avatars.forEach((emoji)=>{
-      const b=document.createElement('button');
-      b.type='button';
-      b.className='odp-avatar-choice'+(pendingAvatar===emoji?' active':'');
-      const img=document.createElement('img');
-      img.src=svgAvatar(emoji);
-      img.alt=emoji;
-      b.appendChild(img);
-      b.onclick=()=>{
-        pendingAvatar=emoji;
-        customAvatar='';
-        renderChoices();
-        setDisplayedAvatar(pendingAvatar);
-      };
-      avatarGrid.appendChild(b);
-    });
+
+  function updateNames(n){
+    const shown=n||'Gast';
+    openName.textContent=shown;
+    loggedName.textContent=shown;
+    usernameHelp.textContent=shown;
+    viewName.textContent=shown;
   }
-  function open(){
-    originalName=localStorage.getItem('offlineDicePlayerName')||'Gast';
+
+  function load(){
+    const n=localStorage.getItem('offlineDicePlayerName')||'Gast';
     pendingAvatar=localStorage.getItem('offlineDiceProfileImage')||'';
-    customAvatar=pendingAvatar.startsWith('data:image')?pendingAvatar:'';
-    nameInput.value=originalName==='Gast'?'':originalName;
-    displayName.textContent=originalName;
-    setDisplayedAvatar(pendingAvatar);
-    renderChoices();
-    errorBox.style.display='none';
-    root.classList.add('open');
-    setTimeout(()=>nameInput.focus(),80);
+    const bio=localStorage.getItem('offlineDiceProfileBio')||'';
+    nameInput.value=n==='Gast'?'':n;
+    bioInput.value=bio;
+    selectedFileName='No file selected';
+    fileName.textContent=selectedFileName;
+    updateNames(n);
+    setImage(photo,pendingAvatar);
+    setImage(openAvatar,pendingAvatar);
+    setImage(viewAvatar,pendingAvatar);
+    error.style.display='none';
+    profileView.classList.remove('active');
+    syncStats();
+    syncBackground();
   }
-  function close(){root.classList.remove('open')}
-  trigger.addEventListener('click',()=>root.classList.contains('open')?close():open());
-  closeBtn.addEventListener('click',close);
-  cancelBtn.addEventListener('click',close);
-  document.addEventListener('click',(e)=>{
-    if(root.classList.contains('open')&&!root.contains(e.target)) close();
-  });
-  uploadBtn.addEventListener('click',()=>fileInput.click());
-  fileInput.addEventListener('change',()=>{
-    const f=fileInput.files&&fileInput.files[0];
-    if(!f) return;
-    if(f.size>2*1024*1024){
-      errorBox.textContent='Das Bild darf maximal 2 MB groß sein.';
-      errorBox.style.display='block';
+
+  function syncStats(){
+    const readNum=(keys)=>{
+      for(const k of keys){
+        const v=Number(localStorage.getItem(k));
+        if(Number.isFinite(v)&&v>=0)return Math.floor(v);
+      }
+      return 0;
+    };
+    document.getElementById('odpdRolls').textContent=readNum(['offlineDiceRolls','diceRollCount','rollCount']);
+    document.getElementById('odpdFlips').textContent=readNum(['offlineDiceFlips','flipCount']);
+    document.getElementById('odpdSpins').textContent=readNum(['offlineDiceSpins','spinCount']);
+  }
+
+  function open(){
+    load();
+    root.classList.add('odpd-active');
+    document.body.style.overflow='hidden';
+  }
+  function close(){
+    root.classList.remove('odpd-active');
+    document.body.style.overflow='';
+  }
+
+  openBtn.addEventListener('click',open);
+  chooseFile.addEventListener('click',()=>file.click());
+
+  file.addEventListener('change',()=>{
+    const f=file.files&&file.files[0];
+    if(!f)return;
+    if(f.size>5*1024*1024){
+      error.textContent='Profile photo must be 5 MB or smaller.';
+      error.style.display='block';
       return;
     }
-    const reader=new FileReader();
-    reader.onload=()=>{
-      customAvatar=String(reader.result||'');
-      pendingAvatar=customAvatar;
-      errorBox.style.display='none';
-      setDisplayedAvatar(pendingAvatar);
-      renderChoices();
+    selectedFileName=f.name;
+    fileName.textContent=f.name;
+    const r=new FileReader();
+    r.onload=()=>{
+      pendingAvatar=String(r.result||'');
+      setImage(photo,pendingAvatar);
+      setImage(openAvatar,pendingAvatar);
+      setImage(viewAvatar,pendingAvatar);
+      error.style.display='none';
     };
-    reader.readAsDataURL(f);
+    r.readAsDataURL(f);
+  });
+
+  nameInput.addEventListener('input',()=>updateNames(nameInput.value.trim()||'Gast'));
+
+  viewBtn.addEventListener('click',()=>{
+    viewBio.textContent=bioInput.value.trim()||'No bio added yet.';
+    setImage(viewAvatar,pendingAvatar);
+    profileView.classList.toggle('active');
+  });
+
+  logoutBtn.addEventListener('click',()=>{
+    localStorage.removeItem('offlineDicePlayerName');
+    localStorage.removeItem('offlineDiceProfileImage');
+    localStorage.removeItem('offlineDiceProfileBio');
+    window.dispatchEvent(new CustomEvent('offlineDiceLogout'));
+    close();
+    setTimeout(()=>location.reload(),50);
   });
 
   saveBtn.addEventListener('click',async()=>{
-    const name=nameInput.value.trim();
-    if(!name){
-      errorBox.textContent='Bitte gib einen Benutzernamen ein.';
-      errorBox.style.display='block';
-      return;
-    }
-    if(name.length>24) return;
+    const n=nameInput.value.trim()||'Gast';
+    const bio=bioInput.value.trim();
+
     saveBtn.disabled=true;
-    saveBtn.textContent='Speichern…';
+    saveBtn.textContent='Saving...';
+    error.style.display='none';
+
     try{
       const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js');
-      const {getDatabase,ref,get,update}=await import('https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js');
+      const {getDatabase,ref,get}=await import('https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js');
       const cfg={
         apiKey:'AIzaSyBUT0t1I9Dkee5Ok_uYMzs4WfdwapOA5As',
         authDomain:'kenzy-dice.firebaseapp.com',
@@ -2429,35 +2618,50 @@ body.dice-roll-active #od-public-chat{
       const snap=await get(ref(db,'registeredUsers'));
       let duplicate=false;
       if(snap.exists()){
-        snap.forEach(child=>{
-          const d=child.val()||{};
-          if(child.key!==uid && String(d.name||'').trim().toLowerCase()===name.toLowerCase()) duplicate=true;
+        snap.forEach(c=>{
+          const d=c.val()||{};
+          if(c.key!==uid&&String(d.name||'').trim().toLowerCase()===n.toLowerCase())duplicate=true;
         });
       }
       if(duplicate){
-        errorBox.textContent='Dieser Benutzername ist bereits vergeben.';
-        errorBox.style.display='block';
+        error.textContent='This username is already taken.';
+        error.style.display='block';
         return;
       }
-      localStorage.setItem('offlineDicePlayerName',name);
+
+      localStorage.setItem('offlineDicePlayerName',n);
       localStorage.setItem('offlineDiceProfileImage',pendingAvatar||'');
-      displayName.textContent=name;
-      setDisplayedAvatar(pendingAvatar);
-      window.dispatchEvent(new CustomEvent('offlineDiceLogin',{detail:{name:name}}));
+      localStorage.setItem('offlineDiceProfileBio',bio);
+      updateNames(n);
+      setImage(photo,pendingAvatar);
+      setImage(openAvatar,pendingAvatar);
+      window.dispatchEvent(new CustomEvent('offlineDiceLogin',{detail:{name:n}}));
       close();
-    }catch(err){
-      errorBox.textContent='Speichern fehlgeschlagen. Bitte prüfe deine Verbindung.';
-      errorBox.style.display='block';
+    }catch(e){
+      error.textContent='Could not save profile. Please check your connection.';
+      error.style.display='block';
     }finally{
       saveBtn.disabled=false;
-      saveBtn.textContent='Speichern';
+      saveBtn.textContent='Save profile';
     }
   });
 
-  setDisplayedAvatar(selectedAvatar);
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'&&root.classList.contains('odpd-active'))close();
+  });
+
+  const themeSelect=document.getElementById('themeSelect');
+  if(themeSelect){
+    themeSelect.addEventListener('change',()=>setTimeout(syncBackground,0));
+  }
+
+  window.addEventListener('offlineDiceLogin',()=>setTimeout(load,0));
+  window.addEventListener('offlineDiceLogout',()=>setTimeout(load,0));
+
+  load();
 })();
 </script>
-<!-- OFFLINE DICE PROFILE V3 END -->
+<!-- OFFLINE DICE PROFILE DASHBOARD END -->
 
 <div aria-hidden="true" id="od-ban-overlay">
 <div class="od-ban-card">
