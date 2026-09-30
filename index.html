@@ -940,10 +940,6 @@ width:52px;height:52px;border-radius:50%;object-fit:cover;
   .last20-roll-id{text-align:left}
 }
 </style>
-<style id="last20-visibility-fix">
-#last20Rolls{display:flex!important;visibility:visible!important;opacity:1!important;}
-#last20Current,#last20Previous,#last20Stats{visibility:visible!important;opacity:1!important;}
-</style>
 <style id="miniCounterStyle">
 .mini-counter{
   width:100%;
@@ -3359,7 +3355,7 @@ async function getRandomResult(mode) {
 
             // The Verify Code was already created by the Worker.
             const historyVerifyCode = window.provablyFair.lastVerify;
-             addSpinHistory(verifyColors, historyVerifyCode);
+             setTimeout(() => addSpinHistory(verifyColors, historyVerifyCode), 5000);
             const vc = document.getElementById("verifyCodeDisplay");
             if (vc) vc.textContent = window.provablyFair.lastVerify;
         }
@@ -6386,61 +6382,80 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
   }
 })();
 </script>
-<script id="last20-rolls-script">
+<script>
 (function(){
-  const KEY="offlineDiceLast20Rolls";
-  const history=[];
-  const colorMap={red:"#ef4444",orange:"#f59e0b",gold:"#facc15",green:"#3baa35",blue:"#3b5bea",purple:"#9c27b0"};
-
+  const HISTORY_KEY='offlineDiceLast20Rolls';
+  let history=[];
   try{
-    const saved=JSON.parse(localStorage.getItem(KEY)||"[]");
-    if(Array.isArray(saved)) saved.slice(0,20).forEach(x=>{
-      if(x && Array.isArray(x.colors) && x.colors.length) history.push({colors:x.colors.slice(),code:x.code||""});
-    });
-  }catch(e){}
+    const saved=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
+    if(Array.isArray(saved)) history=saved.slice(0,20).filter(x=>x&&Array.isArray(x.colors));
+  }catch(e){ history=[]; }
+  const colorMap={
+    red:'#ef4444', orange:'#f59e0b', gold:'#facc15', green:'#3baa35', blue:'#3b5bea', purple:'#9c27b0'
+  };
+
+  function die(color){
+    const d=document.createElement('span');
+    d.className='last20-die';
+    d.style.background=colorMap[color] || color;
+    return d;
+  }
+
+  function makeRoll(item,index,current){
+    const box=document.createElement('div');
+    box.className='last20-roll'+(current?' current':'');
+    const head=document.createElement('div');
+    head.className='last20-roll-head';
+    const name=document.createElement('div');
+    name.className='last20-roll-name';
+    name.textContent=current?'THIS ROLL':String(index+2);
+    const id=document.createElement('div');
+    id.className='last20-roll-id';
+    id.textContent=item.code || 'Verify code unavailable';
+    head.append(name,id);
+    const dice=document.createElement('div');
+    dice.className='last20-dice';
+    (item.colors||[]).forEach(c=>dice.appendChild(die(String(c).toLowerCase())));
+    box.append(head,dice);
+    return box;
+  }
 
   function render(){
-    const root=document.getElementById("last20Rolls");
-    const stats=document.getElementById("last20Stats");
-    const current=document.getElementById("last20Current");
-    const previous=document.getElementById("last20Previous");
-    if(!root||!stats||!current||!previous) return;
-    root.style.display="flex";
-    root.style.visibility="visible";
-    root.style.opacity="1";
-    stats.innerHTML=""; current.innerHTML=""; previous.innerHTML="";
+    const stats=document.getElementById('last20Stats');
+    const current=document.getElementById('last20Current');
+    const previous=document.getElementById('last20Previous');
+    if(!stats||!current||!previous)return;
+    stats.innerHTML='';
+    current.innerHTML='';
+    previous.innerHTML='';
+
     const counts={red:0,orange:0,gold:0,green:0,blue:0,purple:0};
-    history.forEach(r=>(r.colors||[]).forEach(c=>{c=String(c).toLowerCase();if(counts[c]!==undefined)counts[c]++;}));
+    history.forEach(item=>(item.colors||[]).forEach(c=>{
+      c=String(c).toLowerCase();
+      if(counts[c]!==undefined)counts[c]++;
+    }));
     Object.keys(counts).forEach(c=>{
-      const x=document.createElement("span"); x.className="last20-stat";
-      const d=document.createElement("span"); d.className="last20-dot"; d.style.background=colorMap[c];
-      x.append(d,document.createTextNode("× "+counts[c])); stats.appendChild(x);
+      const stat=document.createElement('div');
+      stat.className='last20-stat';
+      const dot=document.createElement('span');
+      dot.className='last20-dot';
+      dot.style.background=colorMap[c];
+      stat.append(dot,document.createTextNode('× '+counts[c]));
+      stats.appendChild(stat);
     });
-    if(!history.length){
-      const e=document.createElement("div"); e.className="last20-roll"; e.style.color="#aaa"; e.textContent="No rolls yet"; current.appendChild(e); return;
+    if(history.length){
+      current.appendChild(makeRoll(history[0],0,true));
+      history.slice(1).forEach((item,i)=>previous.appendChild(makeRoll(item,i,false)));
     }
-    history.forEach((r,idx)=>{
-      const box=document.createElement("div"); box.className="last20-roll"+(idx===0?" current":"");
-      const head=document.createElement("div"); head.className="last20-roll-head";
-      const name=document.createElement("div"); name.className="last20-roll-name"; name.textContent=idx===0?"THIS ROLL":String(idx+1);
-      const id=document.createElement("div"); id.className="last20-roll-id"; id.textContent=r.code||"Verify code unavailable";
-      head.append(name,id);
-      const dice=document.createElement("div"); dice.className="last20-dice";
-      (r.colors||[]).forEach(c=>{const d=document.createElement("span");d.className="last20-die";d.style.background=colorMap[String(c).toLowerCase()]||String(c);dice.appendChild(d);});
-      box.append(head,dice);
-      (idx===0?current:previous).appendChild(box);
-    });
   }
 
   window.addSpinHistory=function(colors,code){
-    if(!Array.isArray(colors)||!colors.length) return;
-    history.unshift({colors:colors.slice(),code:code||""});
-    if(history.length>20) history.length=20;
-    try{localStorage.setItem(KEY,JSON.stringify(history));}catch(e){}
+    history.unshift({colors:Array.isArray(colors)?colors.slice():[],code:code||''});
+    if(history.length>20)history.length=20;
+    try{localStorage.setItem(HISTORY_KEY,JSON.stringify(history));}catch(e){}
     render();
   };
-
-  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",render,{once:true}); else render();
+  render();
 })();
 </script>
 
