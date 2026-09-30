@@ -6442,3 +6442,108 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
   -webkit-text-fill-color:#111 !important;
 }
 </style>
+
+
+<style id="od-profile-final-neutral-override">
+/* FINAL ACCOUNT BUTTON OVERRIDE — no gold/yellow, normal font */
+#od-profile-dashboard .odpd-save,
+#od-profile-dashboard .odpd-save *,
+#od-profile-dashboard .odpd-view,
+#od-profile-dashboard .odpd-view *,
+#od-profile-dashboard .odpd-logout,
+#od-profile-dashboard .odpd-logout *,
+#od-profile-dashboard .odpd-file-btn,
+#od-profile-dashboard .odpd-file-btn *,
+#od-profile-dashboard .odpd-back,
+#od-profile-dashboard .odpd-back * {
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-weight: 600 !important;
+  font-style: normal !important;
+  text-shadow: none !important;
+  letter-spacing: 0 !important;
+}
+
+/* Absolutely no theme/gold color on button text */
+#od-profile-dashboard .odpd-save,
+#od-profile-dashboard .odpd-view,
+#od-profile-dashboard .odpd-logout,
+#od-profile-dashboard .odpd-file-btn,
+#od-profile-dashboard .odpd-back {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-decoration: none !important;
+  filter: none !important;
+}
+
+/* Save button stays light with dark normal text */
+#od-profile-dashboard .odpd-save {
+  background: #f0f0f0 !important;
+  border: 1px solid #d8d8d8 !important;
+  color: #111111 !important;
+  -webkit-text-fill-color: #111111 !important;
+}
+
+/* View button */
+#od-profile-dashboard .odpd-view {
+  background: rgba(8,8,10,.78) !important;
+  border: 1px solid rgba(255,255,255,.20) !important;
+}
+
+/* Choose file */
+#od-profile-dashboard .odpd-file-btn {
+  background: #08090c !important;
+  border: 1px solid rgba(255,255,255,.22) !important;
+}
+
+/* Small compact Logout button */
+#od-profile-dashboard .odpd-logout {
+  width: 78px !important;
+  min-width: 78px !important;
+  max-width: 78px !important;
+  height: 27px !important;
+  min-height: 27px !important;
+  max-height: 27px !important;
+  padding: 0 !important;
+  margin: 8px 0 0 !important;
+  border-radius: 7px !important;
+  background: rgba(8,8,10,.78) !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+  font-size: 9px !important;
+  line-height: 27px !important;
+}
+
+/* Back button */
+#od-profile-dashboard .odpd-back {
+  color: rgba(255,255,255,.72) !important;
+  -webkit-text-fill-color: rgba(255,255,255,.72) !important;
+  background: transparent !important;
+  border: 0 !important;
+  font-size: 10px !important;
+}
+
+/* Other account labels must also stay neutral */
+#od-profile-dashboard .odpd-account-title,
+#od-profile-dashboard .odpd-account-sub,
+#od-profile-dashboard .odpd-section-title,
+#od-profile-dashboard .odpd-photo-label,
+#od-profile-dashboard .odpd-label,
+#od-profile-dashboard .odpd-field-help,
+#od-profile-dashboard .odpd-help,
+#od-profile-dashboard .odpd-file-name,
+#od-profile-dashboard .odpd-open-name,
+#od-profile-dashboard .odpd-open-sub {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* Secondary explanatory text stays gray, never gold */
+#od-profile-dashboard .odpd-account-sub,
+#od-profile-dashboard .odpd-field-help,
+#od-profile-dashboard .odpd-help,
+#od-profile-dashboard .odpd-file-name,
+#od-profile-dashboard .odpd-open-sub {
+  color: rgba(255,255,255,.48) !important;
+  -webkit-text-fill-color: rgba(255,255,255,.48) !important;
+}
+</style>
