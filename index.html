@@ -2041,374 +2041,386 @@ body.dice-roll-active #od-public-chat{
 
 <!-- OFFLINE DICE PROFILE DASHBOARD START -->
 <style id="offline-dice-profile-dashboard">
-#od-profile-dashboard{
-  position:fixed;
-  top:16px;
-  left:16px;
-  z-index:2147483000;
-  font-family:'Luckiest Guy',cursive !important;
-}
+/* Completely isolated account UI */
 #od-profile-dashboard,
-#od-profile-dashboard *{
-  color:#f2f2f2;
-}
-#od-profile-dashboard .odpd-open,
-#od-profile-dashboard .odpd-logout,
-#od-profile-dashboard .odpd-file-btn{
-  color:#f2f2f2 !important;
-}
-#od-profile-dashboard .odpd-save{
-  color:#111 !important;
-}
-#od-profile-dashboard .odpd-account-title,
-#od-profile-dashboard .odpd-section-title,
-#od-profile-dashboard .odpd-label,
-#od-profile-dashboard .odpd-stat-number,
-#od-profile-dashboard .odpd-open-name{
-  color:#fff !important;
-}
-#od-profile-dashboard .odpd-account-title,
-#od-profile-dashboard .odpd-section-title,
-#od-profile-dashboard .odpd-label,
-#od-profile-dashboard .odpd-stat-number,
-#od-profile-dashboard .odpd-open-name,
-#od-profile-dashboard .odpd-open-sub,
-#od-profile-dashboard .odpd-account-sub,
-#od-profile-dashboard .odpd-help,
-#od-profile-dashboard .odpd-field-help,
-#od-profile-dashboard .odpd-file-name,
-#od-profile-dashboard .odpd-stat-label,
-#od-profile-dashboard .odpd-view,
-#od-profile-dashboard .odpd-photo-label{
+#od-profile-dashboard *,
+#od-profile-dashboard *::before,
+#od-profile-dashboard *::after{
+  box-sizing:border-box !important;
+  font-family:'Luckiest Guy',cursive !important;
+  color:#f5f5f5 !important;
+  -webkit-text-fill-color:#f5f5f5 !important;
   text-shadow:none !important;
 }
+
+#od-profile-dashboard{
+  position:fixed !important;
+  top:15px !important;
+  left:15px !important;
+  z-index:2147483000 !important;
+}
+
+/* Small profile opener */
 #od-profile-dashboard .odpd-open{
-  appearance:none;
-  width:142px;
-  height:46px;
-  padding:6px 12px 6px 7px;
-  border:1px solid rgba(255,255,255,.20);
-  border-radius:14px;
-  background:rgba(7,10,15,.78);
-  color:#fff;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  cursor:pointer;
-  box-shadow:0 12px 35px rgba(0,0,0,.32);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
+  appearance:none !important;
+  width:142px !important;
+  height:46px !important;
+  padding:5px 11px !important;
+  border:1px solid rgba(255,255,255,.20) !important;
+  border-radius:13px !important;
+  background:rgba(7,8,12,.78) !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:9px !important;
+  cursor:pointer !important;
+  box-shadow:0 10px 28px rgba(0,0,0,.30) !important;
+  backdrop-filter:blur(16px) !important;
+  -webkit-backdrop-filter:blur(16px) !important;
 }
 #od-profile-dashboard .odpd-open-avatar{
-  width:34px;height:31px;flex:0 0 39px;
-  border-radius:50%;object-fit:cover;background:#20242a;
+  width:34px !important;
+  height:34px !important;
+  flex:0 0 34px !important;
+  border-radius:50% !important;
+  object-fit:cover !important;
+  background:#20242a !important;
 }
-#od-profile-dashboard .odpd-open-copy{min-width:0;flex:1;text-align:left}
+#od-profile-dashboard .odpd-open-copy{
+  min-width:0 !important;
+  flex:1 !important;
+  text-align:left !important;
+}
 #od-profile-dashboard .odpd-open-name{
-  display:block;color:#fff;font-size:11px;font-weight:400;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  display:block !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  font-weight:400 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
 }
 #od-profile-dashboard .odpd-open-sub{
-  display:block;margin-top:3px;color:rgba(255,255,255,.48);font-size:8px;
+  display:block !important;
+  margin-top:4px !important;
+  font-size:8px !important;
+  line-height:1 !important;
+  opacity:.48 !important;
 }
-#od-profile-dashboard .odpd-chevron{color:rgba(255,255,255,.55);font-size:13px}
+#od-profile-dashboard .odpd-chevron{
+  font-family:Arial,sans-serif !important;
+  font-size:18px !important;
+  opacity:.55 !important;
+}
 
+/* Full account page */
 #od-profile-dashboard .odpd-screen{
-  position:fixed;
-  inset:0;
-  display:none;
-  overflow:auto;
-  box-sizing:border-box;
-  padding:0 24px 60px;
-  color:#f7f7f8;
-  background:#111;
-  background-position:center center;
-  background-size:cover;
-  background-repeat:no-repeat;
-  background-attachment:fixed;
+  position:fixed !important;
+  inset:0 !important;
+  display:none !important;
+  overflow:auto !important;
+  padding:0 24px 50px !important;
+  background-position:center center !important;
+  background-size:cover !important;
+  background-repeat:no-repeat !important;
+  background-attachment:fixed !important;
 }
 #od-profile-dashboard .odpd-screen::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  background:rgba(0,0,0,.66);
-  z-index:0;
+  content:"" !important;
+  position:fixed !important;
+  inset:0 !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+  background:rgba(0,0,0,.58) !important;
 }
 #od-profile-dashboard.odpd-active .odpd-screen{
-  display:block;
-  animation:odpdFade .18s ease-out;
+  display:block !important;
 }
 #od-profile-dashboard .odpd-page{
-  position:relative;
-  z-index:1;
-  width:min(100%,920px);
-  margin:0 auto;
-  padding-top:0;
+  position:relative !important;
+  z-index:1 !important;
+  width:min(100%,920px) !important;
+  margin:0 auto !important;
 }
+
+/* Header exactly like the reference structure */
 #od-profile-dashboard .odpd-topbar{
-  min-height:86px;
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:20px;
+  min-height:82px !important;
+  padding:0 !important;
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:space-between !important;
 }
-#od-profile-dashboard .odpd-top-left{padding-top:1px}
+#od-profile-dashboard .odpd-top-left{
+  padding-top:0 !important;
+}
 #od-profile-dashboard .odpd-back{
-  appearance:none;
-  border:0;
-  background:transparent;
-  color:rgba(255,255,255,.68) !important;
-  padding:0;
-  margin:0 0 8px;
-  font:400 11px 'Luckiest Guy',cursive;
-  cursor:pointer;
+  appearance:none !important;
+  display:block !important;
+  margin:4px 0 4px !important;
+  padding:0 !important;
+  border:0 !important;
+  background:transparent !important;
+  font-size:11px !important;
+  line-height:1 !important;
+  font-weight:400 !important;
+  cursor:pointer !important;
+  opacity:.65 !important;
 }
-#od-profile-dashboard .odpd-back:hover{color:#fff !important;}
 #od-profile-dashboard .odpd-account-title{
-  margin:0;
-  font-size:25px;
-  line-height:1.1;
-  font-weight:900;
-  letter-spacing:-.8px;
+  margin:0 !important;
+  font-size:29px !important;
+  line-height:1 !important;
+  font-weight:400 !important;
+  letter-spacing:-.2px !important;
 }
 #od-profile-dashboard .odpd-account-sub{
-  margin:4px 0 0;
-  color:rgba(255,255,255,.52);
-  font-size:13px;
-  font-weight:600;
+  margin:5px 0 0 !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  opacity:.48 !important;
+  font-weight:400 !important;
 }
 #od-profile-dashboard .odpd-logout{
-  margin-top:10px;
-  height:31px;
-  padding:0 11px;
-  border:1px solid rgba(255,255,255,.20);
-  border-radius:9px;
-  background:rgba(10,10,12,.68);
-  color:#fff;
-  font-size:11px;
-  font-weight:400;
-  cursor:pointer;
+  appearance:none !important;
+  margin-top:11px !important;
+  height:34px !important;
+  padding:0 15px !important;
+  border:1px solid rgba(255,255,255,.20) !important;
+  border-radius:9px !important;
+  background:rgba(8,9,12,.70) !important;
+  font-size:11px !important;
+  font-weight:400 !important;
+  cursor:pointer !important;
 }
-#od-profile-dashboard .odpd-logout:hover{background:rgba(255,255,255,.10)}
 
+/* Reference-style cards */
 #od-profile-dashboard .odpd-section{
-  box-sizing:border-box;
-  margin-top:0;
-  padding:19px 22px 21px;
-  border:1px solid rgba(255,255,255,.18);
-  border-radius:16px;
-  background:rgba(5,6,9,.88);
-  box-shadow:0 20px 55px rgba(0,0,0,.30);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
+  margin:0 !important;
+  padding:21px 22px 23px !important;
+  border:1px solid rgba(255,255,255,.19) !important;
+  border-radius:19px !important;
+  background:rgba(3,4,7,.91) !important;
+  box-shadow:0 18px 50px rgba(0,0,0,.30) !important;
+  backdrop-filter:blur(7px) !important;
+  -webkit-backdrop-filter:blur(7px) !important;
 }
-#od-profile-dashboard .odpd-section + .odpd-section{margin-top:18px}
+#od-profile-dashboard .odpd-section + .odpd-section{
+  margin-top:18px !important;
+}
 #od-profile-dashboard .odpd-section-title{
-  margin:0 0 24px;
-  font-size:17px;
-  line-height:1.2;
-  font-weight:900;
+  margin:0 0 24px !important;
+  font-size:18px !important;
+  line-height:1 !important;
+  font-weight:400 !important;
 }
+
+/* Photo row */
 #od-profile-dashboard .odpd-photo-row{
-  display:flex;
-  align-items:center;
-  gap:18px;
-  margin-bottom:25px;
+  display:flex !important;
+  align-items:center !important;
+  gap:17px !important;
+  margin:0 0 25px !important;
 }
 #od-profile-dashboard .odpd-photo{
-  width:64px;height:64px;
-  flex:0 0 64px;
-  border-radius:50%;
-  object-fit:cover;
-  background:#20242a;
-  border:1px solid rgba(255,255,255,.15);
+  width:64px !important;
+  height:64px !important;
+  flex:0 0 64px !important;
+  border-radius:50% !important;
+  object-fit:cover !important;
+  background:#20242a !important;
+  border:1px solid rgba(255,255,255,.16) !important;
 }
-#od-profile-dashboard .odpd-photo-copy{min-width:0}
+#od-profile-dashboard .odpd-photo-copy{
+  min-width:0 !important;
+}
 #od-profile-dashboard .odpd-photo-label{
-  margin:0 0 7px;
-  font-size:11px;
-  font-weight:400;
+  margin:0 0 7px !important;
+  font-size:11px !important;
+  line-height:1 !important;
+  font-weight:400 !important;
 }
 #od-profile-dashboard .odpd-file-row{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
+  display:flex !important;
+  align-items:center !important;
+  gap:9px !important;
+  flex-wrap:wrap !important;
 }
 #od-profile-dashboard .odpd-file-btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  height:31px;
-  padding:0 11px;
-  border:1px solid rgba(255,255,255,.28);
-  border-radius:8px;
-  background:#090a0d;
-  color:#fff;
-  font-size:12px;
-  font-weight:700;
-  cursor:pointer;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  height:33px !important;
+  padding:0 12px !important;
+  border:1px solid rgba(255,255,255,.25) !important;
+  border-radius:8px !important;
+  background:#08090c !important;
+  font-size:11px !important;
+  font-weight:400 !important;
+  cursor:pointer !important;
 }
-#od-profile-dashboard .odpd-file-name{
-  color:rgba(255,255,255,.48);
-  font-size:12px;
+#od-profile-dashboard .odpd-file-name,
+#od-profile-dashboard .odpd-help{
+  font-family:Arial,Helvetica,sans-serif !important;
+  font-size:11px !important;
+  opacity:.48 !important;
 }
 #od-profile-dashboard .odpd-help{
-  margin-top:7px;
-  color:rgba(255,255,255,.42);
-  font-size:11px;
+  margin-top:7px !important;
 }
-#od-profile-dashboard .odpd-field{margin-top:21px}
+
+/* Inputs */
+#od-profile-dashboard .odpd-field{
+  margin-top:21px !important;
+}
 #od-profile-dashboard .odpd-label{
-  display:block;
-  margin-bottom:7px;
-  color:#f4f4f5;
-  font-size:11px;
-  font-weight:400;
+  display:block !important;
+  margin-bottom:7px !important;
+  font-size:11px !important;
+  line-height:1 !important;
+  font-weight:400 !important;
 }
 #od-profile-dashboard .odpd-input,
 #od-profile-dashboard .odpd-textarea{
-  width:100%;
-  box-sizing:border-box;
-  border:1px solid rgba(255,255,255,.22);
-  border-radius:10px;
-  outline:none;
-  background:rgba(0,0,0,.48);
-  color:#fff;
-  font-family:'Luckiest Guy',cursive !important;
-  font-size:13px;
+  width:100% !important;
+  border:1px solid rgba(255,255,255,.22) !important;
+  border-radius:10px !important;
+  outline:none !important;
+  background:rgba(0,0,0,.48) !important;
+  font-family:Arial,Helvetica,sans-serif !important;
+  font-size:13px !important;
+  -webkit-text-fill-color:#f5f5f5 !important;
 }
 #od-profile-dashboard .odpd-input{
-  height:41px;
-  padding:0 11px;
+  height:40px !important;
+  padding:0 12px !important;
 }
 #od-profile-dashboard .odpd-textarea{
-  min-height:88px;
-  padding:12px 13px;
-  resize:vertical;
-}
-#od-profile-dashboard .odpd-input:focus,
-#od-profile-dashboard .odpd-textarea:focus{
-  border-color:rgba(255,255,255,.55);
-  box-shadow:0 0 0 2px rgba(255,255,255,.06);
+  min-height:94px !important;
+  padding:11px 12px !important;
+  resize:vertical !important;
 }
 #od-profile-dashboard .odpd-field-help{
-  margin-top:7px;
-  color:rgba(255,255,255,.44);
-  font-size:11px;
-}
-#od-profile-dashboard .odpd-actions{
-  display:flex;
-  align-items:center;
-  gap:16px;
-  margin-top:24px;
-}
-#od-profile-dashboard .odpd-save{
-  height:38px;
-  padding:0 11px;
-  border:1px solid rgba(255,255,255,.28);
-  border-radius:10px;
-  background:#f1f1f2;
-  color:#0a0a0c;
-  box-shadow:0 7px 18px rgba(0,0,0,.24);
-  font-size:12px;
-  font-weight:900;
-  cursor:pointer;
-}
-#od-profile-dashboard .odpd-save:hover{background:#fff}
-#od-profile-dashboard .odpd-view{
-  border:0;
-  background:transparent;
-  color:rgba(255,255,255,.78);
-  font-size:11px;
-  font-weight:400;
-  cursor:pointer;
-  padding:8px 0;
-}
-#od-profile-dashboard .odpd-view:hover{color:#fff}
-#od-profile-dashboard .odpd-error{
-  display:none;
-  margin-top:9px;
-  color:#ff8c8c;
-  font-size:11px;
-}
-#od-profile-dashboard .odpd-stats{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px;
-}
-#od-profile-dashboard .odpd-stat{
-  min-height:105px;
-  box-sizing:border-box;
-  border:1px solid rgba(255,255,255,.19);
-  border-radius:13px;
-  background:rgba(0,0,0,.25);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-}
-#od-profile-dashboard .odpd-stat-icon{
-  font-size:20px;
-  line-height:1;
-  margin-bottom:11px;
-  filter:grayscale(1);
-}
-#od-profile-dashboard .odpd-stat-number{
-  font-size:19px;
-  line-height:1;
-  font-weight:900;
-}
-#od-profile-dashboard .odpd-stat-label{
-  margin-top:9px;
-  color:rgba(255,255,255,.50);
-  font-size:10px;
-  font-weight:900;
-  letter-spacing:.4px;
-}
-#od-profile-dashboard .odpd-close{
-  display:none;
-}
-#od-profile-dashboard .odpd-profile-view{
-  display:none;
-  margin-top:16px;
-  padding-top:16px;
-  border-top:1px solid rgba(255,255,255,.10);
-}
-#od-profile-dashboard .odpd-profile-view.active{display:block}
-#od-profile-dashboard .odpd-profile-view-head{
-  display:flex;align-items:center;gap:13px;
-}
-#od-profile-dashboard .odpd-view-avatar{
-  width:54px;height:54px;border-radius:50%;object-fit:cover;background:#20242a;
-}
-#od-profile-dashboard .odpd-view-name{font-size:16px;font-weight:900}
-#od-profile-dashboard .odpd-view-bio{
-  margin:12px 0 0;color:rgba(255,255,255,.65);font-size:12px;line-height:1.5;
-  white-space:pre-wrap;
+  margin-top:7px !important;
+  font-family:Arial,Helvetica,sans-serif !important;
+  font-size:10px !important;
+  line-height:1.25 !important;
+  opacity:.44 !important;
 }
 
-@keyframes odpdFade{from{opacity:0}to{opacity:1}}
-@media(max-width:650px){
-  #od-profile-dashboard .odpd-screen{padding:0 12px 35px}
-  #od-profile-dashboard .odpd-topbar{min-height:80px}
-  #od-profile-dashboard .odpd-back{
-  appearance:none;
-  border:0;
-  background:transparent;
-  color:rgba(255,255,255,.68) !important;
-  padding:0;
-  margin:0 0 8px;
-  font:400 11px 'Luckiest Guy',cursive;
-  cursor:pointer;
+/* Small action buttons */
+#od-profile-dashboard .odpd-actions{
+  display:flex !important;
+  align-items:center !important;
+  gap:15px !important;
+  margin-top:23px !important;
 }
-#od-profile-dashboard .odpd-back:hover{color:#fff !important;}
-#od-profile-dashboard .odpd-account-title{font-size:25px}
-  #od-profile-dashboard .odpd-section{padding:19px 16px}
-  #od-profile-dashboard .odpd-stats{grid-template-columns:1fr}
-  #od-profile-dashboard .odpd-stat{min-height:94px}
-  #od-profile-dashboard .odpd-actions{gap:13px}
+#od-profile-dashboard .odpd-save{
+  height:40px !important;
+  padding:0 15px !important;
+  border:1px solid rgba(255,255,255,.25) !important;
+  border-radius:10px !important;
+  background:#eeeeef !important;
+  color:#111 !important;
+  -webkit-text-fill-color:#111 !important;
+  font-size:11px !important;
+  font-weight:400 !important;
+  cursor:pointer !important;
+}
+#od-profile-dashboard .odpd-view{
+  border:0 !important;
+  background:transparent !important;
+  padding:7px 0 !important;
+  font-size:11px !important;
+  font-weight:400 !important;
+  cursor:pointer !important;
+  opacity:.78 !important;
+}
+#od-profile-dashboard .odpd-error{
+  display:none !important;
+  margin-top:9px !important;
+  font-family:Arial,Helvetica,sans-serif !important;
+  color:#ff9a9a !important;
+  -webkit-text-fill-color:#ff9a9a !important;
+  font-size:11px !important;
+}
+
+/* Statistics: only rolls + coin flips */
+#od-profile-dashboard .odpd-stats{
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+#od-profile-dashboard .odpd-stat{
+  min-height:118px !important;
+  border:1px solid rgba(255,255,255,.19) !important;
+  border-radius:13px !important;
+  background:rgba(0,0,0,.22) !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+#od-profile-dashboard .odpd-stat-icon{
+  font-family:Arial,Helvetica,sans-serif !important;
+  font-size:19px !important;
+  line-height:1 !important;
+  margin-bottom:10px !important;
+  filter:grayscale(1) !important;
+}
+#od-profile-dashboard .odpd-stat-number{
+  font-size:21px !important;
+  line-height:1 !important;
+  font-weight:400 !important;
+}
+#od-profile-dashboard .odpd-stat-label{
+  margin-top:9px !important;
+  font-size:9px !important;
+  line-height:1 !important;
+  font-weight:400 !important;
+  letter-spacing:.3px !important;
+  opacity:.50 !important;
+}
+
+/* View profile */
+#od-profile-dashboard .odpd-profile-view{
+  display:none !important;
+  margin-top:16px !important;
+  padding-top:16px !important;
+  border-top:1px solid rgba(255,255,255,.10) !important;
+}
+#od-profile-dashboard .odpd-profile-view.active{display:block !important}
+#od-profile-dashboard .odpd-profile-view-head{
+  display:flex !important;
+  align-items:center !important;
+  gap:13px !important;
+}
+#od-profile-dashboard .odpd-view-avatar{
+  width:54px !important;
+  height:54px !important;
+  border-radius:50% !important;
+  object-fit:cover !important;
+  background:#20242a !important;
+}
+#od-profile-dashboard .odpd-view-name{
+  font-size:16px !important;
+  font-weight:400 !important;
+}
+#od-profile-dashboard .odpd-view-bio{
+  margin:12px 0 0 !important;
+  font-family:Arial,Helvetica,sans-serif !important;
+  font-size:12px !important;
+  line-height:1.5 !important;
+  opacity:.65 !important;
+  white-space:pre-wrap !important;
+}
+
+@media(max-width:650px){
+  #od-profile-dashboard .odpd-screen{padding:0 12px 35px !important}
+  #od-profile-dashboard .odpd-topbar{min-height:78px !important}
+  #od-profile-dashboard .odpd-account-title{font-size:25px !important}
+  #od-profile-dashboard .odpd-section{padding:19px 16px 20px !important}
+  #od-profile-dashboard .odpd-stats{grid-template-columns:1fr !important}
+  #od-profile-dashboard .odpd-stat{min-height:94px !important}
 }
 </style>
 
