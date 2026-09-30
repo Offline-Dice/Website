@@ -3355,7 +3355,7 @@ async function getRandomResult(mode) {
 
             // The Verify Code was already created by the Worker.
             const historyVerifyCode = window.provablyFair.lastVerify;
-             setTimeout(() => addSpinHistory(verifyColors, historyVerifyCode), 5000);
+             addSpinHistory(verifyColors, historyVerifyCode);
             const vc = document.getElementById("verifyCodeDisplay");
             if (vc) vc.textContent = window.provablyFair.lastVerify;
         }
@@ -6388,7 +6388,7 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
   let history=[];
   try{
     const saved=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
-    if(Array.isArray(saved)) history=saved.slice(0,20).filter(x=>x&&Array.isArray(x.colors));
+    if(Array.isArray(saved)) history=saved.filter(x=>x && Array.isArray(x.colors)).slice(0,20);
   }catch(e){ history=[]; }
   const colorMap={
     red:'#ef4444', orange:'#f59e0b', gold:'#facc15', green:'#3baa35', blue:'#3b5bea', purple:'#9c27b0'
@@ -6450,9 +6450,10 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
   }
 
   window.addSpinHistory=function(colors,code){
-    history.unshift({colors:Array.isArray(colors)?colors.slice():[],code:code||''});
+    const item={colors:Array.isArray(colors)?colors.slice():[],code:code||''};
+    history.unshift(item);
     if(history.length>20)history.length=20;
-    try{localStorage.setItem(HISTORY_KEY,JSON.stringify(history));}catch(e){}
+    try{ localStorage.setItem(HISTORY_KEY,JSON.stringify(history)); }catch(e){}
     render();
   };
   render();
