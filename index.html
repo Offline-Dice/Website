@@ -6581,6 +6581,13 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
   }
 })();
 </script>
+        function changeRollCounter(delta) {
+            const el = document.getElementById('rollCounterValue');
+            if (!el) return;
+            const current = Number(String(el.textContent || '+0').replace('+', '')) || 0;
+            const next = current + Number(delta || 0);
+            el.textContent = next >= 0 ? '+' + next : String(next);
+        }
 </body>
 </html>
 
