@@ -3089,6 +3089,7 @@ background:transparent;
         let rollColorWeights = null;
 
         const DICE_WORKER_URL = "https://offline-dice-api.fischerleo56.workers.dev";
+// Public chat writes use DICE_WORKER_URL + "/chat".
 
 async function getWorkerColorResults(count) {
     const uid = String(localStorage.getItem("offlineDiceFirebaseUserId") || "");
@@ -4062,12 +4063,33 @@ form.addEventListener("submit", async e=>{
   send.disabled=true;
   try{
     const senderProfileImage=String(localStorage.getItem("offlineDiceProfileImage")||"");
-    await push(ref(odChatDb, OD_CHAT_PATH), {
-      name:name,
-      text:text,
-      profileImage: senderProfileImage.indexOf("data:image/")===0 ? senderProfileImage : "",
-      createdAt:serverTimestamp()
+
+    // Chat writes go through the Offline Dice Cloudflare Worker.
+    // The Worker checks the browser Origin and performs the Firebase write server-side.
+    const chatResponse = await fetch(DICE_WORKER_URL + "/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      cache: "no-store",
+      body: JSON.stringify({
+        name: name,
+        text: text,
+        profileImage: senderProfileImage.indexOf("data:image/")===0 ? senderProfileImage : ""
+      })
     });
+
+    let chatResult = null;
+    try {
+      chatResult = await chatResponse.json();
+    } catch {}
+
+    if (!chatResponse.ok || !chatResult || chatResult.ok !== true) {
+      throw new Error(
+        String(chatResult?.error || "Chat Worker request failed (" + chatResponse.status + ")")
+      );
+    }
+
     input.value="";
     input.focus();
   }catch(err){
