@@ -135,6 +135,14 @@
 
         .top-tagline{display:none;}
 
+        /* Only the normal Color Dice mode uses the compact center panel.
+           Coinflip and Color Dice Battle keep the original width. */
+        .layout-row.color-dice-compact > .wrapper {
+            width: 390px;
+            max-width: calc(100% - 40px);
+            box-sizing: border-box;
+        }
+
         .wrapper {
             width: 90%;
             max-width: 700px;
@@ -3437,6 +3445,9 @@ async function getRandomResult(mode) {
         }
 
         function toggleDisplayMode(mode) {
+            const layoutRow = document.querySelector('.layout-row');
+            if (layoutRow) layoutRow.classList.toggle('color-dice-compact', mode === 'color');
+
             const diceResultArea = document.getElementById("diceResultArea");
             const wheelWrapper = document.getElementById("wheelWrapper");
             const numDiceSelect = document.getElementById("numDice");
@@ -3505,6 +3516,9 @@ async function getRandomResult(mode) {
         document.getElementById("colorDice").addEventListener("change", function () {
             toggleDisplayMode(this.value);
         });
+        // Apply the compact width on initial load only when Color Dice is selected.
+        const initialLayoutRow = document.querySelector('.layout-row');
+        if (initialLayoutRow) initialLayoutRow.classList.toggle('color-dice-compact', document.getElementById("colorDice").value === 'color');
 
         document.getElementById("numDice").addEventListener("change", function () {
             const mode = document.getElementById("colorDice").value;
