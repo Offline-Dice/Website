@@ -135,12 +135,40 @@
 
         .top-tagline{display:none;}
 
-        /* Only the normal Color Dice mode uses the compact center panel.
-           Coinflip and Color Dice Battle keep the original width. */
+        /* Compact layout ONLY for the regular Color Dice mode. */
+        .layout-row.color-dice-compact {
+            gap: 8px;
+        }
         .layout-row.color-dice-compact > .wrapper {
             width: 390px;
-            max-width: calc(100% - 40px);
+            max-width: calc(100vw - 32px);
             box-sizing: border-box;
+            flex: 0 0 390px;
+            /* Prevent the wrapper's auto side-margins from pushing the streamer boxes away. */
+            margin-left: 0;
+            margin-right: 0;
+        }
+        .layout-row.color-dice-compact > .wrapper .dropdown-container {
+            width: 100%;
+            gap: 8px;
+        }
+        .layout-row.color-dice-compact > .wrapper .dropdown-container select {
+            flex: 1 1 0;
+            width: 0;
+            min-width: 0;
+            max-width: none;
+            box-sizing: border-box;
+            font-size: 15px;
+            padding: 10px 7px;
+            border-width: 3px;
+            background-position: right 6px center;
+            background-size: 10px auto;
+        }
+        @media (max-width: 1100px) {
+            .layout-row.color-dice-compact > .wrapper {
+                flex-basis: auto;
+                width: min(390px, 90%);
+            }
         }
 
         .wrapper {
@@ -3447,7 +3475,6 @@ async function getRandomResult(mode) {
         function toggleDisplayMode(mode) {
             const layoutRow = document.querySelector('.layout-row');
             if (layoutRow) layoutRow.classList.toggle('color-dice-compact', mode === 'color');
-
             const diceResultArea = document.getElementById("diceResultArea");
             const wheelWrapper = document.getElementById("wheelWrapper");
             const numDiceSelect = document.getElementById("numDice");
@@ -3516,7 +3543,7 @@ async function getRandomResult(mode) {
         document.getElementById("colorDice").addEventListener("change", function () {
             toggleDisplayMode(this.value);
         });
-        // Apply the compact width on initial load only when Color Dice is selected.
+        // Set the compact panel correctly on first page load too.
         const initialLayoutRow = document.querySelector('.layout-row');
         if (initialLayoutRow) initialLayoutRow.classList.toggle('color-dice-compact', document.getElementById("colorDice").value === 'color');
 
