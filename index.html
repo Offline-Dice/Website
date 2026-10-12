@@ -140,10 +140,10 @@
             gap: 8px;
         }
         .layout-row.color-dice-compact > .wrapper {
-            width: 470px;
+            width: 520px;
             max-width: calc(100vw - 32px);
             box-sizing: border-box;
-            flex: 0 0 470px;
+            flex: 0 0 520px;
             /* Prevent the wrapper's auto side-margins from pushing the streamer boxes away. */
             margin-left: 0;
             margin-right: 0;
@@ -155,7 +155,9 @@
         .layout-row.color-dice-compact > .wrapper #diceResultArea {
             flex-wrap: nowrap !important;
             justify-content: center !important;
-            gap: 8px !important;
+            gap: 10px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
         }
         .layout-row.color-dice-compact > .wrapper .dropdown-container select {
             flex: 1 1 0;
@@ -172,7 +174,7 @@
         @media (max-width: 1100px) {
             .layout-row.color-dice-compact > .wrapper {
                 flex-basis: auto;
-                width: min(470px, 90%);
+                width: min(520px, 90%);
             }
         }
 
