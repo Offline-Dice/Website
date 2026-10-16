@@ -2141,6 +2141,17 @@ body.dice-roll-active #od-public-chat{
   backdrop-filter:blur(14px);
   -webkit-backdrop-filter:blur(14px);
 }
+#od-profile-dashboard .odpd-open{position:fixed;}
+#od-profile-dashboard #odpd-vip-badge{
+  position:absolute;top:-7px;right:-8px;z-index:5;
+  font-family:'Luckiest Guy',cursive !important;
+  font-size:10px;line-height:1;padding:3px 5px;
+  color:#fff !important;background:#17191d;
+  border:1px solid rgba(255,255,255,.7);border-radius:4px;
+  transform:rotate(12deg);letter-spacing:.5px;
+  text-shadow:1px 1px 0 rgba(0,0,0,.7) !important;
+  box-shadow:0 2px 7px rgba(0,0,0,.35);pointer-events:none;
+}
 #od-profile-dashboard .odpd-open-avatar{
   width:34px;height:34px;flex:0 0 34px;
   border-radius:50%;object-fit:cover;background:#20242a;
@@ -2484,6 +2495,7 @@ body.dice-roll-active #od-public-chat{
 
 <div id="od-profile-dashboard">
   <button class="odpd-open" id="odpdOpen" type="button">
+    <span id="odpd-vip-badge" aria-label="VIP" style="display:none">VIP</span>
     <img class="odpd-open-avatar" id="odpdOpenAvatar" alt="">
     <span class="odpd-open-copy">
       <span class="odpd-open-name" id="odpdOpenName">Gast</span>
@@ -6154,6 +6166,11 @@ function getLoggedInName(){
 }
 
 function renderVip(v){
+  const vipBadge=document.getElementById("odpd-vip-badge");
+  if(vipBadge){
+    const hasVip=!!(v && (typeof v==="object" ? Object.keys(v).length : v===true || String(v).trim()!==""));
+    vipBadge.style.display=hasVip ? "block" : "none";
+  }
   const box=document.getElementById("od-vip-room");
   const img=document.getElementById("od-vip-image");
   const name=document.getElementById("od-vip-name");
