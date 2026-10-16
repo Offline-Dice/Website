@@ -5665,8 +5665,8 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
     welcomeName.textContent=name;
     welcome.setAttribute("aria-hidden","false");
     intro.classList.add("od-show-welcome");
-    // Welcome animation remains visible for 3 seconds.
-    setTimeout(finish,3000);
+    // Short welcome animation.
+    setTimeout(finish,1000);
   }
 
   function finishLogin(name){
@@ -5744,7 +5744,7 @@ const cleanBlueDb = getDatabase(cleanBlueApp);
       }else{
         showLogin();
       }
-    },2350);
+    },500);
   }
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});
