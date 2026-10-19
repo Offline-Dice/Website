@@ -4767,7 +4767,7 @@ function applyAntiBan(){
             e.classList.add("antiBlur");
     });
 
-    document.querySelectorAll(".color-block").forEach(e=>{
+    document.querySelectorAll(".color-block, .last20-die").forEach(e=>{
         e.classList.add("antiBlur","antiBanDice");
 
         if(!e.dataset.antiBanHoverBound){
@@ -4791,10 +4791,10 @@ function applyAntiBan(){
 function applyAntiBanToNode(node){
     if(!antiBan || !node || node.nodeType !== 1) return;
 
-    const elements = [node, ...node.querySelectorAll(".color-block, select, .top-logo")];
+    const elements = [node, ...node.querySelectorAll(".color-block, .last20-die, select, .top-logo")];
 
     elements.forEach(e=>{
-        if(e.matches(".color-block")){
+        if(e.matches(".color-block, .last20-die")){
             e.classList.add("antiBlur","antiBanDice");
 
             if(!e.dataset.antiBanHoverBound){
