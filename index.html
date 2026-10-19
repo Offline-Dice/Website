@@ -4823,6 +4823,25 @@ function createAntiBan(){
     };
 }
 
+// LAST 20 ROLLS: Farben beim Darüberfahren genauso kurz aufdecken wie die Hauptwürfel.
+if (!window.__last20AntiBanHoverBound) {
+    window.__last20AntiBanHoverBound = true;
+    document.addEventListener("mouseover", function(e) {
+        if (!antiBan) return;
+        const target = e.target && e.target.closest ? e.target.closest("#last20Rolls .last20-die, #last20Rolls .last20-dot") : null;
+        if (!target || target.contains(e.relatedTarget)) return;
+        target.classList.remove("antiBlur");
+        target.classList.add("antiBanDice", "antiBanRevealed");
+    });
+    document.addEventListener("mouseout", function(e) {
+        if (!antiBan) return;
+        const target = e.target && e.target.closest ? e.target.closest("#last20Rolls .last20-die, #last20Rolls .last20-dot") : null;
+        if (!target || target.contains(e.relatedTarget)) return;
+        target.classList.remove("antiBanRevealed");
+        target.classList.add("antiBlur");
+    });
+}
+
 function applyAntiBan(){
     createAntiBan();
 
