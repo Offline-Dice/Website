@@ -6765,6 +6765,37 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
   }
 })();
 </script>
+
+<style id="od-responsive-dice-rows-fix">
+/* Keep dice square and wrap into two rows on narrow screens. */
+@media (max-width: 560px) {
+  #diceResultArea {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+  #diceResultArea > .color-block {
+    flex: 0 1 calc(50% - 10px) !important;
+    width: min(86px, calc(50% - 10px)) !important;
+    max-width: 86px !important;
+    min-width: 0 !important;
+    aspect-ratio: 1 / 1 !important;
+    height: auto !important;
+    box-sizing: border-box !important;
+  }
+}
+@media (min-width: 561px) and (max-width: 760px) {
+  #diceResultArea { flex-wrap: wrap !important; justify-content: center !important; gap: 10px !important; }
+  #diceResultArea > .color-block { flex: 0 1 calc(25% - 10px) !important; min-width: 0 !important; aspect-ratio: 1 / 1 !important; height: auto !important; }
+}
+</style>
 </body>
 </html>
 
