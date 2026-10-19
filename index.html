@@ -4844,6 +4844,11 @@ function applyAntiBan(){
             e.classList.add("antiBlur");
     });
 
+    // Auch die Würfel-Farben in LAST 20 ROLLS im Anti-Ban-Modus zensieren.
+    document.querySelectorAll("#last20Rolls .last20-die, #last20Rolls .last20-dot").forEach(e=>{
+        e.classList.add("antiBlur");
+    });
+
     document.querySelectorAll(".color-block").forEach(e=>{
         e.classList.add("antiBlur","antiBanDice");
 
@@ -4891,7 +4896,7 @@ function applyAntiBanToNode(node){
             }
         }
 
-        if(e.matches("select, .top-logo"))
+        if(e.matches("select, .top-logo, #last20Rolls .last20-die, #last20Rolls .last20-dot"))
             e.classList.add("antiBlur");
 
         if(e.textContent && e.textContent.trim().toUpperCase()==="ROLL COLOR DICE")
@@ -6767,33 +6772,43 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
 </script>
 
 <style id="od-responsive-dice-rows-fix">
-/* Keep dice square and wrap into two rows on narrow screens. */
-@media (max-width: 560px) {
+/* Responsive dice layout: apply to every generated dice element, regardless of dice count/class. */
+@media (max-width: 760px) {
   #diceResultArea {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: center !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    justify-items: center !important;
     align-items: center !important;
     gap: 10px !important;
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
-    padding-left: 6px !important;
-    padding-right: 6px !important;
+    padding: 6px !important;
   }
-  #diceResultArea > .color-block {
-    flex: 0 1 calc(50% - 10px) !important;
-    width: min(86px, calc(50% - 10px)) !important;
+  #diceResultArea > * {
+    width: min(100%, 86px) !important;
     max-width: 86px !important;
     min-width: 0 !important;
     aspect-ratio: 1 / 1 !important;
     height: auto !important;
     box-sizing: border-box !important;
+    justify-self: center !important;
   }
 }
-@media (min-width: 561px) and (max-width: 760px) {
-  #diceResultArea { flex-wrap: wrap !important; justify-content: center !important; gap: 10px !important; }
-  #diceResultArea > .color-block { flex: 0 1 calc(25% - 10px) !important; min-width: 0 !important; aspect-ratio: 1 / 1 !important; height: auto !important; }
+@media (min-width: 761px) and (max-width: 1000px) {
+  #diceResultArea {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    justify-items: center !important;
+    gap: 10px !important;
+  }
+  #diceResultArea > * {
+    width: min(100%, 86px) !important;
+    max-width: 86px !important;
+    min-width: 0 !important;
+    aspect-ratio: 1 / 1 !important;
+    height: auto !important;
+  }
 }
 </style>
 </body>
