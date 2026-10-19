@@ -1920,21 +1920,20 @@ body.dice-roll-active #od-public-chat{
 </style>
 <style id="slow-reveal-control-css">
 #slowRevealToggle{
-  position:fixed!important;left:199px!important;bottom:15px!important;z-index:2147483647!important;
+  position:static!important;left:auto!important;right:auto!important;bottom:auto!important;z-index:2147483647!important;
   display:inline-flex!important;align-items:center;justify-content:center;gap:4px;
-  width:auto!important;min-width:0!important;max-width:none!important;height:34px!important;min-height:34px!important;
-  padding:4px 8px!important;box-sizing:border-box!important;
+  flex:0 0 auto!important;width:auto!important;min-width:0!important;max-width:none!important;height:30px!important;min-height:30px!important;
+  margin:0 0 0 2px!important;padding:3px 7px!important;box-sizing:border-box!important;
   border:1px solid rgba(255,255,255,.55)!important;border-radius:8px!important;
-  background:rgba(255,255,255,.12)!important;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
-  color:#fff!important;font-family:'Luckiest Guy',cursive!important;font-size:12px!important;font-weight:700!important;
-  cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.12)!important;white-space:nowrap;line-height:1!important;
+  background:rgba(5,8,15,.28)!important;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+  color:#fff!important;font-family:'Luckiest Guy',cursive!important;font-size:10px!important;font-weight:700!important;
+  cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)!important;white-space:nowrap;line-height:1!important;
   letter-spacing:.1px!important;text-shadow:none!important;transition:background .18s ease,border-color .18s ease,transform .18s ease;
 }
-#slowRevealToggle:hover{transform:translateY(-1px);background:rgba(255,255,255,.2)!important}
+#slowRevealToggle:hover{transform:translateY(-1px);background:rgba(255,255,255,.12)!important}
 #slowRevealToggle .slow-reveal-dot{width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:#aaa;box-shadow:none;transition:background .18s ease,box-shadow .18s ease}
-#slowRevealToggle.on{background:rgba(255,255,255,.22)!important;border-color:rgba(255,255,255,.9)!important;box-shadow:0 0 0 1px rgba(255,255,255,.12),0 3px 10px rgba(0,0,0,.18)!important}
+#slowRevealToggle.on{background:rgba(255,255,255,.16)!important;border-color:rgba(255,255,255,.85)!important;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 2px 8px rgba(0,0,0,.12)!important}
 #slowRevealToggle.on .slow-reveal-dot{background:#7dffb0;box-shadow:0 0 5px rgba(125,255,176,.7)}
-@media(max-width:520px){#slowRevealToggle{left:199px!important;bottom:15px!important;height:34px!important;min-height:34px!important;padding:4px 7px!important;font-size:11px!important}}
 #slowRevealToggle, #slowRevealToggle span{color:#fff!important;-webkit-text-fill-color:#fff!important;text-shadow:none!important;background-image:none!important}
 </style>
 <style id="od-social-links-css">
@@ -6421,7 +6420,8 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     b.setAttribute('aria-pressed', enabled?'true':'false');
     b.classList.toggle('on',enabled);
     b.addEventListener('click',function(){ enabled=!enabled; localStorage.setItem('slowRevealMode',enabled?'on':'off'); b.classList.toggle('on',enabled); b.setAttribute('aria-pressed',enabled?'true':'false'); });
-    document.body.appendChild(b);
+    const social=document.getElementById('od-social-links');
+    (social||document.body).appendChild(b);
   }
   window.odSlowRevealEnabled=function(){return enabled;};
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setup); else setup();
