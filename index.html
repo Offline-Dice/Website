@@ -4892,7 +4892,7 @@ function applyAntiBan(){
 function applyAntiBanToNode(node){
     if(!antiBan || !node || node.nodeType !== 1) return;
 
-    const elements = [node, ...node.querySelectorAll(".color-block, select, .top-logo")];
+    const elements = [node, ...node.querySelectorAll(".color-block, select, .top-logo, #last20Rolls .last20-die, #last20Rolls .last20-dot")];
 
     elements.forEach(e=>{
         if(e.matches(".color-block")){
