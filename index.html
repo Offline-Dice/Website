@@ -3313,9 +3313,12 @@ async function getRandomResult(mode) {
         let diceRollInProgress = false;
 
         async function rollDice() {
-            // Prevent double-clicks / overlapping rolls. Overlapping async rolls were
-            // causing the Roll Again button and result area to briefly reappear.
+            // Additive one-roll-per-second cooldown. Keep the existing roll flow unchanged.
             if (diceRollInProgress) return;
+            const now = Date.now();
+            const nextAllowedRollAt = Number(window.__offlineDiceNextAllowedRollAt || 0);
+            if (now < nextAllowedRollAt) return;
+            window.__offlineDiceNextAllowedRollAt = now + 1000;
             diceRollInProgress = true;
 
             const resultDiv = document.getElementById("diceResultArea");
@@ -6836,61 +6839,6 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
   }
 }
 </style>
-
-<!-- TEMPORARY RATE-LIMIT TEST PANEL: remove this whole block after testing. -->
-<style>
-#odRateTestPanel{position:fixed;z-index:2147483000;right:12px;bottom:12px;width:min(330px,calc(100vw - 24px));padding:12px;background:#111827;color:#fff;border:1px solid #60a5fa;border-radius:12px;box-shadow:0 8px 30px #0008;font:13px/1.4 Arial,sans-serif;text-align:left}
-#odRateTestPanel button{width:100%;padding:10px;margin:5px 0 8px;background:#2563eb;color:#fff;border:0;border-radius:8px;font-weight:700;cursor:pointer}
-#odRateTestPanel button:disabled{opacity:.6;cursor:wait}
-#odRateTestLog{max-height:130px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#030712;padding:7px;border-radius:6px}
-#odRateTestPanel .od-small{opacity:.8;font-size:11px}
-</style>
-<div id="odRateTestPanel" aria-live="polite">
-  <strong>RATE-LIMIT TEST (temporär)</strong>
-  <div class="od-small">Klicke schnell mehrmals. Jeder Klick sendet einen zusätzlichen Test-Roll-Aufruf an denselben Worker. Die normale Würfelanimation wird dabei nicht verändert.</div>
-  <button id="odRateTestButton" type="button">Test-Aufruf senden</button>
-  <div id="odRateTestLog">Bereit. Klicks hier testen die Worker-Antwort.</div>
-</div>
-<script>
-(function () {
-  'use strict';
-  const panelButton = document.getElementById('odRateTestButton');
-  const log = document.getElementById('odRateTestLog');
-  const workerUrl = 'https://offline-dice-api.fischerleo56.workers.dev';
-  let sent = 0;
-  function addLine(line) {
-    log.textContent = (line + '\n' + log.textContent).slice(0, 1800);
-  }
-  panelButton.addEventListener('click', async function () {
-    sent++;
-    const attempt = sent;
-    const headers = { 'Content-Type': 'application/json' };
-    const uid = String(localStorage.getItem('offlineDiceFirebaseUserId') || '');
-    if (/^[A-Za-z0-9_-]{1,128}$/.test(uid)) headers['X-Session'] = uid;
-    const clientSeed = String((window.provablyFair && window.provablyFair.clientSeed) || localStorage.getItem('clientSeed') || 'RateLimitTest').slice(0, 128);
-    const nonce = Number.isSafeInteger(window.provablyFair && window.provablyFair.nonce) ? window.provablyFair.nonce : 0;
-    addLine('#' + attempt + ' wird gesendet …');
-    try {
-      const response = await fetch(workerUrl, {
-        method: 'POST', headers: headers, cache: 'no-store',
-        body: JSON.stringify({ mode: 'color', count: 1, clientSeed: clientSeed, nonce: nonce + attempt })
-      });
-      let body = '';
-      try { body = await response.text(); } catch (_) {}
-      if (response.status === 429) {
-        addLine('#' + attempt + ' ABGELEHNT: HTTP 429 (Rate-Limit) — ' + body.slice(0, 180));
-      } else if (response.ok) {
-        addLine('#' + attempt + ' ANGENOMMEN: HTTP ' + response.status + ' — Worker hat den Aufruf akzeptiert.');
-      } else {
-        addLine('#' + attempt + ' HTTP ' + response.status + ' — ' + body.slice(0, 180));
-      }
-    } catch (error) {
-      addLine('#' + attempt + ' FEHLER: ' + String(error && error.message || error));
-    }
-  });
-})();
-</script>
-
 </body>
 </html>
 
