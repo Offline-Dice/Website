@@ -975,7 +975,8 @@ width:52px;height:52px;border-radius:50%;object-fit:cover;
 .last20-roll-name{color:#aaa;font-size:13px;font-weight:700}
 .last20-roll-id{color:#aaa;font-size:12px;text-align:right;white-space:nowrap}
 .last20-dice{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-.last20-die{width:26px;height:26px;border-radius:7px;border:2px solid #fff;box-sizing:border-box;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.last20-die{width:26px;height:26px;border-radius:7px;border:3px solid #fff;box-sizing:border-box;position:relative;box-shadow:0 0 7px 1px rgba(255,255,255,.65)}
+.last20-die::after{content:"";position:absolute;left:50%;top:50%;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:#fff;box-shadow:0 0 4px 1px rgba(255,255,255,.9)}
 @media(max-width:600px){
   .last20-rolls{width:94%;padding:13px}
   .last20-title{font-size:21px}
@@ -6617,6 +6618,15 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     blue: "#3b5bea",
     purple: "#9c27b0"
   };
+  // Same colors as the big dice (only used for the small dice in the roll rows).
+  var DIE_COLORS = {
+    red: "red",
+    orange: "orange",
+    yellow: "gold",
+    green: "green",
+    blue: "blue",
+    purple: "purple"
+  };
   var history = [];
 
   function getBox() {
@@ -6650,7 +6660,7 @@ import { getDatabase, ref, query, orderByChild, limitToLast, onValue } from "htt
     var dice = make("div", "last20-dice", "");
     roll.colors.forEach(function (color) {
       var die = make("span", "last20-die", "");
-      die.style.backgroundColor = COLORS[color];
+      die.style.backgroundColor = DIE_COLORS[color];
       die.setAttribute("title", color.toUpperCase());
       dice.appendChild(die);
     });
