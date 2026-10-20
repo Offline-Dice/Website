@@ -469,36 +469,42 @@ async function banUserNetwork(userId, action){
   if(!window.secureAdminAuth || !window.secureAdminAuth.currentUser || window.secureAdminAuth.currentUser.uid!=="5zaM6ctegwPFRTaRabsRBhZyKmq2"){
     throw new Error("Admin-Sitzung nicht aktiv. Bitte Admin neu anmelden.");
   }
+  if(!/^[A-Za-z0-9_-]{1,128}$/.test(String(userId||""))) throw new Error("Ungültige User-ID.");
 
   const userRef=db.ref("registeredUsers/"+userId);
   const snap=await userRef.once("value");
   const user=snap.val()||{};
-  const ip=String(user.networkIp||"").trim();
-  const network=String(user.network||"").trim();
+  const networkSnap=await db.ref("userNetworks/"+userId).once("value").catch(()=>null);
+  const networkData=networkSnap && networkSnap.val() || {};
+  const ip=String(user.networkIp||networkData.ip||"").trim();
+  const network=String(user.network||networkData.network||"").trim();
 
   if(action==="ban"){
-    // Der User-Ban funktioniert auch dann, wenn noch kein Netzwerk erkannt wurde.
+    // Account immer bannen, auch wenn noch keine IP/Netzwerkdaten vorhanden sind.
     await userRef.child("banned").set(true);
+    await userRef.child("bannedAt").set(Date.now());
 
-    // Netzwerk-Ban zusätzlich setzen, sobald eine IP vorhanden ist.
+    // Falls eine IP bekannt ist, zusätzlich das öffentliche Netzwerk bannen.
     if(ip){
       const key=encodeURIComponent(ip).replace(/\./g,"%2E");
       await db.ref("ipBans/"+key).set({
         ip:ip,
         network:network,
-        userId:userId,
+        userId:String(userId),
+        uid:String(userId),
         userName:String(user.name||"").slice(0,64),
         reason:"User-Ban: "+String(user.name||userId).slice(0,64),
         bannedAt:Date.now()
       });
+      return {userBanned:true, ipBanned:true, ip};
     }
-    return;
+    return {userBanned:true, ipBanned:false, ip:""};
   }
 
-  // Entbannen: Account-Ban immer entfernen.
+  // Beim Entbannen den Account-Ban entfernen und passende IP-/Netzwerk-Bans bereinigen.
   await userRef.child("banned").set(false);
+  await userRef.child("bannedAt").remove();
 
-  // Alle passenden Netzwerk-Bans entfernen, auch ältere Einträge.
   const bansSnap=await db.ref("ipBans").once("value");
   const bans=bansSnap.val()||{};
   const updates={};
@@ -506,7 +512,7 @@ async function banUserNetwork(userId, action){
   Object.keys(bans).forEach(function(key){
     const ban=bans[key];
     if(!ban)return;
-    const banUserId=String(ban.userId||"").trim();
+    const banUserId=String(ban.userId||ban.uid||"").trim();
     const banIp=String(ban.ip||"").trim();
     const banNetwork=String(ban.network||"").trim();
     const banName=String(ban.userName||"").trim();
@@ -517,6 +523,7 @@ async function banUserNetwork(userId, action){
     if(matchesUser||matchesIp||matchesNetwork||matchesName)updates["ipBans/"+key]=null;
   });
   if(Object.keys(updates).length)await db.ref().update(updates);
+  return {userBanned:false, ipBanned:false, ip};
 }
 
 function renderRegisteredUsers(data){
@@ -1589,26 +1596,43 @@ if(typeof db!=="undefined"){
       const users=snap.val()||{};
       const entries=Object.entries(users).map(([id,u])=>({id,...(u||{})})).sort((a,b)=>String(a.name||a.id).localeCompare(String(b.name||b.id),undefined,{sensitivity:"base"}));
       select.innerHTML='<option value="">User auswählen...</option>';
-      entries.forEach(function(u){
+      Promise.all(entries.map(async function(u){
+        let ip=String(u.networkIp||"").trim();
+        if(!ip){
+          const ns=await db.ref("userNetworks/"+u.id).once("value").catch(()=>null);
+          ip=String((ns&&ns.val()&&ns.val().ip)||"").trim();
+        }
         const opt=document.createElement("option");
         opt.value=u.id;
-        opt.textContent=(u.banned?"⛔ ":"")+String(u.name||u.id)+(u.networkIp?" — Netzwerk erkannt":" — Netzwerk fehlt");
+        opt.textContent=(u.banned?"⛔ ":"")+String(u.name||u.id)+(ip?" — IP erkannt":" — nur User-Bann möglich");
         select.appendChild(opt);
-      });
+      }));
     }).catch(function(e){setStatus("❌ "+e.message);});
   }
   button?.addEventListener("click",async function(){
     const id=select?.value;
     if(!id){setStatus("❌ User auswählen.");return;}
-    const snap=await db.ref("registeredUsers/"+id).once("value").catch(e=>null);
+    const snap=await db.ref("registeredUsers/"+id).once("value").catch(()=>null);
     const user=snap?.val()||{};
     const action=user.banned?"unban":"ban";
     const label=user.banned?"entbannen":"bannen";
-    if(!confirm("User \""+String(user.name||id)+"\" wirklich "+label+"?\n\nDas zuletzt erkannte öffentliche Netzwerk/WLAN dieses Users wird dabei ebenfalls "+(action==="ban"?"gebannt.":"entbannt.")))return;
+    const networkSnap=await db.ref("userNetworks/"+id).once("value").catch(()=>null);
+    const networkData=networkSnap && networkSnap.val() || {};
+    const hasIp=!!String(user.networkIp||networkData.ip||"").trim();
+    const detail=action==="ban"
+      ? (hasIp ? "Der User-Account UND sein zuletzt erkanntes öffentliches Netzwerk/WLAN werden gebannt." : "Es ist keine IP hinterlegt. Der User-Account wird trotzdem gebannt; ein IP-/WLAN-Bann ist erst möglich, sobald eine IP registriert wurde.")
+      : "Der User-Account und zugehörige IP-/Netzwerk-Bans werden entfernt.";
+    if(!confirm("User \""+String(user.name||id)+"\" wirklich "+label+"?\n\n"+detail))return;
     try{
       setStatus("⏳ Wird verarbeitet...");
-      await banUserNetwork(id,action);
-      setStatus(action==="ban"?"✅ User + WLAN/Netzwerk gebannt.":"✅ User + WLAN/Netzwerk vollständig entbannt.");
+      const result=await banUserNetwork(id,action);
+      if(action==="ban"){
+        setStatus(result && result.ipBanned
+          ? "✅ User und IP/WLAN gebannt ("+result.ip+")."
+          : "✅ User gebannt. ⚠️ Keine IP hinterlegt – es wurde nur der User gebannt.");
+      }else{
+        setStatus("✅ User-Bann und passende IP-/Netzwerk-Bans entfernt.");
+      }
       load();
       refreshRegisteredUsers();
     }catch(e){
