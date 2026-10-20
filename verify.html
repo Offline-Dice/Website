@@ -277,6 +277,13 @@ body:before{
   color:rgba(255,255,255,.7);
   padding:20px;
 }
+.user-history{width:93%;margin:18px auto 0;text-align:left;font-family:Arial,Helvetica,sans-serif}
+.user-history-title{font-size:18px;font-weight:800;margin:0 0 10px;text-align:center}
+.history-roll{padding:12px;margin:8px 0;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(0,0,0,.14)}
+.history-roll-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;color:rgba(255,255,255,.78);margin-bottom:8px}
+.history-dice{display:flex;gap:6px;flex-wrap:wrap}
+.history-die{width:25px;height:25px;border:2px solid #fff;border-radius:6px;box-shadow:0 2px 5px rgba(0,0,0,.25)}
+.history-colors{font-size:12px;color:rgba(255,255,255,.9);margin-top:7px;word-break:break-word}
 
 .warning{
   width:93%;
@@ -327,8 +334,12 @@ body:before{
       </div>
 
       <section class="result-card">
-        <div class="result-card-header">MOST RECENT ROLL</div>
+        <div class="result-card-header">VERIFY RESULT</div>
         <div id="result" class="result-panel"></div>
+      </section>
+      <section class="result-card">
+        <div class="result-card-header">USER'S LAST 20 ROLLS</div>
+        <div id="userHistory" class="user-history"><div class="empty-rolls">Enter a Verify Code to load this user's roll history.</div></div>
       </section>
 
       <div class="warning" id="warning">
@@ -473,6 +484,22 @@ function showResult(colors, data){
   else if(rollTimer) { clearInterval(rollTimer); rollTimer = null; }
 }
 
+function renderUserHistory(data){
+  const host = document.getElementById("userHistory");
+  if(!host) return;
+  const rolls = Array.isArray(data?.last20Rolls) ? data.last20Rolls.slice(0,20) : [];
+  if(!rolls.length){ host.innerHTML = `<div class="empty-rolls">No saved roll history for this user yet.</div>`; return; }
+  host.innerHTML = `<div class="user-history-title">${rolls.length} / 20 ROLLS SAVED</div>` + rolls.map((roll,index) => {
+    const colors = Array.isArray(roll?.colors) ? roll.colors : [];
+    const code = String(roll?.code || "");
+    const parsed = formatRollTime(roll?.created);
+    const timeText = parsed ? parsed.date.toLocaleString() : "Time unavailable";
+    const dice = colors.map(c => `<span class="history-die" style="background:${colorMap[c] || "#777"}"></span>`).join("");
+    const names = colors.map(c => colorNames[c] || String(c)).join(" · ");
+    return `<article class="history-roll"><div class="history-roll-head"><strong>#${index+1} ${code}</strong><span>${timeText}</span></div><div class="history-dice">${dice || "<span>No colors</span>"}</div><div class="history-colors">${names}</div></article>`;
+  }).join("");
+}
+
 function showError(message){
   const result = document.getElementById("result");
   result.className = "result-panel error";
@@ -502,11 +529,14 @@ window.verify = async function(){
 
     if(!snap.exists()){
       showError("❌ INVALID CODE");
+      const historyHost = document.getElementById("userHistory");
+      if(historyHost) historyHost.innerHTML = `<div class="empty-rolls">No history available for this code.</div>`;
       return;
     }
 
     const data = snap.val();
     showResult(data.colors || [], data);
+    renderUserHistory(data);
   }catch(error){
     console.error(error);
     showError("❌ FIREBASE ERROR");
