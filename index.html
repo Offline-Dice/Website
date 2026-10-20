@@ -3313,9 +3313,12 @@ async function getRandomResult(mode) {
         let diceRollInProgress = false;
 
         async function rollDice() {
-            // Prevent double-clicks / overlapping rolls. Overlapping async rolls were
-            // causing the Roll Again button and result area to briefly reappear.
+            // Additive one-roll-per-second cooldown. Keep the existing roll flow unchanged.
             if (diceRollInProgress) return;
+            const now = Date.now();
+            const nextAllowedRollAt = Number(window.__offlineDiceNextAllowedRollAt || 0);
+            if (now < nextAllowedRollAt) return;
+            window.__offlineDiceNextAllowedRollAt = now + 1000;
             diceRollInProgress = true;
 
             const resultDiv = document.getElementById("diceResultArea");
