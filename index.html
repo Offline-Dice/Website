@@ -3567,7 +3567,7 @@ async function getRandomResult(mode) {
 
         function toggleDisplayMode(mode) {
             const layoutRow = document.querySelector('.layout-row');
-            if (layoutRow) layoutRow.classList.toggle('color-dice-compact', mode === 'color');
+            if (layoutRow) layoutRow.classList.toggle('color-dice-compact', mode === 'color' || mode === 'coinflip');
             const diceResultArea = document.getElementById("diceResultArea");
             const wheelWrapper = document.getElementById("wheelWrapper");
             const numDiceSelect = document.getElementById("numDice");
@@ -3638,7 +3638,7 @@ async function getRandomResult(mode) {
         });
         // Set the compact panel correctly on first page load too.
         const initialLayoutRow = document.querySelector('.layout-row');
-        if (initialLayoutRow) initialLayoutRow.classList.toggle('color-dice-compact', document.getElementById("colorDice").value === 'color');
+        if (initialLayoutRow) initialLayoutRow.classList.toggle('color-dice-compact', ['color','coinflip'].includes(document.getElementById("colorDice").value));
 
         document.getElementById("numDice").addEventListener("change", function () {
             const mode = document.getElementById("colorDice").value;
