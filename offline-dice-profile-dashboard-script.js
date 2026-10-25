@@ -96,6 +96,8 @@
     const next=readCounter(key)+1;
     localStorage.setItem(key,String(next));
   }
+  // Global machen: game-main.js ruft addCounter(...) beim Roll/Coinflip auf.
+  window.addCounter=addCounter;
 
   function open(){
     load();
