@@ -1,0 +1,17 @@
+
+#od-chat-launcher{
+  bottom:72px!important;
+}
+@media(max-width:600px){
+  #od-chat-launcher{bottom:62px!important}
+}
+/* During the Color Dice roll, hide the chat exactly like the other page UI. */
+body.dice-focus-mode #od-chat-launcher,
+body.dice-focus-mode #od-public-chat,
+body.dice-roll-active #od-chat-launcher,
+body.dice-roll-active #od-public-chat{
+  display:none!important;
+  visibility:hidden!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}

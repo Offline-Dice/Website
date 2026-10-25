@@ -1,0 +1,69 @@
+
+#antiBanBox{
+    display:flex !important;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    position:fixed !important;
+    right:15px !important;
+    bottom:15px !important;
+    margin:0 !important;
+    z-index:2147483647 !important;
+    transform:none !important;
+}
+
+#antiBanText{
+    color:white;
+    font-size:13px;
+    font-weight:bold;
+}
+
+#antiBanSwitch{
+    width:42px;
+    height:22px;
+    border-radius:16px;
+    border:0;
+    background:#555;
+    position:relative;
+    cursor:pointer;
+    padding:0;
+}
+
+#antiBanSwitch:before{
+    content:"";
+    position:absolute;
+    width:18px;
+    height:18px;
+    top:2px;
+    left:2px;
+    border-radius:50%;
+    background:white;
+    transition:.2s;
+}
+
+#antiBanSwitch.on{
+    background:#22c55e;
+}
+
+#antiBanSwitch.on:before{
+    left:22px;
+}
+
+.antiBlur{
+    filter:blur(14px)!important;
+}
+
+.antiBanDice {
+    cursor: default;
+    transition: filter .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+.antiBanDice.antiBanRevealed {
+    filter: blur(0) !important;
+    animation: antiBanDiceReveal .35s ease-out;
+}
+@keyframes antiBanDiceReveal {
+    0%   { transform: scale(.96); box-shadow: 6px 6px 12px rgba(0,0,0,.3), -4px -4px 10px var(--shadow-light); }
+    60%  { transform: scale(1.045); }
+    100% { transform: scale(1); }
+}
+

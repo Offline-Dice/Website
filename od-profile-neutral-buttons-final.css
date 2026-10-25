@@ -1,0 +1,14 @@
+
+#od-profile-dashboard .odpd-save,
+#od-profile-dashboard .odpd-view,
+#od-profile-dashboard .odpd-logout,
+#od-profile-dashboard .odpd-file-btn,
+#od-profile-dashboard .odpd-back{
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  text-shadow:none !important;
+}
+#od-profile-dashboard .odpd-save{
+  color:#111 !important;
+  -webkit-text-fill-color:#111 !important;
+}

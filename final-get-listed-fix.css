@@ -1,0 +1,49 @@
+
+/* FINAL GET LISTED STYLE OVERRIDE */
+.get-listed-btn,
+.get-listed-btn * {
+  font-family: 'Luckiest Guy', cursive !important;
+  color: #ffffff !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: none !important;
+}
+.get-listed-label,
+.listed-popup-text,
+.listed-popup-discord {
+  font-family: 'Luckiest Guy', cursive !important;
+  color: #ffffff !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: none !important;
+}
+.listed-popup-close {
+  all: unset !important;
+  position: absolute !important;
+  top: 10px !important;
+  right: 14px !important;
+  width: 34px !important;
+  height: 34px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: #ffffff !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 28px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: none !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  opacity: .9 !important;
+  z-index: 5 !important;
+}
+.listed-popup-close:hover {
+  opacity: 1 !important;
+  background: rgba(255,255,255,.08) !important;
+  transform: scale(1.05) !important;
+}

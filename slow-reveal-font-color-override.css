@@ -1,0 +1,14 @@
+
+#slowRevealToggle,
+#slowRevealToggle span:not(.slow-reveal-dot),
+#slowRevealToggle span:not(.slow-reveal-dot)::before,
+#slowRevealToggle span:not(.slow-reveal-dot)::after {
+  font-family: 'Luckiest Guy', cursive !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 transparent !important;
+  background: none !important;
+  background-image: none !important;
+  filter: none !important;
+}

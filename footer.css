@@ -1,0 +1,10 @@
+
+.offline-dice-footer{
+  width:100%;
+  text-align:center;
+  margin:28px 0 18px;
+  color:rgba(255,255,255,.55);
+  font-size:12px;
+  font-weight:600;
+  pointer-events:none;
+}

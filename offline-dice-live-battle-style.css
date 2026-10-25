@@ -1,0 +1,231 @@
+
+#liveBattleArea{display:none;width:90%;max-width:650px;margin:0 auto 8px;box-sizing:border-box}
+#liveBattleArea.active{display:block}
+#liveBattleArea .lb-battle-dice-row{
+display:grid;grid-template-columns:1fr 120px 1fr;align-items:center;gap:8px;
+margin:18px auto 10px
+}
+#liveBattleArea .lb-battle-player{text-align:center;min-width:0}
+#liveBattleArea .lb-player-name{
+font-family:'Luckiest Guy',cursive;font-size:19px;line-height:1.1;
+color:var(--white);text-shadow:2px 3px 4px rgba(0,0,0,.3);
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+#liveBattleArea .lb-hits{
+font-family:'Luckiest Guy',cursive;font-size:13px;color:var(--white);
+margin:2px 0 6px;text-shadow:1px 2px 3px rgba(0,0,0,.3)
+}
+#liveBattleArea .lb-hits span{font-size:23px}
+#liveBattleArea .lb-single-battle-die{display:flex;justify-content:center;align-items:center}
+#liveBattleArea .lb-die{margin:0}
+#liveBattleArea .lb-current-color{
+font-size:11px;font-weight:400;color:var(--white);margin-top:4px;min-height:16px
+}
+#liveBattleArea .lb-roll-progress{
+font-family:'Luckiest Guy',cursive;font-size:16px;color:var(--white);
+text-align:center;margin:4px 0 9px;text-shadow:1px 2px 3px rgba(0,0,0,.3)
+}
+#liveBattleArea .lb-player-settings{
+display:grid;grid-template-columns:1fr 1fr;gap:10px
+}
+#liveBattleArea .lb-setting{
+background:rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.25);
+border-radius:10px;padding:9px;text-align:center
+}
+#liveBattleArea .lb-setting input{
+width:100%;height:31px;box-sizing:border-box;padding:7px 10px;
+border:4px solid var(--primary-blue);border-radius:10px;
+background:var(--white);color:var(--dark-blue);
+font-family:'Luckiest Guy',cursive;font-size:13px;outline:none
+}
+#liveBattleArea .lb-setting-label{
+font-family:'Luckiest Guy',cursive;font-size:13px;color:var(--white);margin:6px 0
+}
+#liveBattleArea .lb-colors{display:flex;justify-content:center;gap:5px;flex-wrap:wrap}
+#liveBattleArea .lb-color{
+width:28px;height:28px;border-radius:8px;border:3px solid transparent;
+cursor:pointer;padding:0
+}
+#liveBattleArea .lb-color.selected{
+border-color:var(--white);box-shadow:0 0 0 2px var(--primary-blue);transform:scale(1.06)
+}
+#liveBattleArea .lb-bottom{
+display:flex;justify-content:center;align-items:center;gap:8px;margin:10px 0 18px
+}
+#liveBattleArea #lbRollCount{
+height:38px;padding:5px 10px;border:4px solid var(--primary-blue);
+border-radius:10px;background:var(--white);color:var(--dark-blue);
+font-family:'Luckiest Guy',cursive;font-size:15px;outline:none
+}
+#liveBattleArea #lbSpinButton{
+height:46px;padding:7px 28px;border:0;border-radius:12px;
+background:var(--primary-blue);color:var(--white);
+font-family:'Luckiest Guy',cursive;font-size:19px;cursor:pointer;
+box-shadow:4px 4px 8px rgba(0,0,0,.25)
+}
+#liveBattleArea #lbSpinButton:disabled{opacity:.55;cursor:not-allowed}
+#liveBattleArea #lbAutoRollButton{
+height:46px;padding:7px 22px;border:0;border-radius:12px;
+background:var(--primary-blue);color:var(--white);
+font-family:'Luckiest Guy',cursive;font-size:19px;cursor:pointer;
+box-shadow:4px 4px 8px rgba(0,0,0,.25)
+}
+#liveBattleArea #lbAutoRollButton.active{background:#16a34a}
+#liveBattleArea #lbAutoRollButton:disabled{opacity:.55;cursor:not-allowed}
+#liveBattleArea .lb-die.lb-battle-rolling{
+animation:dice-roll-shake .16s ease-in-out infinite !important
+}
+#liveBattleArea .lb-die.lb-battle-exit{
+animation:dice-clean-exit .10s ease-out forwards !important
+}
+@media(max-width:600px){
+#liveBattleArea .lb-player-settings{grid-template-columns:1fr}
+#liveBattleArea .lb-die{width:82px;height:82px;border-width:9px;border-radius:23px}
+#liveBattleArea .lb-battle-dice-row{grid-template-columns:1fr 95px 1fr}
+}
+
+#liveBattleArea .lb-single-battle-die{
+display:flex;justify-content:center;align-items:center;gap:12px;
+width:100%;min-height:105px;flex-wrap:nowrap;overflow:hidden
+}
+#liveBattleArea .lb-single-battle-die .lb-die{
+flex:0 0 78px;width:78px;height:78px;border-radius:22px;border-width:9px
+}
+@media(max-width:700px){
+#liveBattleArea .lb-single-battle-die{gap:7px}
+#liveBattleArea .lb-single-battle-die .lb-die{
+flex:0 0 62px;width:62px;height:62px;border-width:7px;border-radius:18px
+}
+}
+
+#liveBattleArea .lb-battle-dice-row{margin:8px auto 2px}
+#liveBattleArea .lb-roll-progress{margin:1px 0 5px}
+#liveBattleArea .lb-player-name{font-size:19px}
+#liveBattleArea .lb-hits{margin:1px 0 4px}
+#liveBattleArea .lb-player-settings{margin-top:2px}
+#liveBattleArea .lb-bottom{margin:7px 0 10px}
+
+/* Live Battle: full-width dice row, just like the normal Color Dice area */
+#liveBattleArea .lb-battle-dice-row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+width:100%;
+margin:10px auto 3px;
+align-items:start;
+}
+#liveBattleArea .lb-single-battle-die{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:12px;
+width:100%;
+min-height:105px;
+flex-wrap:nowrap;
+overflow:visible;
+box-sizing:border-box;
+}
+#liveBattleArea .lb-single-battle-die .lb-die{
+flex:0 0 78px;
+width:78px;
+height:78px;
+box-sizing:border-box;
+}
+@media(max-width:700px){
+#liveBattleArea .lb-single-battle-die{gap:7px}
+#liveBattleArea .lb-single-battle-die .lb-die{
+flex:0 0 60px;width:60px;height:60px;border-width:7px;border-radius:18px
+}
+}
+
+#liveBattleArea.lb-locked .lb-setting input,
+#liveBattleArea.lb-locked .lb-color,
+#liveBattleArea.lb-locked #lbRollCount{
+opacity:.55;
+cursor:not-allowed;
+}
+
+#lbWinnerOverlay{
+display:none;position:absolute;inset:0;z-index:50;align-items:center;justify-content:center;
+background:rgba(4,13,35,.88);backdrop-filter:blur(5px);border-radius:16px
+}
+#lbWinnerOverlay.active{display:flex;animation:lbWinnerFade .35s ease-out}
+#lbWinnerOverlay .lb-winner-box{
+text-align:center;padding:28px 35px;border-radius:18px;
+background:linear-gradient(145deg,rgba(16,83,180,.96),rgba(5,31,80,.98));
+border:3px solid rgba(255,255,255,.8);
+box-shadow:0 0 35px rgba(0,102,255,.55),0 15px 35px rgba(0,0,0,.45);
+animation:lbWinnerPop .55s cubic-bezier(.2,1.35,.4,1)
+}
+#lbWinnerOverlay .lb-winner-small{
+font-family:'Luckiest Guy',cursive;font-size:22px;color:#fff;
+letter-spacing:2px;text-shadow:2px 3px 4px rgba(0,0,0,.35)
+}
+#lbWinnerOverlay .lb-winner-name{
+font-family:'Luckiest Guy',cursive;font-size:48px;color:#fff;margin:3px 0;
+text-shadow:3px 4px 0 rgba(0,0,0,.2),0 0 18px rgba(255,255,255,.3)
+}
+#lbWinnerOverlay .lb-winner-score{
+font-family:'Luckiest Guy',cursive;font-size:20px;color:#fff;margin-bottom:18px
+}
+#lbWinnerOverlay #lbWinnerClose{
+border:0;border-radius:11px;padding:9px 22px;background:#fff;color:var(--dark-blue);
+font-family:'Luckiest Guy',cursive;font-size:17px;cursor:pointer
+}
+@keyframes lbWinnerFade{from{opacity:0}to{opacity:1}}
+@keyframes lbWinnerPop{from{transform:scale(.55) rotate(-3deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+@keyframes lbWinnerGlow{0%,100%{box-shadow:0 0 18px rgba(0,102,255,.4)}50%{box-shadow:0 0 45px rgba(0,102,255,.9)}}
+#lbWinnerOverlay.active .lb-winner-box{animation:lbWinnerPop .55s cubic-bezier(.2,1.35,.4,1),lbWinnerGlow 1.2s .55s ease-in-out 2}
+#liveBattleArea.lb-in-round .lb-mode-lock{
+pointer-events:none;opacity:.55
+}
+
+/* Winner overlay: smooth intro/outro */
+#lbWinnerOverlay{
+opacity:0;
+pointer-events:none;
+transition:opacity .32s ease;
+}
+#lbWinnerOverlay.active{
+opacity:1;
+pointer-events:auto;
+}
+#lbWinnerOverlay .lb-winner-box{
+transform:translateY(18px) scale(.88);
+opacity:0;
+transition:transform .42s cubic-bezier(.2,1.25,.35,1),opacity .28s ease;
+}
+#lbWinnerOverlay.active .lb-winner-box{
+transform:translateY(0) scale(1);
+opacity:1;
+}
+#lbWinnerOverlay.lb-closing .lb-winner-box{
+transform:translateY(18px) scale(.88);
+opacity:0;
+}
+#lbWinnerOverlay .lb-winner-small{
+letter-spacing:3px;
+}
+#lbWinnerOverlay #lbWinnerClose{
+min-width:175px;
+height:46px;
+padding:8px 24px;
+border:3px solid rgba(255,255,255,.85);
+border-radius:13px;
+background:linear-gradient(180deg,#ffffff,#e8f3ff);
+color:#087fd1;
+font-family:'Luckiest Guy',cursive;
+font-size:19px;
+letter-spacing:.3px;
+box-shadow:0 5px 0 rgba(0,40,100,.25),0 8px 18px rgba(0,0,0,.22);
+transition:transform .15s ease,box-shadow .15s ease,filter .15s ease;
+}
+#lbWinnerOverlay #lbWinnerClose:hover{
+transform:translateY(-2px) scale(1.025);
+box-shadow:0 7px 0 rgba(0,40,100,.22),0 11px 22px rgba(0,0,0,.25);
+filter:brightness(1.03);
+}
+#lbWinnerOverlay #lbWinnerClose:active{
+transform:translateY(2px) scale(.98);
+box-shadow:0 2px 0 rgba(0,40,100,.22),0 4px 10px rgba(0,0,0,.2);
+}

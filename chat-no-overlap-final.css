@@ -1,0 +1,13 @@
+
+#od-public-chat{
+  bottom:122px!important;
+  z-index:999998!important;
+}
+#od-chat-launcher{
+  bottom:72px!important;
+  z-index:999999!important;
+}
+@media(max-width:600px){
+  #od-public-chat{bottom:112px!important}
+  #od-chat-launcher{bottom:62px!important}
+}

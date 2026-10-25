@@ -1,0 +1,6 @@
+
+#website-paused-overlay .website-paused-text{
+  white-space:pre-wrap;
+  max-width:min(720px,90vw);
+  text-align:center;
+}

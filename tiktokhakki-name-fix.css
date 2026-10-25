@@ -1,0 +1,9 @@
+
+.stream-btn[data-top-streamer-username="tiktokhakki"] span:not(.top-streamer-live-badge){
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  overflow-wrap:normal !important;
+  word-break:normal !important;
+  font-size:15px !important;
+  line-height:1 !important;
+}

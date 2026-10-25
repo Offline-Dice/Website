@@ -1,0 +1,28 @@
+
+#od-public-chat .od-chat-name-row{
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  width:100% !important;
+  gap:7px !important;
+}
+#od-public-chat .od-chat-avatar{
+  display:block !important;
+  flex:0 0 24px !important;
+  width:24px !important;
+  height:24px !important;
+  min-width:24px !important;
+  min-height:24px !important;
+  max-width:24px !important;
+  max-height:24px !important;
+  margin:0 !important;
+  padding:0 !important;
+  border-radius:50% !important;
+  object-fit:cover !important;
+}
+#od-public-chat .od-chat-name{
+  display:inline-block !important;
+  margin:0 !important;
+}

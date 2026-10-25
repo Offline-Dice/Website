@@ -1,0 +1,29 @@
+
+#od-chat-launcher{
+  bottom:105px!important;
+}
+@media(max-width:600px){
+  #od-chat-launcher{bottom:92px!important}
+}
+/* unread badge */
+#od-chat-launcher{position:fixed!important}
+#od-chat-unread{
+  position:absolute!important;
+  top:-4px!important;
+  right:-4px!important;
+  min-width:19px!important;
+  height:19px!important;
+  padding:0 5px!important;
+  box-sizing:border-box!important;
+  display:none;
+  align-items:center!important;
+  justify-content:center!important;
+  border-radius:999px!important;
+  background:#e53935!important;
+  color:#fff!important;
+  border:2px solid rgba(0,0,0,.35)!important;
+  box-shadow:0 3px 10px rgba(0,0,0,.35)!important;
+  font:700 10px/1 Arial,sans-serif!important;
+  z-index:2!important;
+}
+#od-chat-launcher.has-unread #od-chat-unread{display:flex!important}

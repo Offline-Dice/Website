@@ -1,0 +1,26 @@
+
+#od-public-chat{
+  bottom:100px!important;
+  transition:opacity .22s ease, transform .22s ease!important;
+  transform-origin:bottom right!important;
+}
+#od-public-chat.od-chat-hidden{
+  display:none!important;
+}
+@media(max-width:600px){
+  #od-public-chat{bottom:90px!important}
+}
+
+/* Smooth closing/opening animation without blocking the send button. */
+#od-public-chat.od-chat-animating{
+  display:flex!important;
+  pointer-events:none!important;
+}
+#od-public-chat.od-chat-closing{
+  opacity:0!important;
+  transform:translateY(10px) scale(.97)!important;
+}
+#od-public-chat.od-chat-opening{
+  opacity:0!important;
+  transform:translateY(10px) scale(.97)!important;
+}
