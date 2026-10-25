@@ -558,7 +558,7 @@ async function getRandomResult(mode) {
 
         let isMuted = false;
 
-        const diceRollSound = new Audio('https://raw.githubusercontent.com/4ybanMNLA/gperya-sounds/main/roll-sound.mp3');
+        const diceRollSound = new Audio('roll-sound.mp3');
         // Halloween theme only: use the custom Halloween roll sound. All other themes keep the standard sound.
         const halloweenDiceRollSound = new Audio('halloween-dice-roll.mp3');
         const tickSound = new Audio('https://raw.githubusercontent.com/4ybanMNLA/gperya-sounds/main/tick-sound.wav');
