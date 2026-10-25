@@ -289,7 +289,7 @@ async function getRandomResult(mode) {
                     block.style.filter = "blur(3px)";
                     block.style.boxShadow = "none";
                 });
-                const slowRevealSounds = ["assets/audio/slow-reveal-1.mp3","assets/audio/slow-reveal-2.mp3","assets/audio/slow-reveal-3.mp3","assets/audio/slow-reveal-4.mp3","assets/audio/slow-reveal-5.mp3","assets/audio/slow-reveal-6.mp3"];
+                const slowRevealSounds = ["slow-reveal-1.mp3","slow-reveal-2.mp3","slow-reveal-3.mp3","slow-reveal-4.mp3","slow-reveal-5.mp3","slow-reveal-6.mp3"];
                 for (let i = 0; i < blocks.length; i++) {
                     await new Promise(resolve => setTimeout(resolve, 1000));
                     const block = blocks[i];
@@ -315,7 +315,7 @@ async function getRandomResult(mode) {
                 // Play the success sound once all colors have been revealed and
                 // immediately before the normal page/roll controls return.
                 try {
-                    const slowRevealSuccessAudio = new Audio("assets/audio/slow-reveal-success.mp3");
+                    const slowRevealSuccessAudio = new Audio("slow-reveal-success.mp3");
                     slowRevealSuccessAudio.volume = 0.85;
                     slowRevealSuccessAudio.play().catch(() => {});
                 } catch (_) {}
@@ -560,7 +560,7 @@ async function getRandomResult(mode) {
 
         const diceRollSound = new Audio('https://raw.githubusercontent.com/4ybanMNLA/gperya-sounds/main/roll-sound.mp3');
         // Halloween theme only: use the custom Halloween roll sound. All other themes keep the standard sound.
-        const halloweenDiceRollSound = new Audio('assets/audio/halloween-dice-roll.mp3');
+        const halloweenDiceRollSound = new Audio('halloween-dice-roll.mp3');
         const tickSound = new Audio('https://raw.githubusercontent.com/4ybanMNLA/gperya-sounds/main/tick-sound.wav');
         const winSound = new Audio('https://raw.githubusercontent.com/4ybanMNLA/gperya-sounds/main/wheel-win.wav');
 
@@ -641,16 +641,16 @@ silver:"silver.png",
 sakura:"Sakura.png",
 clouds:"Clouds.png",
 galaxy:"Galaxy.png",
-spongebob:"assets/images/themes/spongebob.jpg",
-"japanese-temple":"assets/images/themes/japanese-temple.png",
-halloween:"assets/images/themes/halloween.jpg",
-midnight:"assets/images/themes/midnight.jpg"
+spongebob:"spongebob.jpg",
+"japanese-temple":"japanese-temple.png",
+halloween:"halloween.jpg",
+midnight:"midnight.jpg"
 };
 document.body.style.background='url("'+map[this.value]+'") center center / cover no-repeat fixed';
 const logo=document.querySelector(".top-logo");
 if(logo){
   if(!logo.dataset.originalSrc) logo.dataset.originalSrc=logo.getAttribute("src");
-  logo.src=this.value==="halloween" ? "assets/images/halloween-logo.png" : logo.dataset.originalSrc;
+  logo.src=this.value==="halloween" ? "halloween-logo.png" : logo.dataset.originalSrc;
 }
 });
 

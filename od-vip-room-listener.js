@@ -14,7 +14,7 @@ const vipConfig = {
 
 const vipApp = getApps().length ? getApps()[0] : initializeApp(vipConfig,"offlineDiceVipRoom");
 const vipDb = getDatabase(vipApp);
-const fallbackImage = "assets/images/vip-fallback.jpg";
+const fallbackImage = "vip-fallback.jpg";
 
 function getLoggedInName(){
   return String(localStorage.getItem("offlineDicePlayerName") || "").trim();
