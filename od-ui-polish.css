@@ -255,3 +255,107 @@ select:focus { outline: none; box-shadow: 0 0 0 4px rgba(255,255,255,.45), 0 8px
 #od-profile-dashboard .odpd-file-btn,
 #od-profile-dashboard .odpd-view,
 #od-profile-dashboard .odpd-logout { box-shadow: 0 6px 16px rgba(0,0,0,.28) !important; }
+
+
+/* ==========================================================
+   TEIL 2 – Haupt-Buttons, Zähler, Infokästen, Live Battle
+   ========================================================== */
+
+/* ---------- Gelber Roll-Button ---------- */
+#rollButton {
+  border-radius: 18px !important;
+  background: linear-gradient(180deg, #fff06b 0%, #ffd400 55%, #f5b800 100%) !important;
+  box-shadow:
+    0 6px 0 rgba(160,105,0,.65),
+    0 16px 26px rgba(0,0,0,.30),
+    inset 0 2px 0 rgba(255,255,255,.65) !important;
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease !important;
+}
+#rollButton:hover:not(:disabled) {
+  transform: translateY(-2px) !important;
+  filter: brightness(1.05);
+  box-shadow:
+    0 8px 0 rgba(160,105,0,.65),
+    0 20px 30px rgba(0,0,0,.34),
+    inset 0 2px 0 rgba(255,255,255,.70) !important;
+}
+#rollButton:active:not(:disabled) {
+  transform: translateY(4px) !important;
+  box-shadow:
+    0 2px 0 rgba(160,105,0,.65),
+    0 6px 12px rgba(0,0,0,.28),
+    inset 0 2px 0 rgba(255,255,255,.55) !important;
+}
+#rollButton:disabled { filter: grayscale(.35) brightness(.92); cursor: not-allowed; }
+
+/* ---------- Zähler (+1 / +10 / +100) ---------- */
+.roll-counter {
+  border: 1px solid rgba(255,255,255,.26) !important;
+  border-radius: 16px !important;
+  background: rgba(8,16,36,.42) !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 20px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.14) !important;
+}
+.roll-counter-side button { transition: background .15s ease; border-radius: 8px; }
+.roll-counter-side button:hover { background: rgba(255,255,255,.14) !important; }
+
+/* ---------- Info-Kasten "Possible colors" + Verify/Ankündigung ---------- */
+.color-container {
+  border: 1px solid rgba(255,255,255,.26) !important;
+  border-radius: 16px !important;
+  background-color: rgba(8,16,36,.38) !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 20px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.12);
+}
+#persistentAnnouncementBox {
+  border-radius: 14px !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,.22) !important;
+}
+
+/* ---------- Live Battle: Kästen, Felder, Buttons ---------- */
+#liveBattleArea .lb-setting {
+  border: 1px solid rgba(255,255,255,.26) !important;
+  border-radius: 16px !important;
+  background: rgba(8,16,36,.34) !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.10);
+}
+#liveBattleArea .lb-setting input,
+#liveBattleArea #lbRollCount { border-radius: 12px !important; }
+#liveBattleArea .lb-setting input:focus,
+#liveBattleArea #lbRollCount:focus { box-shadow: 0 0 0 4px rgba(255,255,255,.40); }
+#liveBattleArea .lb-color { border-radius: 10px !important; transition: transform .15s ease, box-shadow .15s ease; }
+#liveBattleArea .lb-color:hover:not(.selected) { transform: scale(1.08); }
+
+#liveBattleArea #lbSpinButton,
+#liveBattleArea #lbAutoRollButton,
+#liveBattleArea .lb-management-btn {
+  border-radius: 14px !important;
+  background: linear-gradient(180deg, #4aa8ff 0%, #3399ff 55%, #1f7fe0 100%) !important;
+  box-shadow: 0 4px 0 rgba(0,60,140,.70), 0 10px 18px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.40) !important;
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease !important;
+}
+#liveBattleArea #lbAutoRollButton.active {
+  background: linear-gradient(180deg, #34d27a 0%, #16a34a 100%) !important;
+  box-shadow: 0 4px 0 rgba(0,90,40,.70), 0 10px 18px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.40) !important;
+}
+#liveBattleArea #lbSpinButton:hover:not(:disabled),
+#liveBattleArea #lbAutoRollButton:hover:not(:disabled),
+#liveBattleArea .lb-management-btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.06); }
+#liveBattleArea #lbSpinButton:active:not(:disabled),
+#liveBattleArea #lbAutoRollButton:active:not(:disabled),
+#liveBattleArea .lb-management-btn:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(0,60,140,.70), 0 4px 8px rgba(0,0,0,.25) !important;
+}
+
+/* Live-Battle-Buttons: weiße Schrift ohne gelbe Umrandung (passt zum blauen Button) */
+#liveBattleArea #lbSpinButton,
+#liveBattleArea #lbAutoRollButton,
+#liveBattleArea .lb-management-btn {
+  -webkit-text-stroke: 0 !important;
+  color: #fff !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.30);
+}
+#rollButton { margin-bottom: 10px !important; }
