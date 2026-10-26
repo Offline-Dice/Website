@@ -26,3 +26,337 @@
   display:inline-block !important;
   margin:0 !important;
 }
+
+/* ==========================================================
+   OFFLINE DICE – einheitlicher Feinschliff (Kästen & Buttons)
+   Diese Datei wird als letzte geladen und überschreibt nur Details.
+   Zum Ausschalten: den <link ... od-ui-polish.css> in index.html löschen.
+   ========================================================== */
+
+/* ---------- Kästen (Seitenleisten + Spielfeld) ---------- */
+.side-box,
+.wrapper {
+  border: 1px solid rgba(255,255,255,.24) !important;
+  border-radius: 24px !important;
+  background-color: rgba(255,255,255,.03) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(120%) !important;
+  backdrop-filter: blur(8px) saturate(120%) !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* ---------- Streamer-Buttons + "Get listed" ---------- */
+.stream-btn,
+.get-listed-btn {
+  border: 1px solid rgba(255,255,255,.24) !important;
+  border-radius: 16px !important;
+  background: rgba(255,255,255,.05) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.12);
+  transition: background .18s ease, transform .18s ease, box-shadow .18s ease, border-color .18s ease !important;
+}
+.stream-btn:hover,
+.get-listed-btn:hover {
+  background: rgba(255,255,255,.15) !important;
+  border-color: rgba(255,255,255,.40) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.18);
+}
+.stream-btn:active,
+.get-listed-btn:active { transform: translateY(0); }
+.get-listed-plus {
+  border: 1px solid rgba(255,255,255,.30) !important;
+  background: rgba(255,255,255,.10) !important;
+}
+
+/* ---------- Auswahlfelder (Dice / Modus / Theme) ---------- */
+select {
+  border-radius: 14px !important;
+  box-shadow: 0 5px 14px rgba(0,0,0,.18);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+select:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0,.24); }
+select:focus { outline: none; box-shadow: 0 0 0 4px rgba(255,255,255,.45), 0 8px 18px rgba(0,0,0,.24); }
+
+/* ---------- Kleine Buttons unten + Profil-Button (gleicher Glas-Look) ---------- */
+.announcements-link,
+#slowRevealToggle,
+#offlineDiceInstallBtn,
+#od-social-links,
+#od-profile-dashboard .odpd-open {
+  border: 1px solid rgba(255,255,255,.26) !important;
+  background-color: rgba(8,12,24,.40) !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 16px rgba(0,0,0,.25) !important;
+  transition: transform .18s ease, background-color .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.announcements-link:hover,
+#slowRevealToggle:hover,
+#offlineDiceInstallBtn:hover,
+#od-profile-dashboard .odpd-open:hover {
+  background-color: rgba(8,12,24,.58) !important;
+  border-color: rgba(255,255,255,.45) !important;
+  transform: translateY(-1px);
+}
+#od-profile-dashboard .odpd-open { border-radius: 14px !important; }
+
+/* ==========================================================
+   PROFIL-KARTE – schöneres Design (Glas-Look)
+   ========================================================== */
+#od-profile-dashboard .odpd-section {
+  position: relative;
+  padding: 30px 30px 28px !important;
+  border-radius: 24px !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,0) 38%),
+    rgba(9,11,18,.55) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
+  backdrop-filter: blur(22px) saturate(140%) !important;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.10) !important;
+  text-align: left !important;
+}
+
+/* Titel mit kleinem Akzent */
+#od-profile-dashboard .odpd-section-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin: 0 0 26px !important;
+  font-size: 22px !important;
+  letter-spacing: .5px !important;
+  text-align: left !important;
+}
+#od-profile-dashboard .odpd-section-title::before {
+  content: "";
+  width: 5px;
+  height: 22px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #66b3ff, #0066cc);
+}
+
+/* Profilbild */
+#od-profile-dashboard .odpd-photo-row {
+  gap: 20px !important;
+  margin: 0 0 26px !important;
+  padding: 18px !important;
+  border-radius: 18px !important;
+  background: rgba(255,255,255,.04) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+}
+#od-profile-dashboard .odpd-photo {
+  width: 84px !important;
+  height: 84px !important;
+  flex: 0 0 84px !important;
+  border: 3px solid rgba(255,255,255,.14) !important;
+  box-shadow: 0 0 0 2px rgba(51,153,255,.55), 0 8px 22px rgba(0,0,0,.45) !important;
+}
+#od-profile-dashboard .odpd-photo-copy { text-align: left !important; min-width: 0; }
+#od-profile-dashboard .odpd-photo-label {
+  margin: 0 0 10px !important;
+  font-size: 13px !important;
+  text-align: left !important;
+}
+#od-profile-dashboard .odpd-file-row {
+  gap: 12px !important;
+  justify-content: flex-start !important;
+}
+#od-profile-dashboard .odpd-file-btn {
+  height: 36px !important;
+  padding: 0 16px !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.08) !important;
+  border: 1px solid rgba(255,255,255,.22) !important;
+  font-size: 12px !important;
+  transition: background .18s ease, transform .18s ease, border-color .18s ease;
+}
+#od-profile-dashboard .odpd-file-btn:hover {
+  background: rgba(255,255,255,.16) !important;
+  border-color: rgba(255,255,255,.40) !important;
+  transform: translateY(-1px);
+}
+#od-profile-dashboard .odpd-file-name,
+#od-profile-dashboard .odpd-help {
+  text-align: left !important;
+  font-size: 12px !important;
+}
+#od-profile-dashboard .odpd-help { margin-top: 9px !important; }
+
+/* Felder */
+#od-profile-dashboard .odpd-field { margin-top: 22px !important; }
+#od-profile-dashboard .odpd-label {
+  margin: 0 0 9px !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.2px !important;
+  text-transform: uppercase !important;
+  text-align: left !important;
+  color: rgba(255,255,255,.72) !important;
+  -webkit-text-fill-color: rgba(255,255,255,.72) !important;
+}
+#od-profile-dashboard .odpd-input,
+#od-profile-dashboard .odpd-textarea {
+  border: 1px solid rgba(255,255,255,.16) !important;
+  border-radius: 14px !important;
+  background: rgba(255,255,255,.05) !important;
+  font-size: 14px !important;
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+#od-profile-dashboard .odpd-input { height: 48px !important; padding: 0 16px !important; }
+#od-profile-dashboard .odpd-textarea { min-height: 110px !important; padding: 14px 16px !important; line-height: 1.45; }
+#od-profile-dashboard .odpd-input:hover,
+#od-profile-dashboard .odpd-textarea:hover { border-color: rgba(255,255,255,.28) !important; }
+#od-profile-dashboard .odpd-input:focus,
+#od-profile-dashboard .odpd-textarea:focus {
+  border-color: #3399ff !important;
+  background: rgba(51,153,255,.07) !important;
+  box-shadow: 0 0 0 4px rgba(51,153,255,.20) !important;
+}
+#od-profile-dashboard .odpd-field-help {
+  margin-top: 9px !important;
+  font-size: 11px !important;
+  text-align: left !important;
+}
+
+/* Buttons */
+#od-profile-dashboard .odpd-actions { gap: 14px !important; margin-top: 28px !important; }
+#od-profile-dashboard .odpd-save,
+#od-profile-dashboard .odpd-view {
+  height: 48px !important;
+  border-radius: 14px !important;
+  font-size: 13px !important;
+  letter-spacing: .4px !important;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+}
+#od-profile-dashboard .odpd-save {
+  background: linear-gradient(180deg, #ffffff, #e6e9ef) !important;
+  border: 1px solid #ffffff !important;
+  box-shadow: 0 8px 22px rgba(0,0,0,.35) !important;
+}
+#od-profile-dashboard .odpd-save:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0,0,0,.45) !important; }
+#od-profile-dashboard .odpd-view {
+  background: rgba(255,255,255,.07) !important;
+  border: 1px solid rgba(255,255,255,.24) !important;
+}
+#od-profile-dashboard .odpd-view:hover {
+  background: rgba(255,255,255,.14) !important;
+  border-color: rgba(255,255,255,.40) !important;
+  transform: translateY(-2px);
+}
+#od-profile-dashboard .odpd-save:active,
+#od-profile-dashboard .odpd-view:active { transform: translateY(0); }
+
+/* "View my profile" Bereich */
+#od-profile-dashboard .odpd-profile-view {
+  margin-top: 22px !important;
+  padding: 18px !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  border-radius: 16px !important;
+  background: rgba(255,255,255,.04) !important;
+}
+#od-profile-dashboard .odpd-view-avatar { box-shadow: 0 0 0 2px rgba(51,153,255,.55); }
+
+@media (max-width: 650px) {
+  #od-profile-dashboard .odpd-section { padding: 22px 16px 22px !important; border-radius: 20px !important; }
+  #od-profile-dashboard .odpd-photo-row { padding: 14px !important; gap: 14px !important; }
+  #od-profile-dashboard .odpd-photo { width: 68px !important; height: 68px !important; flex-basis: 68px !important; }
+  #od-profile-dashboard .odpd-actions { flex-direction: column; }
+  #od-profile-dashboard .odpd-save, #od-profile-dashboard .odpd-view { width: 100% !important; }
+}
+
+/* Goldene Umrandung der Schrift (kommt von der allgemeinen Button-Regel) im Profil entfernen */
+#od-profile-dashboard button,
+#od-profile-dashboard button * {
+  -webkit-text-stroke: 0 !important;
+  text-stroke: 0 !important;
+}
+#od-profile-dashboard .odpd-view:hover,
+#od-profile-dashboard .odpd-save:hover,
+#od-profile-dashboard .odpd-file-btn:hover {
+  box-shadow: 0 12px 28px rgba(0,0,0,.40) !important;
+}
+
+/* Schatten der allgemeinen Button-Regel im Profil vereinheitlichen */
+#od-profile-dashboard .odpd-back { box-shadow: none !important; background: transparent !important; transform: none !important; }
+#od-profile-dashboard .odpd-back:hover { color: #fff !important; }
+#od-profile-dashboard .odpd-file-btn,
+#od-profile-dashboard .odpd-view,
+#od-profile-dashboard .odpd-logout { box-shadow: 0 6px 16px rgba(0,0,0,.28) !important; }
+
+
+/* ==========================================================
+   TEIL 2 – Haupt-Buttons, Zähler, Infokästen, Live Battle
+   ========================================================== */
+
+/* ---------- Zähler (+1 / +10 / +100) ---------- */
+.roll-counter {
+  border: 1px solid rgba(255,255,255,.26) !important;
+  border-radius: 16px !important;
+  background: rgba(8,16,36,.28) !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 20px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.14) !important;
+}
+.roll-counter-side button { transition: background .15s ease; border-radius: 8px; }
+.roll-counter-side button:hover { background: rgba(255,255,255,.14) !important; }
+
+/* ---------- Info-Kasten "Possible colors" + Verify/Ankündigung ---------- */
+.color-container {
+  border: 1px solid rgba(255,255,255,.26) !important;
+  border-radius: 16px !important;
+  background-color: rgba(8,16,36,.26) !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 20px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.12);
+}
+#persistentAnnouncementBox {
+  border-radius: 14px !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,.22) !important;
+}
+
+/* ---------- Live Battle: Kästen, Felder, Buttons ---------- */
+#liveBattleArea .lb-setting {
+  border: 1px solid rgba(255,255,255,.26) !important;
+  border-radius: 16px !important;
+  background: rgba(8,16,36,.22) !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.10);
+}
+#liveBattleArea .lb-setting input,
+#liveBattleArea #lbRollCount { border-radius: 12px !important; }
+#liveBattleArea .lb-setting input:focus,
+#liveBattleArea #lbRollCount:focus { box-shadow: 0 0 0 4px rgba(255,255,255,.40); }
+#liveBattleArea .lb-color { border-radius: 10px !important; transition: transform .15s ease, box-shadow .15s ease; }
+#liveBattleArea .lb-color:hover:not(.selected) { transform: scale(1.08); }
+
+#liveBattleArea #lbSpinButton,
+#liveBattleArea #lbAutoRollButton,
+#liveBattleArea .lb-management-btn {
+  border-radius: 14px !important;
+  background: linear-gradient(180deg, #4aa8ff 0%, #3399ff 55%, #1f7fe0 100%) !important;
+  box-shadow: 0 4px 0 rgba(0,60,140,.70), 0 10px 18px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.40) !important;
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease !important;
+}
+#liveBattleArea #lbAutoRollButton.active {
+  background: linear-gradient(180deg, #34d27a 0%, #16a34a 100%) !important;
+  box-shadow: 0 4px 0 rgba(0,90,40,.70), 0 10px 18px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.40) !important;
+}
+#liveBattleArea #lbSpinButton:hover:not(:disabled),
+#liveBattleArea #lbAutoRollButton:hover:not(:disabled),
+#liveBattleArea .lb-management-btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.06); }
+#liveBattleArea #lbSpinButton:active:not(:disabled),
+#liveBattleArea #lbAutoRollButton:active:not(:disabled),
+#liveBattleArea .lb-management-btn:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(0,60,140,.70), 0 4px 8px rgba(0,0,0,.25) !important;
+}
+
+/* Live-Battle-Buttons: weiße Schrift ohne gelbe Umrandung (passt zum blauen Button) */
+#liveBattleArea #lbSpinButton,
+#liveBattleArea #lbAutoRollButton,
+#liveBattleArea .lb-management-btn {
+  -webkit-text-stroke: 0 !important;
+  color: #fff !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.30);
+}
