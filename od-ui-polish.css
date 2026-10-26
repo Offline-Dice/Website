@@ -261,33 +261,6 @@ select:focus { outline: none; box-shadow: 0 0 0 4px rgba(255,255,255,.45), 0 8px
    TEIL 2 – Haupt-Buttons, Zähler, Infokästen, Live Battle
    ========================================================== */
 
-/* ---------- Gelber Roll-Button ---------- */
-#rollButton {
-  border-radius: 18px !important;
-  background: linear-gradient(180deg, #fff06b 0%, #ffd400 55%, #f5b800 100%) !important;
-  box-shadow:
-    0 6px 0 rgba(160,105,0,.65),
-    0 16px 26px rgba(0,0,0,.30),
-    inset 0 2px 0 rgba(255,255,255,.65) !important;
-  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease !important;
-}
-#rollButton:hover:not(:disabled) {
-  transform: translateY(-2px) !important;
-  filter: brightness(1.05);
-  box-shadow:
-    0 8px 0 rgba(160,105,0,.65),
-    0 20px 30px rgba(0,0,0,.34),
-    inset 0 2px 0 rgba(255,255,255,.70) !important;
-}
-#rollButton:active:not(:disabled) {
-  transform: translateY(4px) !important;
-  box-shadow:
-    0 2px 0 rgba(160,105,0,.65),
-    0 6px 12px rgba(0,0,0,.28),
-    inset 0 2px 0 rgba(255,255,255,.55) !important;
-}
-#rollButton:disabled { filter: grayscale(.35) brightness(.92); cursor: not-allowed; }
-
 /* ---------- Zähler (+1 / +10 / +100) ---------- */
 .roll-counter {
   border: 1px solid rgba(255,255,255,.26) !important;
@@ -358,4 +331,3 @@ select:focus { outline: none; box-shadow: 0 0 0 4px rgba(255,255,255,.45), 0 8px
   color: #fff !important;
   text-shadow: 0 1px 2px rgba(0,0,0,.30);
 }
-#rollButton { margin-bottom: 10px !important; }
