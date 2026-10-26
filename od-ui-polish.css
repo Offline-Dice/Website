@@ -9,9 +9,9 @@
 .wrapper {
   border: 1px solid rgba(255,255,255,.24) !important;
   border-radius: 24px !important;
-  background-color: rgba(255,255,255,.07) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(130%) !important;
-  backdrop-filter: blur(12px) saturate(130%) !important;
+  background-color: rgba(255,255,255,.03) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(120%) !important;
+  backdrop-filter: blur(8px) saturate(120%) !important;
   box-shadow: 0 14px 34px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.18) !important;
 }
 
@@ -20,7 +20,7 @@
 .get-listed-btn {
   border: 1px solid rgba(255,255,255,.24) !important;
   border-radius: 16px !important;
-  background: rgba(255,255,255,.08) !important;
+  background: rgba(255,255,255,.05) !important;
   box-shadow: 0 4px 12px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.12);
   transition: background .18s ease, transform .18s ease, box-shadow .18s ease, border-color .18s ease !important;
 }
@@ -54,7 +54,7 @@ select:focus { outline: none; box-shadow: 0 0 0 4px rgba(255,255,255,.45), 0 8px
 #od-social-links,
 #od-profile-dashboard .odpd-open {
   border: 1px solid rgba(255,255,255,.26) !important;
-  background-color: rgba(8,12,24,.55) !important;
+  background-color: rgba(8,12,24,.40) !important;
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   box-shadow: 0 6px 16px rgba(0,0,0,.25) !important;
@@ -64,7 +64,7 @@ select:focus { outline: none; box-shadow: 0 0 0 4px rgba(255,255,255,.45), 0 8px
 #slowRevealToggle:hover,
 #offlineDiceInstallBtn:hover,
 #od-profile-dashboard .odpd-open:hover {
-  background-color: rgba(8,12,24,.72) !important;
+  background-color: rgba(8,12,24,.58) !important;
   border-color: rgba(255,255,255,.45) !important;
   transform: translateY(-1px);
 }
@@ -80,7 +80,7 @@ select:focus { outline: none; box-shadow: 0 0 0 4px rgba(255,255,255,.45), 0 8px
   border: 1px solid rgba(255,255,255,.14) !important;
   background:
     linear-gradient(180deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,0) 38%),
-    rgba(9,11,18,.78) !important;
+    rgba(9,11,18,.55) !important;
   -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
   backdrop-filter: blur(22px) saturate(140%) !important;
   box-shadow:
@@ -292,7 +292,7 @@ select:focus { outline: none; box-shadow: 0 0 0 4px rgba(255,255,255,.45), 0 8px
 .roll-counter {
   border: 1px solid rgba(255,255,255,.26) !important;
   border-radius: 16px !important;
-  background: rgba(8,16,36,.42) !important;
+  background: rgba(8,16,36,.28) !important;
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 20px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.14) !important;
@@ -304,7 +304,7 @@ select:focus { outline: none; box-shadow: 0 0 0 4px rgba(255,255,255,.45), 0 8px
 .color-container {
   border: 1px solid rgba(255,255,255,.26) !important;
   border-radius: 16px !important;
-  background-color: rgba(8,16,36,.38) !important;
+  background-color: rgba(8,16,36,.26) !important;
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 20px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.12);
@@ -318,7 +318,7 @@ select:focus { outline: none; box-shadow: 0 0 0 4px rgba(255,255,255,.45), 0 8px
 #liveBattleArea .lb-setting {
   border: 1px solid rgba(255,255,255,.26) !important;
   border-radius: 16px !important;
-  background: rgba(8,16,36,.34) !important;
+  background: rgba(8,16,36,.22) !important;
   box-shadow: 0 6px 16px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.10);
 }
 #liveBattleArea .lb-setting input,
