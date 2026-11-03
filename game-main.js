@@ -636,13 +636,14 @@ clouds:"Clouds.png",
 galaxy:"Galaxy.png",
 spongebob:"spongebob.jpg",
 "japanese-temple":"japanese-temple.png",
-midnight:"midnight.jpg"
+midnight:"midnight.jpg",
+christmas:"christmas-background.png"
 };
 document.body.style.background='url("'+map[this.value]+'") center center / cover no-repeat fixed';
 const logo=document.querySelector(".top-logo");
 if(logo){
   if(!logo.dataset.originalSrc) logo.dataset.originalSrc=logo.getAttribute("src");
-  logo.src=logo.dataset.originalSrc;
+  logo.src=this.value==="christmas" ? "christmas-logo.png" : logo.dataset.originalSrc;
 }
 });
 
