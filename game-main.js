@@ -649,7 +649,7 @@ if(logo){
 
 
 const themeColors={
-"default":"#3399ff","sab-blue":"#3399ff","green":"#2ecc71","sab-green":"#2ecc71",
+"default":"#3399ff","sab-blue":"#3399ff","green":"#2ecc71","sab-green":"#2ecc71","christmas":"#c62828",
 "midnight":"#4169ff",
 "red":"#e53935","sab-red":"#e53935","pink":"#ff4fa3","bw":"#555555",
 "sab-black":"#222222","bronze":"#b87333","silver":"#9e9e9e","sakura":"#e9a8c7","clouds":"#55bdf2","galaxy":"#28bde8","spongebob":"#00aeea"
