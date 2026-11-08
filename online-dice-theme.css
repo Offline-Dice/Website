@@ -1,209 +1,193 @@
 /* ==========================================================
-   OFFLINE DICE – helles, aufgeräumtes Design im Stil von online-dice.com
+   OFFLINE DICE – Glas-Kästen im Stil von online-dice.com (eigene Variante)
    Wird als letzte CSS-Datei geladen und überschreibt nur das Aussehen.
-   Funktion, Würfel-Farben und Themes bleiben unverändert
-   (Themes setzen den Hintergrund weiterhin per Inline-Style).
+   Dein Hintergrund, die Themes, die Würfel und die Spiel-Logik bleiben.
    Zum Ausschalten: den <link ... online-dice-theme.css> in index.html löschen.
    ========================================================== */
 
 :root {
-  --odt-bg: #eef2f7;
-  --odt-card: #ffffff;
-  --odt-border: #dfe5ee;
-  --odt-text: #1f2937;
-  --odt-muted: #6b7280;
-  --odt-accent: #1f9d55;
-  --odt-accent-dark: #178044;
-  --odt-shadow: 0 2px 12px rgba(16, 24, 40, .07);
-  --odt-font: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --odt-edge: rgba(255, 255, 255, .38);
+  --odt-gold: #ffd400;
+  --odt-card-shadow: 0 14px 36px rgba(0, 0, 0, .38), inset 0 0 0 1px rgba(255, 255, 255, .14);
 }
 
-/* ---------- Seite ---------- */
-body {
-  background: linear-gradient(180deg, #f8fafc 0%, var(--odt-bg) 100%) fixed;
-  color: var(--odt-text);
-  font-family: var(--odt-font);
-}
-
-/* ---------- Kopfzeile mit Logo ---------- */
-.top-header {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 10px 0 !important;
-  background: var(--odt-card);
-  border-bottom: 1px solid var(--odt-border);
-  box-shadow: 0 1px 6px rgba(16, 24, 40, .05);
-}
-.top-logo {
-  width: auto !important;
-  height: 78px !important;
-  max-width: 80vw !important;
-  margin: 0 auto !important;
-  filter: none !important;
-}
-
-/* ---------- Karten ---------- */
+/* ---------- Kästen: dicker heller Rand, leichter Glanz, weiche Ecken ---------- */
 .side-box,
 .wrapper,
 .last20-rolls {
-  background: var(--odt-card) !important;
-  border: 1px solid var(--odt-border) !important;
-  border-radius: 16px !important;
-  box-shadow: var(--odt-shadow) !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  color: var(--odt-text) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .20) 0%, rgba(255, 255, 255, .06) 100%),
+    rgba(12, 30, 58, .40) !important;
+  border: 3px solid var(--odt-edge) !important;
+  border-radius: 28px !important;
+  box-shadow: var(--odt-card-shadow) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(125%) !important;
+  backdrop-filter: blur(10px) saturate(125%) !important;
 }
 
-/* ---------- Titel ---------- */
-.title {
-  font-family: var(--odt-font) !important;
-  font-size: 30px !important;
-  font-weight: 800;
-  letter-spacing: .5px;
-  color: var(--odt-text) !important;
-  text-shadow: none !important;
-  -webkit-text-stroke: 0 !important;
-  margin-bottom: 20px !important;
-}
-
-/* ---------- Auswahlfelder ---------- */
-select {
-  font-family: var(--odt-font) !important;
-  font-size: 15px !important;
-  font-weight: 600 !important;
-  padding: 11px 14px !important;
-  color: var(--odt-text) !important;
-  background-color: #fff !important;
-  border: 1px solid #c9d3e0 !important;
-  border-radius: 10px !important;
-  box-shadow: none !important;
-}
-select:hover { border-color: #9fb0c6 !important; transform: none !important; box-shadow: none !important; }
-select:focus { border-color: var(--odt-accent) !important; box-shadow: 0 0 0 3px rgba(31, 157, 85, .2) !important; }
-.layout-row.color-dice-compact > .wrapper .dropdown-container select { border-width: 1px !important; }
-
-/* ---------- ROLL AGAIN Button ---------- */
-#rollButton,
-#lbSpinButton {
-  font-family: var(--odt-font) !important;
-  font-size: 20px !important;
-  font-weight: 800 !important;
-  letter-spacing: .6px;
-  padding: 14px 24px !important;
-  color: #fff !important;
-  background: var(--odt-accent) !important;
-  border: 0 !important;
-  border-radius: 12px !important;
-  -webkit-text-stroke: 0 !important;
-  text-shadow: none !important;
-  box-shadow: 0 3px 0 var(--odt-accent-dark), 0 8px 16px rgba(31, 157, 85, .25) !important;
-}
-#rollButton:hover,
-#lbSpinButton:hover {
-  background: #23ad5f !important;
-  transform: translateY(1px);
-  box-shadow: 0 2px 0 var(--odt-accent-dark), 0 6px 12px rgba(31, 157, 85, .25) !important;
-}
-
-/* ---------- Counter (+1 / -1 …) ---------- */
-.roll-counter {
-  background: #f3f6fa !important;
-  border: 1px solid var(--odt-border) !important;
-  border-radius: 12px !important;
-  box-shadow: none !important;
-}
-.roll-counter-side button {
-  font-family: var(--odt-font) !important;
-  color: var(--odt-muted) !important;
-  -webkit-text-stroke: 0 !important;
-  text-shadow: none !important;
-}
-.roll-counter-side button:hover { background: #e4eaf3 !important; color: var(--odt-text) !important; }
-.roll-counter-value { color: var(--odt-text) !important; font-family: var(--odt-font) !important; }
-
-/* ---------- Install-App-Button ---------- */
-#offlineDiceInstallBtn {
-  color: var(--odt-text) !important;
-  background-color: #fff !important;
-  border: 1px solid var(--odt-border) !important;
-  box-shadow: var(--odt-shadow) !important;
-}
-
-/* ---------- Verify-Zeile + Farben-Info ---------- */
-#verifyBox,
-.verify-id-prefix,
-.verify-code-inline,
-.verify-text-link {
-  color: var(--odt-text) !important;
-  text-shadow: none !important;
-}
-.verify-text-link { color: #2563eb !important; }
-.color-container {
-  background: #f6f8fb !important;
-  border: 1px solid var(--odt-border) !important;
-  border-radius: 12px !important;
-}
-.color-info { color: var(--odt-text) !important; }
-
-/* ---------- Top Streamer ---------- */
+/* ---------- Top-Streamer: Überschrift ---------- */
 .top-streamer-title {
-  font-family: var(--odt-font) !important;
-  font-weight: 800;
+  font-family: 'Luckiest Guy', cursive !important;
+  font-size: 22px !important;
   letter-spacing: .6px;
   text-transform: uppercase;
-  font-size: 13px !important;
-  color: var(--odt-muted) !important;
-  text-shadow: none !important;
+  color: #fff !important;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, .28), 0 0 14px rgba(0, 0, 0, .35) !important;
+  padding: 4px 0 2px;
 }
-.stream-btn,
+
+/* ---------- Top-Streamer: Karte mit Bild, Name und @Name ---------- */
+a.stream-btn {
+  display: grid !important;
+  grid-template-columns: 54px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 13px;
+  row-gap: 1px;
+  align-items: center;
+  padding: 9px 12px !important;
+  text-align: left;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, .10)) !important;
+  border: 2px solid rgba(255, 255, 255, .32) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .25) !important;
+}
+a.stream-btn:hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .32), rgba(255, 255, 255, .16)) !important;
+  border-color: rgba(255, 255, 255, .55) !important;
+}
+a.stream-btn img {
+  grid-row: 1 / span 2;
+  grid-column: 1;
+  width: 54px !important;
+  height: 54px !important;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, .75);
+  box-sizing: border-box;
+}
+a.stream-btn > span:not(.top-streamer-live-badge) {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: end;
+  min-width: 0;
+  text-align: left !important;
+  font-family: 'Luckiest Guy', cursive !important;
+  font-size: 17px !important;
+  letter-spacing: .3px !important;
+  line-height: 1.15 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  color: #fff;
+  text-shadow: 0 2px 3px rgba(0, 0, 0, .45);
+}
+a.stream-btn::after {
+  content: "@" attr(data-top-streamer-username);
+  grid-column: 2;
+  grid-row: 2;
+  align-self: start;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 600 13px/1.2 Arial, sans-serif;
+  color: rgba(255, 255, 255, .82);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .4);
+}
+
+/* LIVE-Anzeige als kleine Pille unten am Bild */
+.top-streamer-live-badge {
+  left: 24px !important;
+  bottom: 6px !important;
+  padding: 2px 6px 2px !important;
+  border-radius: 999px !important;
+  font: 900 9px/1 Arial, sans-serif !important;
+  letter-spacing: .3px !important;
+}
+
+/* "Get Listed Here": gleiche Glas-Optik, gestrichelter Rand */
 .get-listed-btn {
-  background: #f8fafc !important;
-  color: var(--odt-text) !important;
-  border: 1px solid var(--odt-border) !important;
-  border-radius: 12px !important;
+  background: rgba(255, 255, 255, .12) !important;
+  border: 2px dashed rgba(255, 255, 255, .5) !important;
+  border-radius: 16px !important;
   box-shadow: none !important;
 }
-.stream-btn:hover,
-.get-listed-btn:hover {
-  background: #eef3fa !important;
-  border-color: #c3cfdf !important;
-  box-shadow: 0 4px 10px rgba(16, 24, 40, .08) !important;
+.get-listed-btn:hover { background: rgba(255, 255, 255, .22) !important; }
+
+/* ---------- Auswahlfelder: dunkles Glas mit goldenem Rand ---------- */
+select {
+  color: #fff !important;
+  background-color: rgba(8, 22, 46, .55) !important;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffd400%22%20d%3D%22M287%2069.4l-14.7-14.7a10%2010%200%2000-14.1%200L146.2%20188.8%2034.2%2054.7a10%2010%200%2000-14.1%200L5.4%2069.4a10%2010%200%2000%200%2014.1l133.5%20133.5a10%2010%200%200014.1%200L287%2083.5a10%2010%200%20000-14.1z%22%2F%3E%3C%2Fsvg%3E') !important;
+  background-repeat: no-repeat !important;
+  background-position: right 10px center !important;
+  background-size: 11px auto !important;
+  border: 3px solid var(--odt-gold) !important;
+  border-radius: 12px !important;
+  padding-right: 28px !important;
+  text-shadow: 0 2px 3px rgba(0, 0, 0, .45);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .25) !important;
 }
-.stream-btn span,
-.get-listed-label {
-  font-family: var(--odt-font) !important;
-  font-weight: 700;
-  color: var(--odt-text) !important;
-}
-.get-listed-plus {
-  background: #e8eef7 !important;
-  border: 1px solid var(--odt-border) !important;
-  color: var(--odt-muted) !important;
+select:hover { box-shadow: 0 6px 14px rgba(0, 0, 0, .32) !important; }
+select:focus { box-shadow: 0 0 0 4px rgba(255, 212, 0, .35) !important; }
+select option { color: #12233f; background: #fff; text-shadow: none; }
+
+/* ---------- Würfeln-Button: breiter Balken ---------- */
+#rollButton,
+#lbSpinButton {
+  width: 100% !important;
+  box-sizing: border-box;
+  border-radius: 12px !important;
+  border-width: 3px !important;
 }
 
-/* ---------- Last 20 Rolls ---------- */
-.last20-title {
-  font-family: var(--odt-font) !important;
-  font-weight: 800;
-  color: var(--odt-text) !important;
+/* ---------- Verify: ID-Zeile + weißer Button ---------- */
+#verifyBox {
+  width: 100% !important;
+  max-width: none !important;
 }
-.last20-label,
-.last20-roll-name,
-.last20-roll-id { color: var(--odt-muted) !important; font-family: var(--odt-font) !important; }
-.last20-stats { border-bottom: 1px solid var(--odt-border) !important; }
-.last20-stat {
-  background: #f6f8fb !important;
-  border: 1px solid var(--odt-border) !important;
-  color: var(--odt-text) !important;
+.verify-id-line {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 8px !important;
 }
+.verify-text-link {
+  flex: 0 0 100%;
+  box-sizing: border-box;
+  display: block !important;
+  margin: 0 !important;
+  padding: 9px 14px;
+  border-radius: 12px;
+  background: #fff;
+  color: #0b4fb3 !important;
+  font: 700 16px/1.2 Arial, sans-serif !important;
+  text-decoration: none !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .25);
+}
+.verify-text-link::before { content: "✓ "; color: #1f9d55; }
+.verify-text-link:hover { opacity: 1 !important; background: #f1f6ff; }
+
+/* ---------- Counter (+1 / -1 ...) ---------- */
+.roll-counter {
+  background: rgba(255, 255, 255, .20) !important;
+  border: 1px solid rgba(255, 255, 255, .38) !important;
+  border-radius: 12px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25) !important;
+}
+
+/* ---------- "Possible colors" als Leiste ---------- */
+.color-container {
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box;
+  border: 0 !important;
+  border-radius: 12px !important;
+  background: rgba(0, 0, 0, .30) !important;
+}
+
+/* ---------- Last 20 Rolls: Chips im gleichen Glas ---------- */
+.last20-stat,
 .last20-roll {
-  background: #f9fafc !important;
-  border: 1px solid var(--odt-border) !important;
+  background: rgba(255, 255, 255, .12) !important;
+  border: 1px solid rgba(255, 255, 255, .30) !important;
 }
-.last20-roll.current { background: #f0f7f3 !important; border-color: #b9dcc8 !important; }
-.last20-die { border-color: #fff !important; box-shadow: 0 1px 4px rgba(16, 24, 40, .25) !important; }
-.last20-dot { border-color: #fff !important; box-shadow: 0 0 0 1px rgba(16, 24, 40, .2); }
-
-/* ---------- Fußzeile ---------- */
-.offline-dice-footer { color: var(--odt-muted) !important; text-shadow: none !important; }
+.last20-roll.current { background: rgba(255, 255, 255, .20) !important; border-color: rgba(255, 255, 255, .55) !important; }
