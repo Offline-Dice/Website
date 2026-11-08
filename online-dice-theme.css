@@ -1,0 +1,209 @@
+/* ==========================================================
+   OFFLINE DICE – helles, aufgeräumtes Design im Stil von online-dice.com
+   Wird als letzte CSS-Datei geladen und überschreibt nur das Aussehen.
+   Funktion, Würfel-Farben und Themes bleiben unverändert
+   (Themes setzen den Hintergrund weiterhin per Inline-Style).
+   Zum Ausschalten: den <link ... online-dice-theme.css> in index.html löschen.
+   ========================================================== */
+
+:root {
+  --odt-bg: #eef2f7;
+  --odt-card: #ffffff;
+  --odt-border: #dfe5ee;
+  --odt-text: #1f2937;
+  --odt-muted: #6b7280;
+  --odt-accent: #1f9d55;
+  --odt-accent-dark: #178044;
+  --odt-shadow: 0 2px 12px rgba(16, 24, 40, .07);
+  --odt-font: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* ---------- Seite ---------- */
+body {
+  background: linear-gradient(180deg, #f8fafc 0%, var(--odt-bg) 100%) fixed;
+  color: var(--odt-text);
+  font-family: var(--odt-font);
+}
+
+/* ---------- Kopfzeile mit Logo ---------- */
+.top-header {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 0 !important;
+  background: var(--odt-card);
+  border-bottom: 1px solid var(--odt-border);
+  box-shadow: 0 1px 6px rgba(16, 24, 40, .05);
+}
+.top-logo {
+  width: auto !important;
+  height: 78px !important;
+  max-width: 80vw !important;
+  margin: 0 auto !important;
+  filter: none !important;
+}
+
+/* ---------- Karten ---------- */
+.side-box,
+.wrapper,
+.last20-rolls {
+  background: var(--odt-card) !important;
+  border: 1px solid var(--odt-border) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--odt-shadow) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  color: var(--odt-text) !important;
+}
+
+/* ---------- Titel ---------- */
+.title {
+  font-family: var(--odt-font) !important;
+  font-size: 30px !important;
+  font-weight: 800;
+  letter-spacing: .5px;
+  color: var(--odt-text) !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+  margin-bottom: 20px !important;
+}
+
+/* ---------- Auswahlfelder ---------- */
+select {
+  font-family: var(--odt-font) !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  padding: 11px 14px !important;
+  color: var(--odt-text) !important;
+  background-color: #fff !important;
+  border: 1px solid #c9d3e0 !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+select:hover { border-color: #9fb0c6 !important; transform: none !important; box-shadow: none !important; }
+select:focus { border-color: var(--odt-accent) !important; box-shadow: 0 0 0 3px rgba(31, 157, 85, .2) !important; }
+.layout-row.color-dice-compact > .wrapper .dropdown-container select { border-width: 1px !important; }
+
+/* ---------- ROLL AGAIN Button ---------- */
+#rollButton,
+#lbSpinButton {
+  font-family: var(--odt-font) !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  letter-spacing: .6px;
+  padding: 14px 24px !important;
+  color: #fff !important;
+  background: var(--odt-accent) !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: none !important;
+  box-shadow: 0 3px 0 var(--odt-accent-dark), 0 8px 16px rgba(31, 157, 85, .25) !important;
+}
+#rollButton:hover,
+#lbSpinButton:hover {
+  background: #23ad5f !important;
+  transform: translateY(1px);
+  box-shadow: 0 2px 0 var(--odt-accent-dark), 0 6px 12px rgba(31, 157, 85, .25) !important;
+}
+
+/* ---------- Counter (+1 / -1 …) ---------- */
+.roll-counter {
+  background: #f3f6fa !important;
+  border: 1px solid var(--odt-border) !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+.roll-counter-side button {
+  font-family: var(--odt-font) !important;
+  color: var(--odt-muted) !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: none !important;
+}
+.roll-counter-side button:hover { background: #e4eaf3 !important; color: var(--odt-text) !important; }
+.roll-counter-value { color: var(--odt-text) !important; font-family: var(--odt-font) !important; }
+
+/* ---------- Install-App-Button ---------- */
+#offlineDiceInstallBtn {
+  color: var(--odt-text) !important;
+  background-color: #fff !important;
+  border: 1px solid var(--odt-border) !important;
+  box-shadow: var(--odt-shadow) !important;
+}
+
+/* ---------- Verify-Zeile + Farben-Info ---------- */
+#verifyBox,
+.verify-id-prefix,
+.verify-code-inline,
+.verify-text-link {
+  color: var(--odt-text) !important;
+  text-shadow: none !important;
+}
+.verify-text-link { color: #2563eb !important; }
+.color-container {
+  background: #f6f8fb !important;
+  border: 1px solid var(--odt-border) !important;
+  border-radius: 12px !important;
+}
+.color-info { color: var(--odt-text) !important; }
+
+/* ---------- Top Streamer ---------- */
+.top-streamer-title {
+  font-family: var(--odt-font) !important;
+  font-weight: 800;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  font-size: 13px !important;
+  color: var(--odt-muted) !important;
+  text-shadow: none !important;
+}
+.stream-btn,
+.get-listed-btn {
+  background: #f8fafc !important;
+  color: var(--odt-text) !important;
+  border: 1px solid var(--odt-border) !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+.stream-btn:hover,
+.get-listed-btn:hover {
+  background: #eef3fa !important;
+  border-color: #c3cfdf !important;
+  box-shadow: 0 4px 10px rgba(16, 24, 40, .08) !important;
+}
+.stream-btn span,
+.get-listed-label {
+  font-family: var(--odt-font) !important;
+  font-weight: 700;
+  color: var(--odt-text) !important;
+}
+.get-listed-plus {
+  background: #e8eef7 !important;
+  border: 1px solid var(--odt-border) !important;
+  color: var(--odt-muted) !important;
+}
+
+/* ---------- Last 20 Rolls ---------- */
+.last20-title {
+  font-family: var(--odt-font) !important;
+  font-weight: 800;
+  color: var(--odt-text) !important;
+}
+.last20-label,
+.last20-roll-name,
+.last20-roll-id { color: var(--odt-muted) !important; font-family: var(--odt-font) !important; }
+.last20-stats { border-bottom: 1px solid var(--odt-border) !important; }
+.last20-stat {
+  background: #f6f8fb !important;
+  border: 1px solid var(--odt-border) !important;
+  color: var(--odt-text) !important;
+}
+.last20-roll {
+  background: #f9fafc !important;
+  border: 1px solid var(--odt-border) !important;
+}
+.last20-roll.current { background: #f0f7f3 !important; border-color: #b9dcc8 !important; }
+.last20-die { border-color: #fff !important; box-shadow: 0 1px 4px rgba(16, 24, 40, .25) !important; }
+.last20-dot { border-color: #fff !important; box-shadow: 0 0 0 1px rgba(16, 24, 40, .2); }
+
+/* ---------- Fußzeile ---------- */
+.offline-dice-footer { color: var(--odt-muted) !important; text-shadow: none !important; }
