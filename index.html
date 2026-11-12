@@ -373,10 +373,18 @@
     for(let i=0;i<n;i++)stage.appendChild(createDie(palette[i%palette.length]));
     result.textContent='Ready to roll';
   }
+  function setDisplay(node,value){
+    if(!node)return;
+    if(value==='none'){
+      if(node.style.display!=='none')node.style.setProperty('display','none','important');
+    }else if(node.style.display!==value){
+      node.style.removeProperty('display');
+    }
+  }
   function enforceVirtualIsolation(){
     const active=mode.value==='virtualdice';
-    panel.style.display=active?'block':'none';
-    hiddenNodes.forEach(node=>node.style.display=active?'none':'');
+    setDisplay(panel,active?'block':'none');
+    hiddenNodes.forEach(node=>setDisplay(node,active?'none':''));
     document.querySelectorAll('button').forEach(btn=>{
       if(btn===roll)return;
       if(/spin\s*again/i.test((btn.textContent||'').trim())){
@@ -388,8 +396,8 @@
     if(active){
       const coin=document.getElementById('coin');
       const winner=document.getElementById('winnerText');
-      if(coin)coin.style.display='none';
-      if(winner)winner.style.display='none';
+      setDisplay(coin,'none');
+      setDisplay(winner,'none');
       if(!busy)renderDice();
     }
   }
@@ -424,7 +432,12 @@
     },1450);
   }
 
-  mode.addEventListener('change',enforceVirtualIsolation);
+  // Re-apply after the main game script has processed the mode change.
+  mode.addEventListener('change',()=>{
+    enforceVirtualIsolation();
+    setTimeout(enforceVirtualIsolation,0);
+    setTimeout(enforceVirtualIsolation,80);
+  });
   count.addEventListener('change',()=>{if(mode.value==='virtualdice'&&!busy)renderDice();});
   roll.addEventListener('click',rollDice);
   // Keep the coinflip area hidden if the main game script also tries to show it.
@@ -433,7 +446,20 @@
     new MutationObserver(()=>{if(mode.value==='virtualdice')wheel.style.display='none';})
       .observe(wheel,{attributes:true,attributeFilter:['style','class']});
   }
-  new MutationObserver(()=>{if(mode.value==='virtualdice')enforceVirtualIsolation();}).observe(document.body,{childList:true,subtree:true});
+  // Catch UI changes made by game-main.js after this script has run.
+  const isolationObserver=new MutationObserver(()=>{
+    if(mode.value==='virtualdice')enforceVirtualIsolation();
+  });
+  isolationObserver.observe(document.body,{childList:true,subtree:true});
+  hiddenNodes.forEach(node=>isolationObserver.observe(node,{attributes:true,attributeFilter:['style','class']}));
+  if(theme)isolationObserver.observe(theme,{attributes:true,attributeFilter:['style','class']});
+  // Capture the selection too, then enforce again after all bubble listeners finish.
+  document.addEventListener('change',event=>{
+    if(event.target===mode){
+      setTimeout(enforceVirtualIsolation,0);
+      setTimeout(enforceVirtualIsolation,120);
+    }
+  },true);
   enforceVirtualIsolation();
 })();
 </script>
