@@ -273,25 +273,26 @@
 #od-virtual-dice .vd-crate:before{content:"";position:absolute;inset:12px;border:2px solid rgba(133,180,255,.22);border-radius:12px;box-shadow:inset 0 0 18px rgba(67,137,255,.1),0 0 18px rgba(55,125,255,.08);pointer-events:none}
 #od-virtual-dice .vd-crate:after{content:"";position:absolute;left:7%;right:7%;bottom:12px;height:18px;border-radius:50%;background:#000;filter:blur(13px);opacity:.75}
 #od-virtual-dice .vd-dice-stage{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:clamp(12px,3vw,26px);flex-wrap:wrap;width:88%;min-height:170px;transform-style:preserve-3d}
-#od-virtual-dice .vd-die{--die-size:66px;position:relative;width:var(--die-size);height:var(--die-size);transform-style:preserve-3d;filter:drop-shadow(0 12px 8px rgba(0,0,0,.48));}
+#od-virtual-dice .vd-die{--die-size:66px;position:relative;width:var(--die-size);height:var(--die-size);transform-style:preserve-3d;filter:drop-shadow(0 12px 8px rgba(0,0,0,.48))}
 #od-virtual-dice .vd-die.rolling{animation:vd-tumble var(--vd-time,1s) cubic-bezier(.2,.72,.22,1) both}
-#od-virtual-dice .vd-face{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:3px;padding:9px;border-radius:12px;background:linear-gradient(145deg,#fff,#cbd5e1);border:1px solid rgba(255,255,255,.9);box-shadow:inset 0 2px 5px rgba(255,255,255,.9),inset 0 -5px 9px rgba(15,23,42,.2);backface-visibility:hidden}
+#od-virtual-dice .vd-face{position:absolute;inset:0;border-radius:12px;background:var(--die-color,#64748b);border:1px solid rgba(255,255,255,.72);box-shadow:inset 0 3px 8px rgba(255,255,255,.34),inset 0 -8px 12px rgba(0,0,0,.22),0 0 16px color-mix(in srgb,var(--die-color,#64748b) 40%,transparent);backface-visibility:hidden}
 #od-virtual-dice .vd-face.front{transform:translateZ(33px)}
 #od-virtual-dice .vd-face.back{transform:rotateY(180deg) translateZ(33px)}
 #od-virtual-dice .vd-face.right{transform:rotateY(90deg) translateZ(33px)}
 #od-virtual-dice .vd-face.left{transform:rotateY(-90deg) translateZ(33px)}
 #od-virtual-dice .vd-face.top{transform:rotateX(90deg) translateZ(33px)}
 #od-virtual-dice .vd-face.bottom{transform:rotateX(-90deg) translateZ(33px)}
-#od-virtual-dice .vd-pip{width:100%;height:100%;border-radius:50%;background:#172033;box-shadow:inset 0 1px 2px rgba(255,255,255,.2);opacity:0}
-#od-virtual-dice .vd-pip.on{opacity:1}
 #od-virtual-dice .vd-controls{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
 #od-virtual-dice .vd-roll{border:0;border-radius:13px;padding:13px 28px;background:linear-gradient(135deg,#3989ff,#7658f7);color:white;font-weight:950;letter-spacing:.1em;cursor:pointer;box-shadow:0 8px 24px rgba(53,116,255,.3);transition:transform .18s,filter .18s}
 #od-virtual-dice .vd-roll:hover{transform:translateY(-2px);filter:brightness(1.12)}
 #od-virtual-dice .vd-roll:disabled{opacity:.55;cursor:wait;transform:none}
-#od-virtual-dice .vd-result{min-height:24px;margin-top:14px;text-align:center;color:#dbeafe;font-weight:800;letter-spacing:.08em}
+#od-virtual-dice .vd-result{min-height:24px;margin-top:14px;text-align:center;color:#dbeafe;font-weight:800;letter-spacing:.04em}
+#od-virtual-dice .vd-result-colors{display:flex;justify-content:center;align-items:center;gap:9px;flex-wrap:wrap}
+#od-virtual-dice .vd-color-name{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);font-size:13px}
+#od-virtual-dice .vd-color-dot{width:11px;height:11px;border-radius:50%;background:var(--die-color);box-shadow:0 0 10px var(--die-color)}
 #od-virtual-dice .vd-hint{text-align:center;margin-top:5px;color:#71819b;font-size:11px}
 @keyframes vd-tumble{0%{transform:translate3d(0,-115px,0) rotateX(0) rotateY(0) rotateZ(0)}18%{transform:translate3d(var(--vd-x),35px,30px) rotateX(230deg) rotateY(170deg) rotateZ(110deg)}38%{transform:translate3d(calc(var(--vd-x) * -1),-42px,-20px) rotateX(510deg) rotateY(390deg) rotateZ(260deg)}62%{transform:translate3d(var(--vd-x),22px,15px) rotateX(760deg) rotateY(610deg) rotateZ(430deg)}82%{transform:translate3d(0,-8px,0) rotateX(950deg) rotateY(780deg) rotateZ(550deg)}100%{transform:translate3d(0,0,0) rotateX(var(--vd-rx)) rotateY(var(--vd-ry)) rotateZ(var(--vd-rz))}}
-@media(max-width:520px){#od-virtual-dice .vd-card{padding:16px 12px}#od-virtual-dice .vd-crate{height:230px}#od-virtual-dice .vd-die{--die-size:54px}#od-virtual-dice .vd-face{padding:7px;gap:2px}#od-virtual-dice .vd-face.front{transform:translateZ(27px)}#od-virtual-dice .vd-face.back{transform:rotateY(180deg) translateZ(27px)}#od-virtual-dice .vd-face.right{transform:rotateY(90deg) translateZ(27px)}#od-virtual-dice .vd-face.left{transform:rotateY(-90deg) translateZ(27px)}#od-virtual-dice .vd-face.top{transform:rotateX(90deg) translateZ(27px)}#od-virtual-dice .vd-face.bottom{transform:rotateX(-90deg) translateZ(27px)}}
+@media(max-width:520px){#od-virtual-dice .vd-card{padding:16px 12px}#od-virtual-dice .vd-crate{height:230px}#od-virtual-dice .vd-die{--die-size:54px}#od-virtual-dice .vd-face.front{transform:translateZ(27px)}#od-virtual-dice .vd-face.back{transform:rotateY(180deg) translateZ(27px)}#od-virtual-dice .vd-face.right{transform:rotateY(90deg) translateZ(27px)}#od-virtual-dice .vd-face.left{transform:rotateY(-90deg) translateZ(27px)}#od-virtual-dice .vd-face.top{transform:rotateX(90deg) translateZ(27px)}#od-virtual-dice .vd-face.bottom{transform:rotateX(-90deg) translateZ(27px)}}
 @media(prefers-reduced-motion:reduce){#od-virtual-dice .vd-die.rolling{animation-duration:.15s!important}}
 </style>
 <div id="od-virtual-dice" aria-live="polite">
@@ -313,61 +314,94 @@
   const roll=document.getElementById('vdRollButton');
   const result=document.getElementById('vdResult');
   if(!mode||!count||!panel||!stage||!roll)return;
+
   const hiddenIds=['diceResultArea','rollButton','rollCounter','verifyBox','color-container','wheelWrapper','liveBattleArea'];
   const hiddenNodes=hiddenIds.map(id=>document.getElementById(id)).filter(Boolean);
   const theme=document.getElementById('themeSelect');
-  let busy=false, lastValues=[];
-  const patterns={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
-  function makeFace(value,side){
-    const face=document.createElement('div');face.className='vd-face '+side;
-    for(let i=0;i<9;i++){const pip=document.createElement('span');pip.className='vd-pip'+(patterns[value].includes(i)?' on':'');face.appendChild(pip);}
+  const palette=[
+    {name:'Red',hex:'#ef4444'},
+    {name:'Orange',hex:'#f97316'},
+    {name:'Yellow',hex:'#facc15'},
+    {name:'Green',hex:'#16a34a'},
+    {name:'Blue',hex:'#2563eb'},
+    {name:'Purple',hex:'#9333ea'}
+  ];
+  let busy=false;
+
+  function makeFace(color,side){
+    const face=document.createElement('div');
+    face.className='vd-face '+side;
+    face.style.setProperty('--die-color',color.hex);
+    face.setAttribute('aria-label',color.name);
     return face;
   }
-  function createDie(){
-    const die=document.createElement('div');die.className='vd-die';
-    [['front',1],['back',6],['right',3],['left',4],['top',5],['bottom',2]].forEach(([side,val])=>die.appendChild(makeFace(val,side)));
+  function createDie(color){
+    const die=document.createElement('div');
+    die.className='vd-die';
+    die.dataset.color=color.name;
+    [['front'],['back'],['right'],['left'],['top'],['bottom']].forEach(([side])=>die.appendChild(makeFace(color,side)));
     return die;
   }
   function renderDice(){
-    const n=Math.max(1,Math.min(6,Number(count.value)||1));stage.innerHTML='';
-    for(let i=0;i<n;i++)stage.appendChild(createDie());
-    result.textContent='Ready to roll';lastValues=[];
+    const n=Math.max(1,Math.min(6,Number(count.value)||1));
+    stage.innerHTML='';
+    for(let i=0;i<n;i++)stage.appendChild(createDie(palette[i%palette.length]));
+    result.textContent='Ready to roll';
   }
-  function syncMode(){
+  function enforceVirtualIsolation(){
     const active=mode.value==='virtualdice';
     panel.style.display=active?'block':'none';
     hiddenNodes.forEach(node=>node.style.display=active?'none':'');
     if(theme)theme.style.display=active?'none':'';
-    if(active)renderDice();
+    if(active){
+      const coin=document.getElementById('coin');
+      const winner=document.getElementById('winnerText');
+      if(coin)coin.style.display='none';
+      if(winner)winner.style.display='none';
+      if(!busy)renderDice();
+    }
   }
   function rollDice(){
     if(busy)return;
     busy=true;roll.disabled=true;result.textContent='Rolling...';
     const dice=[...stage.querySelectorAll('.vd-die')];
-    const values=dice.map(()=>1+Math.floor(Math.random()*6));
+    const outcomes=dice.map(()=>palette[Math.floor(Math.random()*palette.length)]);
     dice.forEach((die,i)=>{
-      die.classList.remove('rolling');die.style.setProperty('--vd-time',(0.95+Math.random()*.45)+'s');
+      die.classList.remove('rolling');
+      die.style.setProperty('--vd-time',(0.95+Math.random()*.45)+'s');
       die.style.setProperty('--vd-x',(Math.random()*90-45)+'px');
       die.style.setProperty('--vd-rx','0deg');
       die.style.setProperty('--vd-ry','0deg');
       die.style.setProperty('--vd-rz','0deg');
-      void die.offsetWidth;die.classList.add('rolling');
+      void die.offsetWidth;
+      die.classList.add('rolling');
       setTimeout(()=>{
-        const front=die.querySelector('.vd-face.front');
-        front.replaceWith(makeFace(values[i],'front'));
+        [...die.querySelectorAll('.vd-face')].forEach(face=>{
+          face.style.setProperty('--die-color',outcomes[i].hex);
+          face.setAttribute('aria-label',outcomes[i].name);
+        });
+        die.dataset.color=outcomes[i].name;
       },1250);
     });
     setTimeout(()=>{
-      lastValues=values;
-      result.textContent='RESULT: '+values.join('  ·  ');
+      result.innerHTML='<div class="vd-result-colors">'+outcomes.map(color=>
+        '<span class="vd-color-name"><span class="vd-color-dot" style="--die-color:'+color.hex+'"></span>'+color.name+'</span>'
+      ).join('')+'</div>';
       roll.disabled=false;busy=false;
       dice.forEach(d=>{d.classList.remove('rolling');d.style.transform='rotateX(0deg) rotateY(0deg) rotateZ(0deg)';});
     },1450);
   }
-  mode.addEventListener('change',syncMode);
+
+  mode.addEventListener('change',enforceVirtualIsolation);
   count.addEventListener('change',()=>{if(mode.value==='virtualdice'&&!busy)renderDice();});
   roll.addEventListener('click',rollDice);
-  syncMode();
+  // Keep the coinflip area hidden if the main game script also tries to show it.
+  const wheel=document.getElementById('wheelWrapper');
+  if(wheel){
+    new MutationObserver(()=>{if(mode.value==='virtualdice')wheel.style.display='none';})
+      .observe(wheel,{attributes:true,attributeFilter:['style','class']});
+  }
+  enforceVirtualIsolation();
 })();
 </script>
 
