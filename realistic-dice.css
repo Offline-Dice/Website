@@ -1,0 +1,115 @@
+/* Offline Dice – Realistic Dice Mode
+   Zeigt die Würfel als echte 3D-Würfel mit Augen. Die Farbe des Würfels ist
+   weiterhin das Ergebnis vom Worker (Verify-Code bleibt unverändert).
+   Funktioniert zusammen mit dem Anti-Ban-Mode (Blur liegt auf .color-block). */
+
+/* Größe so gewählt, dass 6 Würfel in eine Reihe der mittleren Karte passen */
+:root { --rd-size: 60px; }
+@media (max-width: 760px) { :root { --rd-size: 56px; } }
+
+/* ---------- Der alte flache Würfel wird im Realistic-Mode unsichtbar ---------- */
+body.od-real-dice #diceResultArea .color-block {
+  position: relative !important;
+  width: var(--rd-size) !important;
+  height: var(--rd-size) !important;
+  min-width: var(--rd-size) !important;
+  margin: 14px 9px !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+body.od-real-dice #diceResultArea .color-block.rolling-dice { animation: none !important; }
+body.od-real-dice #diceResultArea .color-block > .dot { display: none !important; }
+
+/* ---------- 3D-Würfel ---------- */
+/* Feste Größe, mittig im .color-block – unabhängig davon, wie groß die Box
+   durch andere CSS-Regeln (z. B. Mobile-Reihen) gerade gemacht wird. */
+.od-rd-scene {
+  --rd-h: calc(var(--rd-size) / 2);
+  position: absolute; left: 50%; top: 50%;
+  width: var(--rd-size); height: var(--rd-size);
+  margin: calc(var(--rd-size) / -2) 0 0 calc(var(--rd-size) / -2);
+  pointer-events: none;
+}
+.od-rd-shadow {
+  position: absolute; left: 6%; right: 6%; bottom: -14px; height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,.5), rgba(0,0,0,0) 70%);
+  filter: blur(2px);
+}
+.od-rd-hopper {
+  position: absolute; inset: 0;
+  perspective: calc(var(--rd-size) * 6);
+}
+.od-rd-cube {
+  position: absolute; inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-24deg) rotateY(32deg);
+}
+
+.od-rd-face {
+  position: absolute; inset: 0;
+  box-sizing: border-box;
+  padding: 15%;
+  display: grid;
+  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+  border-radius: 17%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background-color: var(--rd-color, #e0e0e0);
+  background-image: var(--rd-shade);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255,255,255,.30),
+    inset 0 0 calc(var(--rd-size) * .17) rgba(0,0,0,.40);
+  transition: background-color .25s ease;
+}
+.od-rd-front  { transform: translateZ(var(--rd-h)); --rd-shade: linear-gradient(145deg, rgba(255,255,255,.34), rgba(255,255,255,0) 50%, rgba(0,0,0,.16)); }
+.od-rd-back   { transform: rotateY(180deg) translateZ(var(--rd-h)); --rd-shade: linear-gradient(145deg, rgba(0,0,0,.15), rgba(0,0,0,.30)); }
+.od-rd-right  { transform: rotateY(90deg) translateZ(var(--rd-h)); --rd-shade: linear-gradient(145deg, rgba(0,0,0,.10), rgba(0,0,0,.28)); }
+.od-rd-left   { transform: rotateY(-90deg) translateZ(var(--rd-h)); --rd-shade: linear-gradient(145deg, rgba(255,255,255,.10), rgba(0,0,0,.20)); }
+.od-rd-top    { transform: rotateX(90deg) translateZ(var(--rd-h)); --rd-shade: linear-gradient(160deg, rgba(255,255,255,.45), rgba(255,255,255,.05)); }
+.od-rd-bottom { transform: rotateX(-90deg) translateZ(var(--rd-h)); --rd-shade: linear-gradient(145deg, rgba(0,0,0,.30), rgba(0,0,0,.45)); }
+
+.od-rd-cell { display: flex; align-items: center; justify-content: center; }
+.od-rd-pip {
+  width: 78%; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, #ececec 55%, #c8c8c8);
+  box-shadow: inset 0 -2px 3px rgba(0,0,0,.35), 0 0 0 1px rgba(0,0,0,.22);
+}
+/* Während des Rollens ist der Würfel neutral grau mit dunklen Augen */
+.od-rd-neutral .od-rd-pip {
+  background: radial-gradient(circle at 35% 30%, #5a5a5a, #111);
+  box-shadow: inset 0 -2px 3px rgba(255,255,255,.18), 0 0 0 1px rgba(0,0,0,.35);
+}
+
+/* ---------- Roll-Animation ---------- */
+@keyframes od-rd-tumble {
+  0%   { transform: rotateX(-24deg) rotateY(32deg) rotateZ(0deg); }
+  25%  { transform: rotateX(150deg) rotateY(200deg) rotateZ(40deg); }
+  50%  { transform: rotateX(330deg) rotateY(380deg) rotateZ(-30deg); }
+  75%  { transform: rotateX(500deg) rotateY(520deg) rotateZ(30deg); }
+  100% { transform: rotateX(696deg) rotateY(752deg) rotateZ(0deg); }
+}
+@keyframes od-rd-hop {
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-26px); }
+  55% { transform: translateY(0); }
+  70% { transform: translateY(-10px); }
+  85% { transform: translateY(0); }
+}
+@keyframes od-rd-shadow-pulse {
+  0%, 55%, 100% { transform: scale(1); opacity: 1; }
+  30% { transform: scale(.62); opacity: .5; }
+  70% { transform: scale(.85); opacity: .75; }
+}
+.od-rd-rolling .od-rd-cube    { animation: od-rd-tumble .8s linear infinite; }
+.od-rd-rolling .od-rd-hopper  { animation: od-rd-hop .8s ease-in-out infinite; }
+.od-rd-rolling .od-rd-shadow  { animation: od-rd-shadow-pulse .8s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .od-rd-rolling .od-rd-cube,
+  .od-rd-rolling .od-rd-hopper,
+  .od-rd-rolling .od-rd-shadow { animation-duration: 2.4s; }
+}
