@@ -108,48 +108,6 @@ body.od-real-dice #diceResultArea .color-block > .dot { display: none !important
 .od-rd-rolling .od-rd-hopper  { animation: od-rd-hop .8s ease-in-out infinite; }
 .od-rd-rolling .od-rd-shadow  { animation: od-rd-shadow-pulse .8s ease-in-out infinite; }
 
-/* ---------- Die Box, in die die Würfel beim Rollen fallen ---------- */
-.od-rd-box {
-  position: fixed;
-  z-index: 50;
-  pointer-events: none;
-}
-.od-rd-box-inner {
-  position: absolute; inset: 0;
-  transform-origin: 50% 100%;
-  animation:
-    od-rd-box-in .22s ease-out,
-    od-rd-box-shake .13s linear .36s infinite;
-}
-.od-rd-box-body {
-  position: absolute; left: 0; right: 0; top: 14px; bottom: 0;
-  border-radius: 6px 6px 14px 14px;
-  background:
-    repeating-linear-gradient(90deg, rgba(0,0,0,0) 0 38px, rgba(0,0,0,.18) 38px 40px),
-    linear-gradient(180deg, #b57a3d, #8a5524 60%, #6e4119);
-  box-shadow:
-    inset 0 0 0 3px rgba(255,220,160,.18),
-    inset 0 -14px 20px rgba(0,0,0,.35),
-    0 14px 22px rgba(0,0,0,.45);
-}
-.od-rd-box-rim {
-  position: absolute; left: -6px; right: -6px; top: 0; height: 26px;
-  border-radius: 8px; z-index: 2;
-  background: linear-gradient(180deg, #d9a064, #a8692f);
-  box-shadow: 0 3px 6px rgba(0,0,0,.4), inset 0 -4px 6px rgba(0,0,0,.25);
-}
-@keyframes od-rd-box-in {
-  from { transform: translateY(40px); opacity: 0; }
-  to   { transform: none; opacity: 1; }
-}
-@keyframes od-rd-box-shake {
-  0%   { transform: translate(0, 0) rotate(0deg); }
-  20%  { transform: translate(-16px, -10px) rotate(-7deg); }
-  45%  { transform: translate(15px, 6px) rotate(7deg); }
-  70%  { transform: translate(-12px, 9px) rotate(-5deg); }
-  100% { transform: translate(0, 0) rotate(0deg); }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .od-rd-rolling .od-rd-cube,
   .od-rd-rolling .od-rd-hopper,
