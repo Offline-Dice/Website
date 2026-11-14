@@ -111,7 +111,7 @@ body.od-real-dice #diceResultArea .color-block > .dot { display: none !important
 /* ---------- Die Box, in die die Würfel beim Rollen fallen ---------- */
 .od-rd-box {
   position: fixed;
-  z-index: 2147483000;
+  z-index: 50;
   pointer-events: none;
 }
 .od-rd-box-inner {
@@ -119,7 +119,7 @@ body.od-real-dice #diceResultArea .color-block > .dot { display: none !important
   transform-origin: 50% 100%;
   animation:
     od-rd-box-in .22s ease-out,
-    od-rd-box-shake .17s linear .36s infinite;
+    od-rd-box-shake .13s linear .36s infinite;
 }
 .od-rd-box-body {
   position: absolute; left: 0; right: 0; top: 14px; bottom: 0;
@@ -144,9 +144,9 @@ body.od-real-dice #diceResultArea .color-block > .dot { display: none !important
 }
 @keyframes od-rd-box-shake {
   0%   { transform: translate(0, 0) rotate(0deg); }
-  25%  { transform: translate(-7px, -4px) rotate(-3deg); }
-  50%  { transform: translate(6px, 3px) rotate(3deg); }
-  75%  { transform: translate(-5px, 4px) rotate(-2deg); }
+  20%  { transform: translate(-16px, -10px) rotate(-7deg); }
+  45%  { transform: translate(15px, 6px) rotate(7deg); }
+  70%  { transform: translate(-12px, 9px) rotate(-5deg); }
   100% { transform: translate(0, 0) rotate(0deg); }
 }
 
