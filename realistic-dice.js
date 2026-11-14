@@ -82,6 +82,7 @@
   var box = null;
   var boxRaf = 0;
   var boxFailsafe = 0;
+  var boxStart = 0;
   var dropSoundTimer = 0;
 
   function siblingIndex(block) {
@@ -102,10 +103,25 @@
     if (!n) return;
     var cy = (t + b) / 2;
     var w = Math.max(130, (r - l) + 44);
-    box.style.width = w + "px";
-    box.style.height = "104px";
-    box.style.left = ((l + r) / 2 - w / 2) + "px";
-    box.style.top = (cy - 40) + "px";
+    var wantL = (l + r) / 2 - w / 2;
+    var wantT = cy - 40;
+    /* !important, weil die Seite Kinder von #diceResultArea per CSS auf 76px zwingt */
+    var s = box.style;
+    s.setProperty("width", w + "px", "important");
+    s.setProperty("min-width", "0", "important");
+    s.setProperty("max-width", "none", "important");
+    s.setProperty("height", "104px", "important");
+    s.setProperty("aspect-ratio", "auto", "important");
+    s.setProperty("flex", "none", "important");
+    s.setProperty("left", wantL + "px", "important");
+    s.setProperty("top", wantT + "px", "important");
+    /* Falls ein Elternteil transform/filter hat, ist "fixed" relativ dazu: nachkorrigieren */
+    var rc = box.getBoundingClientRect();
+    var dx = wantL - rc.left, dy = wantT - rc.top;
+    if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+      s.setProperty("left", (wantL + dx) + "px", "important");
+      s.setProperty("top", (wantT + dy) + "px", "important");
+    }
   }
 
   function boxLoop() {
@@ -117,11 +133,15 @@
   function ensureBox() {
     if (box) return;
     box = el("od-rd-box");
+    boxStart = Date.now();
     var inner = el("od-rd-box-inner");
     inner.appendChild(el("od-rd-box-rim"));
     inner.appendChild(el("od-rd-box-body"));
     box.appendChild(inner);
-    document.body.appendChild(box);
+    /* In den Würfelbereich hängen (nicht an den body): der Roll-Bildschirm der Seite
+       zeigt nur #diceResultArea, alles andere kann ausgeblendet oder überdeckt sein. */
+    var host = (rollingBlocks[0] && rollingBlocks[0].parentNode) || document.body;
+    host.appendChild(box);
     placeBox();
     boxRaf = requestAnimationFrame(boxLoop);
     clearTimeout(boxFailsafe);
@@ -183,6 +203,22 @@
     /* ein kleiner Effekt-Sound, wenn der letzte Würfel in der Box ist */
     clearTimeout(dropSoundTimer);
     dropSoundTimer = setTimeout(function () { fx("drop", 0.5); }, delay + 290);
+  }
+
+  /* Im Realistic-Modus dauert der Roll mindestens so lange, damit man die Box
+     im Roll-Bildschirm wirklich rütteln sieht. Dazu wird nur der Rückgabewert von
+     playDiceRollSound() (auf den rollDice() wartet) verlängert – game-main.js
+     selbst bleibt unverändert. */
+  var ROLL_MIN_MS = 2400;
+  function patchRollSound() {
+    if (window.__odRdRollPatched || typeof window.playDiceRollSound !== "function") return;
+    var orig = window.playDiceRollSound;
+    window.__odRdRollPatched = true;
+    window.playDiceRollSound = function () {
+      var p = orig.apply(this, arguments);
+      if (!enabled) return p;
+      return Promise.all([p, new Promise(function (r) { setTimeout(r, ROLL_MIN_MS); })]).then(function () {});
+    };
   }
 
   function land(block) {
@@ -300,6 +336,7 @@
       if (select.options[i].getAttribute("data-realistic") === "1") realisticIndex = i;
     }
     if (realisticIndex === -1) return;
+    patchRollSound();
     /* gespeicherte Auswahl wiederherstellen (ohne change-Event: Spielmodus bleibt "color") */
     if (enabled) select.selectedIndex = realisticIndex;
     select.addEventListener("change", function () {
