@@ -77,6 +77,13 @@
 .od-event-card-join:hover{transform:translateY(-2px);filter:brightness(1.08)}
 @media(max-width:560px){#od-event-card{padding:18px;margin:16px auto}.od-event-card-foot{align-items:stretch}.od-event-card-join{width:100%;box-sizing:border-box}}
 </style>
+
+<style id="top-streamer-box-fit-content">
+/* Top-Streamer-Kästen nur so hoch wie ihr tatsächlicher Inhalt */
+.layout-row { align-items: flex-start !important; }
+.layout-row > .side-box { height: fit-content !important; min-height: 0 !important; align-self: flex-start !important; }
+.layout-row > .side-box > .side-content { height: auto !important; min-height: 0 !important; }
+</style>
 </head>
 <body>
 
