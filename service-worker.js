@@ -1,5 +1,5 @@
 // Offline Dice service worker - v5: remove old cached countdown/site assets.
-const CACHE_NAME = 'offline-dice-shell-v5';
+const CACHE_NAME = 'offline-dice-shell-v6';
 const APP_SHELL = ['/', '/index.html', '/service-offline.html', '/manifest.json'];
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
