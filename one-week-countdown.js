@@ -1,6 +1,7 @@
-/* Offline Dice shared shutdown countdown. */
+/* Offline Dice shared one-week shutdown countdown. */
 (() => {
   'use strict';
+  // Shared fixed deadline for the one-week countdown (UTC).
   const DEADLINE = Date.parse('2026-11-27T14:44:47Z');
   const OFFLINE_URL = '/service-offline.html';
   if (location.pathname.replace(/\/+$/, '') === OFFLINE_URL) return;
