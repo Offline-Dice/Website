@@ -1,7 +1,7 @@
 /* Offline Dice shared shutdown countdown. */
 (() => {
   'use strict';
-  const DEADLINE = Date.parse('2026-11-20T15:20:21Z');
+  const DEADLINE = Date.parse('2026-11-27T14:44:47Z');
   const OFFLINE_URL = '/service-offline.html';
   if (location.pathname.replace(/\/+$/, '') === OFFLINE_URL) return;
 
