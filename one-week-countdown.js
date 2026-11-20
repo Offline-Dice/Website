@@ -6,7 +6,7 @@
   'use strict';
   const COUNTDOWN_DEADLINE = new Date('2026-11-27T14:44:47Z').getTime();
   const OFFLINE_URL = '/service-offline.html';
-  if (location.pathname.replace(/\\/+$/, '') === '/service-offline.html') return;
+  if (location.pathname.replace(/\/+$/, '') === '/service-offline.html') return;
 
   const redirectIfExpired = () => {
     if (Date.now() >= COUNTDOWN_DEADLINE) {
