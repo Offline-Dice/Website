@@ -41,20 +41,16 @@
     overlay.setAttribute('aria-label', 'Service countdown');
     overlay.innerHTML = `
       <div class="od-week-card">
-        <div class="od-week-top"><span class="od-week-live-dot"></span><span>SPECIAL EVENT</span><span class="od-week-tag">FINAL COUNTDOWN</span></div>
-        <div class="od-week-heading">THE NEXT CHAPTER<br><span>STARTS SOON</span></div>
-        <div class="od-week-subtitle">Offline Dice is preparing for a major change.</div>
+        <div class="od-week-heading">THIS WEBSITE WILL GO OFFLINE IN</div>
         <div class="od-week-clock" aria-live="off">
-          <div class="od-week-unit"><strong data-od-count="days">07</strong><small>DAYS</small></div>
-          <i>:</i><div class="od-week-unit"><strong data-od-count="hours">00</strong><small>HOURS</small></div>
-          <i>:</i><div class="od-week-unit"><strong data-od-count="minutes">00</strong><small>MINUTES</small></div>
-          <i>:</i><div class="od-week-unit"><strong data-od-count="seconds">00</strong><small>SECONDS</small></div>
+          <strong data-od-count="days">07</strong><i>:</i>
+          <strong data-od-count="hours">00</strong><i>:</i>
+          <strong data-od-count="minutes">00</strong><i>:</i>
+          <strong data-od-count="seconds">00</strong>
         </div>
-        <div class="od-week-bottom"><span>OFFLINE DICE</span><span>COUNTING DOWN LIVE</span></div>
       </div>`;
     document.body.appendChild(overlay);
     render();
-    requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('od-week-compact')));
     window.setInterval(render, 1000);
     document.addEventListener('visibilitychange', render);
     window.addEventListener('pageshow', render);
