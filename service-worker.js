@@ -1,10 +1,11 @@
 // Offline Dice Service Worker
 // Immer die neueste Version vom Server laden (kein Browser-/HTTP-Cache).
 // Der Zwischenspeicher wird nur genutzt, wenn man offline ist.
-const CACHE_NAME = "offline-dice-shell-v3";
+const CACHE_NAME = "offline-dice-shell-v4";
 const APP_SHELL = [
   "/",
   "/index.html",
+  "/service-offline.html",
   "/manifest.json",
   "/offline-dice-icon-192.png",
   "/offline-dice-icon-512.png"

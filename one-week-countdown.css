@@ -1,0 +1,33 @@
+#od-week-countdown{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:22px;box-sizing:border-box;background:radial-gradient(ellipse at 50% 45%,rgba(19,63,125,.42),transparent 55%),rgba(3,6,16,.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);color:#fff;font-family:Inter,Arial,sans-serif;transition:inset 1.15s cubic-bezier(.2,.8,.2,1),padding 1.15s,width 1.15s,height 1.15s,background 1.15s,backdrop-filter 1.15s;overflow:hidden}
+#od-week-countdown:before,#od-week-countdown:after{content:"";position:absolute;width:55vw;height:55vw;border:1px solid rgba(81,169,255,.13);border-radius:50%;pointer-events:none;animation:od-week-orbit 16s linear infinite}
+#od-week-countdown:after{width:75vw;height:75vw;animation-direction:reverse;border-color:rgba(151,93,255,.12)}
+.od-week-card{position:relative;width:min(900px,100%);box-sizing:border-box;padding:clamp(28px,6vw,70px);border:1px solid rgba(124,184,255,.35);border-radius:30px;background:linear-gradient(145deg,rgba(16,31,62,.96),rgba(12,13,31,.97) 60%,rgba(34,17,65,.96));box-shadow:0 30px 100px rgba(0,0,0,.65),0 0 90px rgba(40,119,255,.18),inset 0 1px rgba(255,255,255,.12);text-align:center;transition:padding 1.15s,width 1.15s,border-radius 1.15s,box-shadow 1.15s}
+.od-week-top,.od-week-bottom{display:flex;align-items:center;justify-content:center;gap:12px;color:#a8c9ff;font-size:11px;font-weight:900;letter-spacing:.22em}
+.od-week-live-dot{width:8px;height:8px;border-radius:50%;background:#48f5c5;box-shadow:0 0 16px #48f5c5;animation:od-week-pulse 1.5s infinite}
+.od-week-tag{padding:7px 10px;border:1px solid rgba(160,129,255,.38);border-radius:999px;background:rgba(125,83,255,.13);color:#d5c7ff}
+.od-week-heading{margin:27px 0 10px;font-size:clamp(35px,8vw,82px);font-weight:1000;line-height:.96;letter-spacing:-.055em}
+.od-week-heading span{color:transparent;background:linear-gradient(90deg,#61d7ff,#8b8bff,#d18bff);background-clip:text;-webkit-background-clip:text}
+.od-week-subtitle{color:#aab8d2;font-size:clamp(13px,2vw,17px);letter-spacing:.04em}
+.od-week-clock{display:flex;align-items:center;justify-content:center;gap:clamp(8px,2vw,22px);margin:38px auto 30px}
+.od-week-unit{min-width:clamp(58px,12vw,130px);padding:17px 8px;border:1px solid rgba(123,174,255,.25);border-radius:17px;background:linear-gradient(180deg,rgba(76,127,218,.18),rgba(255,255,255,.035));box-shadow:inset 0 1px rgba(255,255,255,.08),0 12px 30px rgba(0,0,0,.18)}
+.od-week-unit strong{display:block;font-variant-numeric:tabular-nums;font-size:clamp(30px,6vw,58px);line-height:1.05;letter-spacing:-.04em;text-shadow:0 0 28px rgba(99,187,255,.35)}
+.od-week-unit small{display:block;margin-top:8px;color:#8da9d1;font-size:9px;font-weight:900;letter-spacing:.2em}
+.od-week-clock>i{color:#7187b5;font-size:clamp(24px,4vw,40px);font-style:normal}
+.od-week-bottom{justify-content:space-between;padding-top:18px;border-top:1px solid rgba(255,255,255,.1);font-size:9px;color:#8296ba}
+#od-week-countdown.od-week-compact{inset:16px 16px auto auto;width:min(330px,calc(100vw - 32px));height:auto;padding:0;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;place-items:initial;overflow:visible}
+#od-week-countdown.od-week-compact:before,#od-week-countdown.od-week-compact:after{display:none}
+.od-week-compact .od-week-card{width:100%;padding:12px 14px;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.48),0 0 28px rgba(55,130,255,.16)}
+.od-week-compact .od-week-top{justify-content:flex-start;font-size:8px;letter-spacing:.13em;gap:7px}
+.od-week-compact .od-week-tag{margin-left:auto;padding:4px 6px;font-size:7px}
+.od-week-compact .od-week-heading{margin:8px 0 4px;font-size:17px;line-height:1}
+.od-week-compact .od-week-subtitle{font-size:9px}
+.od-week-compact .od-week-clock{gap:5px;margin:10px auto 8px}
+.od-week-compact .od-week-unit{min-width:0;flex:1;padding:7px 3px;border-radius:8px}
+.od-week-compact .od-week-unit strong{font-size:21px}
+.od-week-compact .od-week-unit small{margin-top:3px;font-size:6px;letter-spacing:.12em}
+.od-week-compact .od-week-clock>i{font-size:14px}
+.od-week-compact .od-week-bottom{padding-top:7px;font-size:6px;letter-spacing:.12em}
+@keyframes od-week-pulse{50%{opacity:.35;box-shadow:0 0 4px #48f5c5}}
+@keyframes od-week-orbit{to{transform:rotate(360deg)}}
+@media(max-width:480px){#od-week-countdown.od-week-compact{inset:10px 10px auto auto;width:min(290px,calc(100vw - 20px))}.od-week-compact .od-week-card{padding:10px 11px}}
+@media(prefers-reduced-motion:reduce){#od-week-countdown,.od-week-card{transition:none!important}#od-week-countdown:before,#od-week-countdown:after,.od-week-live-dot{animation:none!important}}
