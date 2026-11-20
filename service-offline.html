@@ -1,14 +1,80 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#070b18">
-<title>Service Offline | Offline Dice</title>
-<style>
-*{box-sizing:border-box}html,body{min-height:100%;margin:0}body{display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 0%,#18376c 0,transparent 48%),linear-gradient(145deg,#070b18,#101027 60%,#170e2c);color:#fff;font-family:Inter,Arial,sans-serif}.panel{position:relative;width:min(720px,100%);padding:clamp(30px,6vw,64px);overflow:hidden;text-align:center;border:1px solid rgba(130,174,255,.25);border-radius:28px;background:linear-gradient(145deg,rgba(20,37,71,.92),rgba(14,14,34,.96));box-shadow:0 30px 100px rgba(0,0,0,.5),0 0 80px rgba(55,120,255,.13)}.orb{width:86px;height:86px;margin:0 auto 28px;display:grid;place-items:center;border:1px solid rgba(125,170,255,.4);border-radius:26px;background:linear-gradient(135deg,#2679db,#8052db);box-shadow:0 0 45px rgba(76,133,255,.3);font-size:38px}.eyebrow{color:#8fbaff;font-size:11px;font-weight:900;letter-spacing:.25em}.title{margin:15px 0 12px;font-size:clamp(42px,9vw,76px);font-weight:1000;letter-spacing:-.06em;line-height:.95}.title span{color:transparent;background:linear-gradient(90deg,#67d9ff,#b28bff);background-clip:text;-webkit-background-clip:text}.copy{max-width:480px;margin:0 auto;color:#aab8d2;font-size:16px;line-height:1.7}.line{width:80px;height:3px;margin:30px auto;background:linear-gradient(90deg,#50d9ff,#a16aff);border-radius:5px}.foot{color:#7186ad;font-size:10px;font-weight:800;letter-spacing:.2em}@media(prefers-reduced-motion:no-preference){.panel{animation:appear .8s cubic-bezier(.2,.8,.2,1) both}@keyframes appear{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111827">
+  <title>Service Offline – offline-dice.de</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: #f3f4f6;
+      color: #1f2937;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .card {
+      width: 100%;
+      max-width: 650px;
+      padding: 42px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      box-shadow: 0 12px 35px rgba(0,0,0,.06);
+    }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 12px;
+      border-radius: 6px;
+      background: #fff1f2;
+      color: #be123c;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #e11d48; }
+    h1 { margin: 24px 0 12px; font-size: clamp(30px, 6vw, 42px); letter-spacing: -1.2px; }
+    .lead { margin: 0; color: #6b7280; font-size: 16px; line-height: 1.7; }
+    .rule { height: 1px; background: #e5e7eb; margin: 30px 0 24px; }
+    h2 { margin: 0 0 10px; font-size: 16px; }
+    .details { color: #6b7280; font-size: 14px; line-height: 1.7; }
+    .domain { margin-top: 26px; color: #9ca3af; font-size: 13px; }
+    @media (max-width: 520px) { .card { padding: 28px 22px; } }
+  </style>
 </head>
-<body><main class="panel"><div class="orb">⏸</div><div class="eyebrow">OFFLINE DICE • SERVICE STATUS</div><h1 class="title">SERVICE<br><span>OFFLINE</span></h1><p class="copy">The service is currently unavailable. Offline Dice is taking a break while we prepare what comes next. Please check back later.</p><div class="line"></div><div class="foot">THANK YOU FOR BEING PART OF OFFLINE DICE</div></main></body>
+<body>
+  <main class="card">
+    <div class="status"><span class="dot"></span> Service Offline</div>
+    <h1>This website is currently offline.</h1>
+    <p class="lead">
+      The service <strong>offline-dice.de</strong> is currently unavailable.
+      The website has been temporarily disabled or is undergoing a scheduled
+      offline period.
+    </p>
+
+    <div class="rule"></div>
+
+    <h2>What does this mean?</h2>
+    <p class="details">
+      The content and features of offline-dice.de are currently unavailable.
+      Please try again later.
+    </p>
+
+    <h2 style="margin-top:22px;">Current Status</h2>
+    <p class="details">
+      <strong>Website:</strong> offline-dice.de<br>
+      <strong>Status:</strong> Offline<br>
+      <strong>Notice:</strong> No action is required at this time.
+    </p>
+
+    <div class="domain">offline-dice.de</div>
+  </main>
+</body>
 </html>
