@@ -1,8 +1,13 @@
 /* Clean, minimal red countdown bar */
-#od-week-countdown{position:fixed;z-index:2147483000;top:14px;left:50%;transform:translateX(-50%);max-width:calc(100vw - 24px);box-sizing:border-box;pointer-events:none;font-family:Arial,Helvetica,sans-serif}
-.od-week-card{display:flex;align-items:center;justify-content:center;gap:15px;box-sizing:border-box;padding:10px 17px;border:1px solid rgba(255,45,65,.58);border-radius:11px;background:rgba(8,8,11,.94);box-shadow:0 5px 22px rgba(0,0,0,.4),0 0 16px rgba(255,35,55,.12)}
+#od-week-countdown{position:fixed;z-index:2147483000;top:14px;left:50%;transform:translate(-50%,0) scale(1);transform-origin:center center;transition:top .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);max-width:calc(100vw - 24px);box-sizing:border-box;pointer-events:none;font-family:Arial,Helvetica,sans-serif}
+.od-week-card{display:flex;align-items:center;justify-content:center;gap:15px;box-sizing:border-box;padding:10px 17px;border:1px solid rgba(255,45,65,.58);border-radius:11px;background:rgba(8,8,11,.94);box-shadow:0 5px 22px rgba(0,0,0,.4),0 0 16px rgba(255,35,55,.12);transition:border-color .5s,box-shadow .5s}
 .od-week-heading{color:#f5f5f5;font-size:11px;font-weight:800;letter-spacing:.075em;white-space:nowrap}
 .od-week-clock{display:flex;align-items:center;gap:5px;color:#ff3048;font-variant-numeric:tabular-nums;white-space:nowrap}
 .od-week-clock strong{color:#ff3048;font-size:clamp(20px,2.4vw,27px);font-weight:900;line-height:1;text-shadow:0 0 12px rgba(255,35,60,.3)}
 .od-week-clock i{color:#b52236;font-size:19px;font-style:normal;font-weight:800}
-@media(max-width:520px){#od-week-countdown{top:8px;max-width:calc(100vw - 16px)}.od-week-card{gap:9px;padding:9px 10px}.od-week-heading{font-size:8px;letter-spacing:.035em}.od-week-clock{gap:3px}.od-week-clock strong{font-size:18px}.od-week-clock i{font-size:15px}}
+/* Last 5 seconds: timer moves to the middle and grows (scale is set by the script) */
+#od-week-countdown.od-final{top:50%;transform:translate(-50%,-50%) scale(var(--od-final-scale,2))}
+#od-week-countdown.od-final .od-week-card{border-color:rgba(255,60,80,.95);box-shadow:0 10px 50px rgba(0,0,0,.6),0 0 40px rgba(255,35,55,.45)}
+#od-week-countdown.od-final .od-week-clock strong[data-od-count="seconds"]{color:#fff;text-shadow:0 0 18px #ff3048}
+@media(max-width:520px){#od-week-countdown{top:8px;max-width:calc(100vw - 16px)}.od-week-card{gap:9px;padding:9px 10px}.od-week-heading{font-size:8px;letter-spacing:.035em}.od-week-clock{gap:3px}.od-week-clock strong{font-size:18px}.od-week-clock i{font-size:15px}#od-week-countdown.od-final .od-week-card{flex-direction:column;gap:6px}}
+@media(prefers-reduced-motion:reduce){#od-week-countdown{transition:none}}
