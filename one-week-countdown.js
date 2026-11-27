@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   // Shared fixed deadline for the one-week countdown (UTC).
-  const DEADLINE = Date.parse('2026-11-27T14:44:47Z');
+  const DEADLINE = Date.parse('2026-11-28T14:44:47Z');
   const OFFLINE_URL = '/service-offline.html';
   const FINAL_SECONDS = 5;   // last seconds: timer grows, pulses and beeps
   const END_HOLD_MS = 1500;  // keep "00" + end tone visible before leaving the page
